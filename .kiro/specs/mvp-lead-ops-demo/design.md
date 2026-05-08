@@ -6,6 +6,8 @@ Use one full-stack Next.js repository for the MVP demo.
 
 Do not split frontend and backend at the start. The MVP needs fast iteration, tight CopilotKit integration, shared TypeScript schemas, and simple deployment. A separate backend can be extracted later if ingestion volume, long-running processing, or provider integrations require it.
 
+Public demo deployment decision: host the Next.js app on Vercel and use Supabase for managed PostgreSQL, auth, and storage. Do not self-host PostgreSQL or run Supabase on a VPS for the MVP unless Supabase becomes a blocker.
+
 ## High-Level Components
 
 - Dashboard app: lead list, lead detail, follow-ups, metrics, activity history.
@@ -208,5 +210,4 @@ Split later only if:
 
 ## Open Technical Questions
 
-- Supabase-only auth/storage vs separate auth and storage choices
-- Which deployment target and database provider will be used for the public portfolio demo
+- Later provider choices if Supabase becomes a blocker

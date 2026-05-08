@@ -10,6 +10,7 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [x] Split Demo Core from Later MVP
 - [x] Finalize initial lead status labels, colors, and allowed transitions
 - [x] Finalize software services seed examples and fields
+- [x] Set public demo deployment baseline to Vercel app plus Supabase managed Postgres/auth/storage
 
 ## Foundation
 

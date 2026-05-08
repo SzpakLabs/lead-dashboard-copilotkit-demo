@@ -52,6 +52,7 @@ Create a portfolio-ready demo that proves the operational loop from unstructured
 - Auth strategy: seeded workspace and fake user.
 - Extractor strategy: mock/deterministic extractor behind an interface.
 - Repo strategy: one full-stack Next.js repository.
+- Public demo deployment: Vercel for the app and Supabase for managed PostgreSQL/auth/storage unless Supabase becomes a blocker.
 - Calendar strategy: internal lead-related calendar only; no external sync in MVP.
 
 ## Open Questions
