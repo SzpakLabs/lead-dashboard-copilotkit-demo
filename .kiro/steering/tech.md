@@ -55,22 +55,27 @@ For the Nuxt laptop-repair website, do not assume CopilotKit can be embedded nat
 
 Use PostgreSQL as the source of truth.
 
-Core tables should start around:
+Demo Core tables should start around:
 
 - workspaces
 - users
 - leads
 - contacts
+- followups
+- lead_events
+- ingestion_events
+
+Later MVP tables can add:
+
 - conversations
 - calls
 - transcripts
 - recordings
 - custom_field_definitions
 - custom_field_values
-- followups
-- lead_events
 - assistant_action_logs
-- ingestion_events
+
+Calendar display should start as a derived read model from explicit lead/follow-up fields such as `scheduledAt`, `completedAt`, and `followUpDueAt`. Add a dedicated `calendar_items` table only when standalone calendar events need direct editing.
 
 All writes should go through domain functions, not direct component-level DB calls.
 
@@ -81,7 +86,7 @@ All sources should normalize through a single pipeline:
 1. input received
 2. ingestion event stored
 3. text/transcript normalized
-4. structured extraction runs
+4. mock/deterministic structured extraction runs behind an extraction interface
 5. draft lead or lead update proposal is created
 6. user reviews if needed
 7. mutation is applied through domain action

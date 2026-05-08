@@ -36,38 +36,46 @@ The core promise is:
 
 Build a portfolio-ready demo that can later become a pilot for real service businesses and be used by the creator to manage software development leads from LinkedIn and Upwork.
 
-The demo must prove the core loop:
+The first implementation target is Demo Core, not the full MVP. Demo Core must prove the core loop:
 
 1. unstructured input is received
 2. structured lead draft is created
 3. user reviews or confirms extracted data
 4. lead is visible in a dashboard
 5. status and follow-up can be managed
-6. assistant can search and propose safe edits
+6. basic audit/activity is visible
 
-## MVP Scope
+The first vertical template is software services, because the creator can dogfood it immediately with LinkedIn and Upwork leads.
+
+## Demo Core Scope
 
 In scope:
 
 - Workspace-scoped leads
-- Manual lead creation
-- Text/transcript ingestion into draft leads
+- Seeded workspace and fake user
+- Software services vertical template
+- Pasted text/transcript ingestion into draft leads
+- Mock/deterministic extraction behind an interface
 - Review and confirmation flow
 - Lead list and lead detail
 - Statuses and follow-ups
-- Calendar view for completed and upcoming lead-related work
+- Basic audit/activity
+- Simple metrics
+
+Later MVP:
+
+- Manual lead creation
 - Workspace custom fields
-- Basic dashboard metrics
+- Calendar view for completed and upcoming lead-related work
+- Internal calendar availability checks
 - CopilotKit assistant in the dashboard
+- Assistant search and display
 - Assistant action previews before mutation
-- Audit log for important changes
-
-Optional if easy:
-
+- Live LLM extraction
+- Laptop repair and beauty services templates
 - Telegram text or voice-note intake
 - Recording upload for demo transcription
 - Saved filters
-- External calendar sync
 
 Out of scope for MVP:
 
@@ -77,6 +85,7 @@ Out of scope for MVP:
 - Production telephony API integration
 - Native SMS/iMessage ingestion
 - Full Google/Apple calendar integration
+- External calendar sync
 - Complex analytics/reporting
 - Billing
 - Enterprise permissions
@@ -85,18 +94,20 @@ Out of scope for MVP:
 ## Product Rules
 
 - Lead is the primary operational entity.
+- Contact/client is the person or company. A contact can have many leads.
+- Lead is one specific request, job, project, deal, or service opportunity.
+- Calendar items are scheduled or historical events related to contacts and leads; they are not leads.
+- Same person with the same ongoing request means one contact, one lead, and many calendar items or activities.
+- Same person with a new request later means one contact and a new lead.
 - Every input path must normalize into the same ingestion pipeline.
 - Assistant actions must use explicit typed tools, not freeform database access.
 - Mutations proposed by the assistant must show a preview and wait for confirmation unless explicitly classified as safe and reversible.
 - Source artifacts such as transcripts and recordings should remain traceable.
 - Custom fields are workspace-scoped and must not break existing leads.
-- Calendar availability should be computed from lead-related scheduled work before adding external calendar sync.
+- Calendar availability should be computed from internal lead-related scheduled work. Assistant answers must be framed as "Based on this dashboard..." until external calendar sync exists.
 - Avoid starting with AG-UI visuals before domain model, workflows, action contracts, and audit rules are stable.
 
 ## Open Product Questions
 
-- Which initial demo input should be first: pasted transcript, uploaded recording, or Telegram message?
-- Which pilot should drive the first vertical template: laptop repair or beauty services?
 - What is the minimal acceptable confirmation UX for assistant edits?
-- Does the demo require auth, or can it start with a seeded demo workspace?
 - Which iPhone call recording path is legally and technically viable for pilots?
