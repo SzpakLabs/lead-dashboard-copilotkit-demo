@@ -8,7 +8,7 @@ Before planning or implementation, read these files in order:
 2. `.kiro/steering/tech.md`
 3. `.kiro/steering/structure.md`
 4. `.kiro/specs/README.md`
-5. Active spec files under `.kiro/specs/mvp-lead-ops-demo/`
+5. The spec files for whichever spec is marked active in `.kiro/specs/README.md`
 
 ## Steering
 
@@ -23,12 +23,6 @@ Follow steering unless the user explicitly changes direction.
 ## Specs
 
 Use `.kiro/specs/README.md` to identify the active spec.
-
-Current active spec:
-
-- `.kiro/specs/mvp-lead-ops-demo/requirements.md`
-- `.kiro/specs/mvp-lead-ops-demo/design.md`
-- `.kiro/specs/mvp-lead-ops-demo/tasks.md`
 
 Only the active spec should drive the first implementation session. Deferred specs are context only unless the user explicitly activates them.
 
