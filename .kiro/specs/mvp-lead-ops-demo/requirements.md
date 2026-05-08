@@ -4,6 +4,8 @@
 
 Build a portfolio-ready lead operations demo for small service businesses. The demo must show the core loop from unstructured input to structured lead management, with safe assistant-assisted search and edits.
 
+The demo should support three realistic starting contexts: laptop repair, beauty services, and the creator's own software development / freelance services pipeline sourced from LinkedIn and Upwork.
+
 ## Requirement 1: Lead as Primary Entity
 
 WHEN a lead is created manually or from ingestion
@@ -109,7 +111,7 @@ THE SYSTEM SHALL include `Test` in person names.
 
 - What is the first demo ingestion input: pasted transcript, uploaded audio, or Telegram message?
 - Should auth be included in the first demo or deferred behind a seeded demo workspace?
-- Which exact custom fields should the first two pilot templates include?
+- Which exact custom fields should the laptop repair, beauty services, and software services templates include?
 - What recording source is realistic for iPhone calls?
 - Should the assistant preview be global in chat or embedded near the affected lead form?
 - What are default working hours and appointment duration for availability checks?

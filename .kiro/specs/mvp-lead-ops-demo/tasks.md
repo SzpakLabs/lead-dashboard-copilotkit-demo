@@ -6,10 +6,10 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 - [ ] Confirm first demo input source: pasted transcript, audio upload, or Telegram text
 - [ ] Confirm whether first demo includes auth or a seeded demo workspace
-- [ ] Choose first vertical template: laptop repair or beauty services
+- [ ] Choose first vertical template: laptop repair, beauty services, or software services
 - [ ] Finalize initial lead statuses
 - [ ] Finalize default working hours and appointment duration for calendar availability
-- [ ] Finalize first custom field examples for both pilot businesses
+- [ ] Finalize first custom field examples for laptop repair, beauty services, and software services
 
 ## Foundation
 

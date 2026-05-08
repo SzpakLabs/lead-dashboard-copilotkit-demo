@@ -20,6 +20,7 @@ Initial pilot contexts:
 
 - Laptop and electronics repair business
 - Makeup / beauty service business
+- Software development / freelance services pipeline for the product creator
 
 ## Positioning
 
@@ -33,7 +34,7 @@ The core promise is:
 
 ## MVP Goal
 
-Build a portfolio-ready demo that can later become a pilot for two real businesses.
+Build a portfolio-ready demo that can later become a pilot for real service businesses and be used by the creator to manage software development leads from LinkedIn and Upwork.
 
 The demo must prove the core loop:
 
