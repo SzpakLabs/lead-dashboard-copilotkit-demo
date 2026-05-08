@@ -8,14 +8,14 @@ Do not split frontend and backend at the start. The MVP needs fast iteration, ti
 
 ## High-Level Components
 
-- Dashboard app: lead list, lead detail, follow-ups, custom fields, assistant panel.
-- API/domain layer: typed actions for leads, custom fields, follow-ups, ingestion, and audit.
-- CopilotKit runtime endpoint: bridges dashboard assistant to typed assistant tools.
+- Dashboard app: lead list, lead detail, follow-ups, metrics, activity history.
+- API/domain layer: typed actions for leads, contacts, follow-ups, ingestion, and audit.
 - Ingestion layer: stores source input and creates draft lead data or proposals.
-- AI extraction service: converts unstructured text/transcript into structured draft data.
-- Calendar layer: derives lead-related calendar items and availability from scheduled work.
+- Extraction service: converts unstructured text/transcript into structured draft data. Demo Core uses a mock/deterministic implementation behind an interface.
+- Calendar layer: later derives lead-related calendar items and availability from scheduled work.
+- CopilotKit runtime endpoint: later bridges dashboard assistant to typed assistant tools.
 - Database: PostgreSQL source of truth.
-- Storage: recordings and attachments when audio is introduced.
+- Storage: later recordings and attachments when audio is introduced.
 
 ## Data Model
 
@@ -25,23 +25,33 @@ Primary entities:
 - User
 - Lead
 - Contact
+- FollowUp
+- LeadEvent
+- IngestionEvent
+
+Later entities:
+
 - Conversation
 - Call
 - Transcript
 - Recording
 - CustomFieldDefinition
 - CustomFieldValue
-- FollowUp
 - CalendarItem
-- LeadEvent
-- IngestionEvent
 - AssistantActionLog
 
 Core rule:
 
-Lead is the main operational object. Calls, transcripts, recordings, follow-ups, custom fields, and assistant actions attach to or affect leads.
+Contact/client is the person or company. Lead is one specific request, job, project, deal, or service opportunity. CalendarItem is a scheduled or historical event related to a lead/contact.
 
-CalendarItem can be a stored table or derived read model. For the MVP, prefer deriving it from lead appointment fields, follow-up due dates, and completed lead timestamps unless editing calendar items directly becomes required.
+Rules:
+
+- Same person, same ongoing request: one Contact, one Lead, many CalendarItems or Activities.
+- Same person, new request later: one Contact, new Lead.
+- First contact creates or links a Contact, creates a Lead, and creates or derives a CalendarItem if there was a call, meeting, appointment, or scheduled slot.
+- Repeated contact creates a CalendarItem or Activity; it creates a new Lead only if the request is distinct.
+
+For Demo Core, calendar display is deferred. Store explicit calendar-like fields where useful: `scheduledAt`, `completedAt`, and `followUpDueAt`. Add a dedicated `calendar_items` table only if directly editable standalone events become required.
 
 ## Core Flow
 
@@ -59,9 +69,52 @@ flowchart LR
   J --> G
 ```
 
+## Demo Core Scope
+
+Demo Core includes:
+
+- pasted text/transcript input
+- seeded workspace and fake user
+- software services template
+- mock/deterministic extraction
+- draft lead creation
+- lead list
+- lead detail
+- review/edit
+- status changes
+- follow-ups
+- basic audit/activity
+- simple metrics
+
+Software services extractor target fields:
+
+- contact name
+- company or client organization
+- source channel
+- project type
+- problem summary
+- requested outcome
+- budget range
+- timeline
+- next step
+- scheduled time, if mentioned
+- follow-up due time, if mentioned
+
+Later MVP includes:
+
+- custom fields
+- calendar view
+- assistant search
+- assistant calendar awareness
+- assistant mutations with preview
+- live LLM extraction
+- Telegram intake
+- audio upload/transcription
+- laptop repair and beauty templates
+
 ## Assistant Action Model
 
-Initial tools:
+Later assistant tools:
 
 - `find_leads`
 - `open_lead`
@@ -100,14 +153,18 @@ Expected implementation shape:
 
 Use a dense operational layout, not a marketing page.
 
-Primary screens:
+Demo Core screens:
 
 - Leads
 - Lead detail
 - Follow-ups
-- Calendar
 - Calls / ingestion inbox
+
+Later screens:
+
+- Calendar
 - Settings / custom fields
+- Assistant panel
 
 MVP layout:
 
@@ -138,17 +195,18 @@ Split later only if:
 - Duplicate lead suspected
 - Missing phone or contact name
 - Empty or low-quality transcript
-- Ambiguous assistant target
-- Custom field type conflict
-- User rejects assistant preview
 - User edits extracted values before save
-- Calendar item has missing duration
-- Assistant availability request lacks timezone or working-hours context
+- Invalid status transition
+- Overdue follow-up
+- Repeated interaction for same contact and same lead
+- Repeated interaction for same contact but new lead
+- Later: ambiguous assistant target
+- Later: custom field type conflict
+- Later: user rejects assistant preview
+- Later: calendar item has missing duration
+- Later: assistant availability request lacks timezone or working-hours context
 
 ## Open Technical Questions
 
 - Supabase-only auth/storage vs separate auth and storage choices
-- Whether first demo uses seeded data, live LLM extraction, or both
-- Whether to include audio upload in the first spec or keep it text/transcript-only
 - Which deployment target and database provider will be used for the public portfolio demo
-- Whether calendar items should be stored explicitly or derived from leads/follow-ups in the first version

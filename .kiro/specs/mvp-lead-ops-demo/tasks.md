@@ -4,20 +4,20 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Planning
 
-- [ ] Confirm first demo input source: pasted transcript, audio upload, or Telegram text
-- [ ] Confirm whether first demo includes auth or a seeded demo workspace
-- [ ] Choose first vertical template: laptop repair, beauty services, or software services
-- [ ] Finalize initial lead statuses
-- [ ] Finalize default working hours and appointment duration for calendar availability
-- [ ] Finalize first custom field examples for laptop repair, beauty services, and software services
+- [x] Set first demo input source to pasted text/transcript
+- [x] Set first demo auth strategy to seeded workspace and fake user
+- [x] Set first vertical template to software services
+- [x] Split Demo Core from Later MVP
+- [x] Finalize initial lead status labels, colors, and allowed transitions
+- [x] Finalize software services seed examples and fields
 
 ## Foundation
 
 - [ ] Scaffold Next.js App Router project with TypeScript strict mode
 - [ ] Add Tailwind and UI primitives
 - [ ] Configure database provider and Drizzle
-- [ ] Define base schema for workspaces, leads, contacts, custom fields, follow-ups, ingestion events, and audit logs
-- [ ] Decide whether MVP calendar items are derived or stored explicitly
+- [ ] Define base schema for workspaces, fake users, contacts, leads, follow-ups, ingestion events, and audit/activity events
+- [ ] Add explicit lead/follow-up date fields needed for later calendar derivation: `scheduledAt`, `completedAt`, `followUpDueAt`
 - [ ] Add seed data using test-safe person names
 
 ## Slice 1: Lead From Ingestion
@@ -25,6 +25,7 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Create ingestion endpoint for pasted text/transcript
 - [ ] Store ingestion event
 - [ ] Add extraction service interface
+- [ ] Add mock/deterministic software-services extractor
 - [ ] Create draft lead from extracted fields
 - [ ] Show draft/needs-review leads in dashboard
 
@@ -45,22 +46,27 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Add create/update/complete follow-up flow
 - [ ] Show due and overdue follow-ups
 
-## Slice 4: Custom Fields
+## Slice 4: Basic Metrics and Activity
+
+- [ ] Show simple counts: total leads, needs review, scheduled, won/lost, overdue follow-ups
+- [ ] Show lead activity history in lead detail
+- [ ] Verify all lead edits, status changes, and follow-up changes write audit/activity events
+
+## Later MVP: Custom Fields
 
 - [ ] Add custom field definition CRUD
 - [ ] Render custom fields in lead detail
 - [ ] Save custom field values
 - [ ] Validate field type changes and archived fields
 
-## Slice 5: Calendar View
+## Later MVP: Calendar View
 
-- [ ] Add scheduled/completed date fields needed for calendar display
-- [ ] Build calendar item query/read model
+- [ ] Build calendar item query/read model from lead/follow-up date fields
 - [ ] Add calendar screen with month/week/day scope as appropriate for MVP
 - [ ] Color-code calendar items by lead status
 - [ ] Link calendar items back to lead detail
 
-## Slice 6: Assistant Search
+## Later MVP: Assistant Search
 
 - [ ] Add CopilotKit runtime route
 - [ ] Add assistant panel
@@ -68,14 +74,14 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Implement `open_lead`
 - [ ] Render assistant result cards
 
-## Slice 7: Assistant Calendar Awareness
+## Later MVP: Assistant Calendar Awareness
 
 - [ ] Implement `list_calendar_items`
 - [ ] Implement `check_availability`
-- [ ] Teach assistant to answer availability questions from internal calendar data
+- [ ] Teach assistant to answer availability questions from internal calendar data with "Based on this dashboard..." wording
 - [ ] Ask for clarification when date, time, duration, timezone, or working-hours context is missing
 
-## Slice 8: Assistant Mutations
+## Later MVP: Assistant Mutations
 
 - [ ] Implement mutation preview contract
 - [ ] Implement `update_lead_fields`
@@ -87,12 +93,16 @@ Status: draft only. Do not implement these tasks until the next implementation s
 ## Verification
 
 - [ ] Verify dashboard core flow manually with test-safe names
-- [ ] Verify assistant search returns correct lead cards
-- [ ] Verify rejected assistant preview does not mutate data
-- [ ] Verify confirmed assistant mutation writes audit event
-- [ ] Verify custom fields survive lead edits and filtering
-- [ ] Verify calendar color matches lead status
-- [ ] Verify assistant availability answers use scheduled lead/follow-up data
+- [ ] Verify pasted text creates a draft lead through the mock extractor
+- [ ] Verify user can review/edit/confirm the draft lead
+- [ ] Verify status and follow-up changes write audit/activity events
+- [ ] Verify simple metrics match seeded/demo data
+- [ ] Later: verify assistant search returns correct lead cards
+- [ ] Later: verify rejected assistant preview does not mutate data
+- [ ] Later: verify confirmed assistant mutation writes audit event
+- [ ] Later: verify custom fields survive lead edits and filtering
+- [ ] Later: verify calendar color matches lead status
+- [ ] Later: verify assistant availability answers use scheduled lead/follow-up data
 
 ## Optional Content Milestones
 
