@@ -8,6 +8,7 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Confirm whether first demo includes auth or a seeded demo workspace
 - [ ] Choose first vertical template: laptop repair or beauty services
 - [ ] Finalize initial lead statuses
+- [ ] Finalize default working hours and appointment duration for calendar availability
 - [ ] Finalize first custom field examples for both pilot businesses
 
 ## Foundation
@@ -16,6 +17,7 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Add Tailwind and UI primitives
 - [ ] Configure database provider and Drizzle
 - [ ] Define base schema for workspaces, leads, contacts, custom fields, follow-ups, ingestion events, and audit logs
+- [ ] Decide whether MVP calendar items are derived or stored explicitly
 - [ ] Add seed data using test-safe person names
 
 ## Slice 1: Lead From Ingestion
@@ -50,7 +52,15 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Save custom field values
 - [ ] Validate field type changes and archived fields
 
-## Slice 5: Assistant Search
+## Slice 5: Calendar View
+
+- [ ] Add scheduled/completed date fields needed for calendar display
+- [ ] Build calendar item query/read model
+- [ ] Add calendar screen with month/week/day scope as appropriate for MVP
+- [ ] Color-code calendar items by lead status
+- [ ] Link calendar items back to lead detail
+
+## Slice 6: Assistant Search
 
 - [ ] Add CopilotKit runtime route
 - [ ] Add assistant panel
@@ -58,7 +68,14 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Implement `open_lead`
 - [ ] Render assistant result cards
 
-## Slice 6: Assistant Mutations
+## Slice 7: Assistant Calendar Awareness
+
+- [ ] Implement `list_calendar_items`
+- [ ] Implement `check_availability`
+- [ ] Teach assistant to answer availability questions from internal calendar data
+- [ ] Ask for clarification when date, time, duration, timezone, or working-hours context is missing
+
+## Slice 8: Assistant Mutations
 
 - [ ] Implement mutation preview contract
 - [ ] Implement `update_lead_fields`
@@ -74,6 +91,8 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Verify rejected assistant preview does not mutate data
 - [ ] Verify confirmed assistant mutation writes audit event
 - [ ] Verify custom fields survive lead edits and filtering
+- [ ] Verify calendar color matches lead status
+- [ ] Verify assistant availability answers use scheduled lead/follow-up data
 
 ## Optional Content Milestones
 
@@ -92,6 +111,9 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [ ] Article 5: Custom fields without building a bloated CRM
   - Trigger: after custom fields are usable in lead detail
   - Angle: workspace-specific schemas for different service businesses
-- [ ] Article 6: From portfolio demo to real pilot
+- [ ] Article 6: Calendar-aware lead ops without building a full booking system
+  - Trigger: after calendar view and assistant availability checks work
+  - Angle: completed/upcoming lead work, status colors, internal availability
+- [ ] Article 7: From portfolio demo to real pilot
   - Trigger: after demo deployment and first pilot integration plan
   - Angle: what changed when moving from demo to real business workflow

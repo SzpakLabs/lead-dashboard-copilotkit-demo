@@ -13,6 +13,7 @@ Do not split frontend and backend at the start. The MVP needs fast iteration, ti
 - CopilotKit runtime endpoint: bridges dashboard assistant to typed assistant tools.
 - Ingestion layer: stores source input and creates draft lead data or proposals.
 - AI extraction service: converts unstructured text/transcript into structured draft data.
+- Calendar layer: derives lead-related calendar items and availability from scheduled work.
 - Database: PostgreSQL source of truth.
 - Storage: recordings and attachments when audio is introduced.
 
@@ -31,6 +32,7 @@ Primary entities:
 - CustomFieldDefinition
 - CustomFieldValue
 - FollowUp
+- CalendarItem
 - LeadEvent
 - IngestionEvent
 - AssistantActionLog
@@ -38,6 +40,8 @@ Primary entities:
 Core rule:
 
 Lead is the main operational object. Calls, transcripts, recordings, follow-ups, custom fields, and assistant actions attach to or affect leads.
+
+CalendarItem can be a stored table or derived read model. For the MVP, prefer deriving it from lead appointment fields, follow-up due dates, and completed lead timestamps unless editing calendar items directly becomes required.
 
 ## Core Flow
 
@@ -69,6 +73,8 @@ Initial tools:
 - `update_custom_field_value`
 - `summarize_lead`
 - `list_followups`
+- `list_calendar_items`
+- `check_availability`
 
 Tool rules:
 
@@ -99,6 +105,7 @@ Primary screens:
 - Leads
 - Lead detail
 - Follow-ups
+- Calendar
 - Calls / ingestion inbox
 - Settings / custom fields
 
@@ -135,6 +142,8 @@ Split later only if:
 - Custom field type conflict
 - User rejects assistant preview
 - User edits extracted values before save
+- Calendar item has missing duration
+- Assistant availability request lacks timezone or working-hours context
 
 ## Open Technical Questions
 
@@ -142,3 +151,4 @@ Split later only if:
 - Whether first demo uses seeded data, live LLM extraction, or both
 - Whether to include audio upload in the first spec or keep it text/transcript-only
 - Which deployment target and database provider will be used for the public portfolio demo
+- Whether calendar items should be stored explicitly or derived from leads/follow-ups in the first version

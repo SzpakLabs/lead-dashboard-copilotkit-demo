@@ -54,6 +54,7 @@ In scope:
 - Review and confirmation flow
 - Lead list and lead detail
 - Statuses and follow-ups
+- Calendar view for completed and upcoming lead-related work
 - Workspace custom fields
 - Basic dashboard metrics
 - CopilotKit assistant in the dashboard
@@ -65,6 +66,7 @@ Optional if easy:
 - Telegram text or voice-note intake
 - Recording upload for demo transcription
 - Saved filters
+- External calendar sync
 
 Out of scope for MVP:
 
@@ -73,6 +75,7 @@ Out of scope for MVP:
 - Kanban-first workflow
 - Production telephony API integration
 - Native SMS/iMessage ingestion
+- Full Google/Apple calendar integration
 - Complex analytics/reporting
 - Billing
 - Enterprise permissions
@@ -86,6 +89,7 @@ Out of scope for MVP:
 - Mutations proposed by the assistant must show a preview and wait for confirmation unless explicitly classified as safe and reversible.
 - Source artifacts such as transcripts and recordings should remain traceable.
 - Custom fields are workspace-scoped and must not break existing leads.
+- Calendar availability should be computed from lead-related scheduled work before adding external calendar sync.
 - Avoid starting with AG-UI visuals before domain model, workflows, action contracts, and audit rules are stable.
 
 ## Open Product Questions

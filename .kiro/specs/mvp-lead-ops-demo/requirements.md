@@ -44,7 +44,21 @@ THE SYSTEM SHALL allow creating custom field definitions scoped to that workspac
 WHEN a lead has custom fields
 THE SYSTEM SHALL store values without changing the base lead schema.
 
-## Requirement 6: Assistant Search and Display
+## Requirement 6: Calendar View and Availability
+
+WHEN a lead has a scheduled time, follow-up due time, appointment time, or completed time
+THE SYSTEM SHALL make it visible in a calendar view.
+
+WHEN calendar items are displayed
+THE SYSTEM SHALL color-code them by lead status.
+
+WHEN a user asks whether a date/time is free
+THE SYSTEM SHALL allow the assistant to check internal lead-related calendar items and answer using known scheduled work.
+
+WHEN availability cannot be determined because working hours, duration, or timezone is missing
+THE SYSTEM SHALL ask for clarification instead of guessing.
+
+## Requirement 7: Assistant Search and Display
 
 WHEN the user asks the assistant to find leads
 THE SYSTEM SHALL translate the request into typed search/filter actions and return structured result cards in the dashboard assistant.
@@ -52,7 +66,7 @@ THE SYSTEM SHALL translate the request into typed search/filter actions and retu
 WHEN a search result references a lead
 THE SYSTEM SHALL allow the user to open that lead from the assistant result.
 
-## Requirement 7: Assistant Mutations Require Preview
+## Requirement 8: Assistant Mutations Require Preview
 
 WHEN the assistant proposes a lead mutation
 THE SYSTEM SHALL show a preview of the intended change before applying it.
@@ -63,7 +77,7 @@ THE SYSTEM SHALL apply the mutation through the same domain action used by the d
 WHEN the user rejects the preview
 THE SYSTEM SHALL leave persisted lead data unchanged.
 
-## Requirement 8: Auditability
+## Requirement 9: Auditability
 
 WHEN lead data, status, follow-up, custom field definition, or custom field value changes
 THE SYSTEM SHALL write an audit/activity event with actor, action type, target, timestamp, and before/after data where applicable.
@@ -71,7 +85,7 @@ THE SYSTEM SHALL write an audit/activity event with actor, action type, target, 
 WHEN an assistant action is requested
 THE SYSTEM SHALL log the requested tool, parsed arguments, confirmation result, and final status.
 
-## Requirement 9: Demo Constraints
+## Requirement 10: Demo Constraints
 
 WHEN implementation starts
 THE SYSTEM SHALL use a single repository and avoid a separate backend service unless a spec explicitly changes that decision.
@@ -88,6 +102,7 @@ THE SYSTEM SHALL include `Test` in person names.
 - Billing
 - Enterprise multi-tenant administration
 - Native iPhone SMS/iMessage ingestion
+- Full external Google/Apple calendar sync
 - Full reporting suite
 
 ## Open Questions
@@ -97,3 +112,4 @@ THE SYSTEM SHALL include `Test` in person names.
 - Which exact custom fields should the first two pilot templates include?
 - What recording source is realistic for iPhone calls?
 - Should the assistant preview be global in chat or embedded near the affected lead form?
+- What are default working hours and appointment duration for availability checks?
