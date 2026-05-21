@@ -9,7 +9,15 @@ import { LeadDetailForm } from "@/components/leads/lead-detail-form";
 import { LeadStatusForm } from "@/components/leads/lead-status-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDb } from "@/lib/db";
-import { contacts, followUps, ingestionEvents, leads } from "@/lib/db/schema";
+import {
+  contacts,
+  followUps,
+  ingestionEvents,
+  leadEvents,
+  leads,
+  users
+} from "@/lib/db/schema";
+import { formatDate, formatDateTime } from "@/lib/date-format";
 import {
   getLeadStatusColorClassName,
   getLeadStatusLabel,
@@ -57,7 +65,11 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
   const detailFollowUps = activeLeadId
     ? await getLeadFollowUps(activeLeadId)
     : [];
+  const detailActivity = activeLeadId
+    ? await getLeadActivity(activeLeadId)
+    : [];
   const currentTime = await getCurrentTime();
+  const metrics = await getDashboardMetrics(leadRows, currentTime);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
@@ -82,6 +94,17 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
           </p>
         </div>
         <IngestionForm />
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <MetricCard label="Total leads" value={metrics.totalLeads} />
+        <MetricCard label="Needs review" value={metrics.needsReview} />
+        <MetricCard label="Scheduled" value={metrics.scheduled} />
+        <MetricCard label="Won / lost" value={metrics.wonLost} />
+        <MetricCard
+          label="Overdue follow-ups"
+          value={metrics.overdueFollowUps}
+        />
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
@@ -249,12 +272,24 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                     />
                     <Field
                       label="Created"
-                      value={detail.ingestedAt.toLocaleString()}
+                      value={formatDateTime(detail.ingestedAt)}
                     />
                   </div>
                   <div className="rounded-md border border-border bg-muted/40 p-3 text-sm leading-6">
                     {detail.rawText}
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Activity</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Lead edits, status changes, and follow-up changes.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <ActivityList activity={detailActivity} />
                 </CardContent>
               </Card>
             </>
@@ -311,6 +346,35 @@ async function getCurrentTime() {
   return Date.now();
 }
 
+async function getDashboardMetrics(
+  leadRows: Array<{ status: LeadStatus }>,
+  currentTime: number
+) {
+  const db = getDb();
+  const followUpRows = await db
+    .select({
+      status: followUps.status,
+      followUpDueAt: followUps.followUpDueAt
+    })
+    .from(followUps);
+
+  const won = leadRows.filter((lead) => lead.status === "won").length;
+  const lost = leadRows.filter((lead) => lead.status === "lost").length;
+
+  return {
+    totalLeads: leadRows.length,
+    needsReview: leadRows.filter((lead) => lead.status === "needs_review")
+      .length,
+    scheduled: leadRows.filter((lead) => lead.status === "scheduled").length,
+    wonLost: `${won} / ${lost}`,
+    overdueFollowUps: followUpRows.filter(
+      (followUp) =>
+        followUp.status === "open" &&
+        followUp.followUpDueAt.getTime() < currentTime
+    ).length
+  };
+}
+
 async function getLeadFollowUps(leadId: string): Promise<FollowUpListItem[]> {
   const db = getDb();
   const rows = await db
@@ -332,6 +396,81 @@ async function getLeadFollowUps(leadId: string): Promise<FollowUpListItem[]> {
     followUpDueAt: followUp.followUpDueAt.toISOString(),
     completedAt: followUp.completedAt?.toISOString() ?? null
   }));
+}
+
+async function getLeadActivity(leadId: string) {
+  const db = getDb();
+
+  return db
+    .select({
+      id: leadEvents.id,
+      action: leadEvents.action,
+      summary: leadEvents.summary,
+      targetType: leadEvents.targetType,
+      createdAt: leadEvents.createdAt,
+      actorName: users.name
+    })
+    .from(leadEvents)
+    .leftJoin(users, eq(leadEvents.actorUserId, users.id))
+    .where(eq(leadEvents.leadId, leadId))
+    .orderBy(desc(leadEvents.createdAt));
+}
+
+function MetricCard({
+  label,
+  value
+}: {
+  label: string;
+  value: number | string;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <p className="text-xs font-medium uppercase text-muted-foreground">
+          {label}
+        </p>
+        <p className="mt-2 text-2xl font-semibold">{value}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ActivityList({
+  activity
+}: {
+  activity: Awaited<ReturnType<typeof getLeadActivity>>;
+}) {
+  if (activity.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        No activity has been recorded yet.
+      </p>
+    );
+  }
+
+  return (
+    <ol className="space-y-3">
+      {activity.map((event) => (
+        <li
+          key={event.id}
+          className="rounded-md border border-border bg-muted/30 p-3"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">{event.summary}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {formatActivityAction(event.action)} by{" "}
+                {event.actorName ?? "System"}
+              </p>
+            </div>
+            <time className="shrink-0 text-right text-xs text-muted-foreground">
+              {formatDateTime(event.createdAt)}
+            </time>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 function StatusBadge({ status }: { status: LeadStatus }) {
@@ -371,7 +510,7 @@ function FollowUpDueBadge({
         isOverdue ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
       )}
     >
-      {isOverdue ? "Overdue" : "Due"} {followUpDueAt.toLocaleDateString()}
+      {isOverdue ? "Overdue" : "Due"} {formatDate(followUpDueAt)}
     </span>
   );
 }
@@ -389,4 +528,11 @@ function Field({ label, value }: { label: string; value: string | null }) {
 
 function formatSource(sourceType: string, sourceChannel: string) {
   return `${sourceChannel} / ${sourceType.replace("_", " ")}`;
+}
+
+function formatActivityAction(action: string) {
+  return action
+    .split(".")
+    .map((part) => part.replace("_", " "))
+    .join(" ");
 }

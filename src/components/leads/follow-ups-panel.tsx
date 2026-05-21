@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/date-format";
 import { cn } from "@/lib/utils";
 
 export type FollowUpListItem = {
@@ -265,7 +266,7 @@ function formatDueState(followUp: FollowUpListItem, currentTime: number) {
 }
 
 function formatDueDate(value: string | null) {
-  return value ? new Date(value).toLocaleString() : "Missing";
+  return formatDateTime(value);
 }
 
 function toDateTimeLocalValue(value: string) {
