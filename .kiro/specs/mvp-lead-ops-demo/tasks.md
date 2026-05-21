@@ -32,12 +32,12 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Slice 2: Lead Review and Detail
 
-- [ ] Build lead list/table
-- [ ] Build lead detail view
-- [ ] Add editable standard fields
-- [ ] Add transcript/source context panel
-- [ ] Save edits through domain action
-- [ ] Write audit events for edits
+- [x] Build lead list/table
+- [x] Build lead detail view
+- [x] Add editable standard fields
+- [x] Add transcript/source context panel
+- [x] Save edits through domain action
+- [x] Write audit events for edits
 
 ## Slice 3: Status and Follow-Up
 
