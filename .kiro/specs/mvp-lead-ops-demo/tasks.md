@@ -14,12 +14,12 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Foundation
 
-- [ ] Scaffold Next.js App Router project with TypeScript strict mode
-- [ ] Add Tailwind and UI primitives
-- [ ] Configure database provider and Drizzle
-- [ ] Define base schema for workspaces, fake users, contacts, leads, follow-ups, ingestion events, and audit/activity events
-- [ ] Add explicit lead/follow-up date fields needed for later calendar derivation: `scheduledAt`, `completedAt`, `followUpDueAt`
-- [ ] Add seed data using test-safe person names
+- [x] Scaffold Next.js App Router project with TypeScript strict mode
+- [x] Add Tailwind and UI primitives
+- [x] Configure database provider and Drizzle
+- [x] Define base schema for workspaces, fake users, contacts, leads, follow-ups, ingestion events, and audit/activity events
+- [x] Add explicit lead/follow-up date fields needed for later calendar derivation: `scheduledAt`, `completedAt`, `followUpDueAt`
+- [x] Add seed data using test-safe person names
 
 ## Slice 1: Lead From Ingestion
 
