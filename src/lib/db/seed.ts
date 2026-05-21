@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -10,6 +10,9 @@ import {
   users,
   workspaces
 } from "./schema";
+
+config({ path: ".env.local" });
+config();
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -102,7 +105,8 @@ async function seed() {
       status: "scheduled",
       source: "linkedin",
       projectType: "website",
-      problemSummary: "Current website does not convert service inquiries reliably.",
+      problemSummary:
+        "Current website does not convert service inquiries reliably.",
       requestedOutcome: "Rebuild the site and add a cleaner booking path.",
       budgetRange: "$3k-$6k",
       timeline: "Discovery call next Tuesday",
@@ -123,7 +127,8 @@ async function seed() {
       status: "needs_review",
       source: "upwork",
       projectType: "dashboard",
-      problemSummary: "Client onboarding status is spread across chats and sheets.",
+      problemSummary:
+        "Client onboarding status is spread across chats and sheets.",
       requestedOutcome: "Prototype dashboard for client onboarding visibility.",
       budgetRange: "Around $4k",
       timeline: "Prototype this month",

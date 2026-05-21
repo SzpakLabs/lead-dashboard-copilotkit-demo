@@ -23,12 +23,12 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Slice 1: Lead From Ingestion
 
-- [ ] Create ingestion endpoint for pasted text/transcript
-- [ ] Store ingestion event
-- [ ] Add extraction service interface
-- [ ] Add mock/deterministic software-services extractor
-- [ ] Create draft lead from extracted fields
-- [ ] Show draft/needs-review leads in dashboard
+- [x] Create ingestion endpoint for pasted text/transcript
+- [x] Store ingestion event
+- [x] Add extraction service interface
+- [x] Add mock/deterministic software-services extractor
+- [x] Create draft lead from extracted fields
+- [x] Show draft/needs-review leads in dashboard
 
 ## Slice 2: Lead Review and Detail
 
