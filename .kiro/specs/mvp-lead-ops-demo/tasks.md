@@ -49,9 +49,9 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Slice 4: Basic Metrics and Activity
 
-- [ ] Show simple counts: total leads, needs review, scheduled, won/lost, overdue follow-ups
-- [ ] Show lead activity history in lead detail
-- [ ] Verify all lead edits, status changes, and follow-up changes write audit/activity events
+- [x] Show simple counts: total leads, needs review, scheduled, won/lost, overdue follow-ups
+- [x] Show lead activity history in lead detail
+- [x] Verify all lead edits, status changes, and follow-up changes write audit/activity events
 
 ## Later MVP: Custom Fields
 
