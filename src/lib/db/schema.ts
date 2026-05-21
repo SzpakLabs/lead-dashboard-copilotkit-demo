@@ -49,8 +49,12 @@ export const workspaces = pgTable("workspaces", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
 });
 
 export const users = pgTable(
@@ -64,8 +68,12 @@ export const users = pgTable(
     email: text("email").notNull(),
     role: text("role").notNull().default("owner"),
     isFake: boolean("is_fake").notNull().default(true),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
   },
   (table) => ({
     workspaceIdx: index("users_workspace_id_idx").on(table.workspaceId)
@@ -84,8 +92,12 @@ export const contacts = pgTable(
     email: text("email"),
     phone: text("phone"),
     source: leadSourceEnum("source").notNull().default("other"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
   },
   (table) => ({
     workspaceIdx: index("contacts_workspace_id_idx").on(table.workspaceId)
@@ -106,11 +118,18 @@ export const ingestionEvents = pgTable(
     sourceChannel: leadSourceEnum("source_channel").notNull().default("other"),
     rawText: text("raw_text").notNull(),
     normalizedText: text("normalized_text").notNull(),
-    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
   },
   (table) => ({
-    workspaceIdx: index("ingestion_events_workspace_id_idx").on(table.workspaceId)
+    workspaceIdx: index("ingestion_events_workspace_id_idx").on(
+      table.workspaceId
+    )
   })
 );
 
@@ -137,13 +156,20 @@ export const leads = pgTable(
     budgetRange: text("budget_range"),
     timeline: text("timeline"),
     nextStep: text("next_step"),
-    missingFields: jsonb("missing_fields").$type<string[]>().notNull().default([]),
+    missingFields: jsonb("missing_fields")
+      .$type<string[]>()
+      .notNull()
+      .default([]),
     confidence: text("confidence").notNull().default("medium"),
     scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     followUpDueAt: timestamp("follow_up_due_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
   },
   (table) => ({
     workspaceIdx: index("leads_workspace_id_idx").on(table.workspaceId),
@@ -167,10 +193,16 @@ export const followUps = pgTable(
     }),
     status: followUpStatusEnum("status").notNull().default("open"),
     note: text("note").notNull(),
-    followUpDueAt: timestamp("follow_up_due_at", { withTimezone: true }).notNull(),
+    followUpDueAt: timestamp("follow_up_due_at", {
+      withTimezone: true
+    }).notNull(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
   },
   (table) => ({
     workspaceIdx: index("follow_ups_workspace_id_idx").on(table.workspaceId),
@@ -196,7 +228,9 @@ export const leadEvents = pgTable(
     summary: text("summary").notNull(),
     before: jsonb("before").$type<Record<string, unknown> | null>(),
     after: jsonb("after").$type<Record<string, unknown> | null>(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
   },
   (table) => ({
     workspaceIdx: index("lead_events_workspace_id_idx").on(table.workspaceId),

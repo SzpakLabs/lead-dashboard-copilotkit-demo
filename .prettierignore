@@ -1,0 +1,9 @@
+.next
+.raw
+coverage
+dist
+drizzle/meta
+node_modules
+out
+package-lock.json
+tsconfig.tsbuildinfo
