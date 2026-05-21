@@ -192,6 +192,18 @@ Split later only if:
 - Telegram bot needs independent runtime
 - multiple clients share a stable public API
 
+## Verification Rule
+
+After each implementation task or slice, run the project verification gate before
+marking the task complete:
+
+- lint
+- Prettier format check
+- unit tests
+
+Use the repository `check` script when available so these checks stay
+centralized.
+
 ## Edge Cases
 
 - Duplicate lead suspected
