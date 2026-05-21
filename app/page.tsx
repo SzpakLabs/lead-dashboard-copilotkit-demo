@@ -1,10 +1,20 @@
-import { desc, eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import Link from "next/link";
+import {
+  FollowUpsPanel,
+  type FollowUpListItem
+} from "@/components/leads/follow-ups-panel";
 import { IngestionForm } from "@/components/leads/ingestion-form";
 import { LeadDetailForm } from "@/components/leads/lead-detail-form";
+import { LeadStatusForm } from "@/components/leads/lead-status-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDb } from "@/lib/db";
-import { contacts, ingestionEvents, leads } from "@/lib/db/schema";
+import { contacts, followUps, ingestionEvents, leads } from "@/lib/db/schema";
+import {
+  getLeadStatusColorClassName,
+  getLeadStatusLabel,
+  type LeadStatus
+} from "@/lib/domain/leads/status";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +40,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
       projectType: leads.projectType,
       timeline: leads.timeline,
       nextStep: leads.nextStep,
+      followUpDueAt: leads.followUpDueAt,
       missingFields: leads.missingFields,
       confidence: leads.confidence,
       createdAt: leads.createdAt,
@@ -43,6 +54,10 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
 
   const activeLeadId = selectedLeadId ?? leadRows[0]?.id;
   const detail = activeLeadId ? await getLeadDetail(activeLeadId) : null;
+  const detailFollowUps = activeLeadId
+    ? await getLeadFollowUps(activeLeadId)
+    : [];
+  const currentTime = await getCurrentTime();
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
@@ -53,7 +68,8 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
         </h1>
         <p className="max-w-2xl text-base leading-7 text-muted-foreground">
           Paste lead text or a transcript, review extracted records, and keep
-          source context traceable while edits write audit activity.
+          source context traceable while status and follow-up changes write
+          audit activity.
         </p>
       </section>
 
@@ -91,6 +107,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                     <th className="px-5 py-3">Source</th>
                     <th className="px-5 py-3">Timeline</th>
                     <th className="px-5 py-3">Next step</th>
+                    <th className="px-5 py-3">Follow-up</th>
                     <th className="px-5 py-3">Review</th>
                   </tr>
                 </thead>
@@ -126,6 +143,12 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                       </td>
                       <td className="max-w-48 px-5 py-4 align-top text-muted-foreground">
                         {lead.nextStep ?? "Missing"}
+                      </td>
+                      <td className="px-5 py-4 align-top">
+                        <FollowUpDueBadge
+                          followUpDueAt={lead.followUpDueAt}
+                          currentTime={currentTime}
+                        />
                       </td>
                       <td className="px-5 py-4 align-top">
                         <span className="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
@@ -174,6 +197,36 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                       timeline: detail.timeline ?? "",
                       nextStep: detail.nextStep ?? ""
                     }}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Status</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Move the lead through allowed lifecycle transitions.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <LeadStatusForm
+                    leadId={detail.id}
+                    status={detail.status as LeadStatus}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Follow-ups</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Track due and overdue next actions for this lead.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <FollowUpsPanel
+                    leadId={detail.id}
+                    followUps={detailFollowUps}
                   />
                 </CardContent>
               </Card>
@@ -254,25 +307,71 @@ async function getLeadDetail(leadId: string) {
   return null;
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    new: "bg-gray-100 text-gray-700",
-    needs_review: "bg-amber-100 text-amber-800",
-    contacted: "bg-blue-100 text-blue-800",
-    scheduled: "bg-violet-100 text-violet-800",
-    in_progress: "bg-cyan-100 text-cyan-800",
-    won: "bg-green-100 text-green-800",
-    lost: "bg-red-100 text-red-800"
-  };
+async function getCurrentTime() {
+  return Date.now();
+}
+
+async function getLeadFollowUps(leadId: string): Promise<FollowUpListItem[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: followUps.id,
+      note: followUps.note,
+      status: followUps.status,
+      followUpDueAt: followUps.followUpDueAt,
+      completedAt: followUps.completedAt
+    })
+    .from(followUps)
+    .where(eq(followUps.leadId, leadId))
+    .orderBy(asc(followUps.followUpDueAt));
+
+  return rows.map((followUp) => ({
+    id: followUp.id,
+    note: followUp.note,
+    status: followUp.status,
+    followUpDueAt: followUp.followUpDueAt.toISOString(),
+    completedAt: followUp.completedAt?.toISOString() ?? null
+  }));
+}
+
+function StatusBadge({ status }: { status: LeadStatus }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex rounded-md px-2 py-1 text-xs font-medium",
+        getLeadStatusColorClassName(status) ?? "bg-gray-100 text-gray-700"
+      )}
+    >
+      {getLeadStatusLabel(status)}
+    </span>
+  );
+}
+
+function FollowUpDueBadge({
+  followUpDueAt,
+  currentTime
+}: {
+  followUpDueAt: Date | null;
+  currentTime: number;
+}) {
+  if (!followUpDueAt) {
+    return (
+      <span className="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+        None
+      </span>
+    );
+  }
+
+  const isOverdue = followUpDueAt.getTime() < currentTime;
 
   return (
     <span
       className={cn(
         "inline-flex rounded-md px-2 py-1 text-xs font-medium",
-        styles[status] ?? styles.new
+        isOverdue ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
       )}
     >
-      {formatStatus(status)}
+      {isOverdue ? "Overdue" : "Due"} {followUpDueAt.toLocaleDateString()}
     </span>
   );
 }
@@ -286,10 +385,6 @@ function Field({ label, value }: { label: string; value: string | null }) {
       <p className="text-sm leading-6">{value ?? "Missing"}</p>
     </div>
   );
-}
-
-function formatStatus(status: string) {
-  return status.replace("_", " ");
 }
 
 function formatSource(sourceType: string, sourceChannel: string) {

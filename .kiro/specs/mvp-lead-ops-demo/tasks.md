@@ -41,11 +41,11 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Slice 3: Status and Follow-Up
 
-- [ ] Add lead status model
-- [ ] Add status change UI
-- [ ] Add follow-up model
-- [ ] Add create/update/complete follow-up flow
-- [ ] Show due and overdue follow-ups
+- [x] Add lead status model
+- [x] Add status change UI
+- [x] Add follow-up model
+- [x] Add create/update/complete follow-up flow
+- [x] Show due and overdue follow-ups
 
 ## Slice 4: Basic Metrics and Activity
 
