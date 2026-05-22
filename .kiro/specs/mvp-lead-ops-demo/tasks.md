@@ -77,10 +77,10 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Later MVP: Assistant Calendar Awareness
 
-- [ ] Implement `list_calendar_items`
-- [ ] Implement `check_availability`
-- [ ] Teach assistant to answer availability questions from internal calendar data with "Based on this dashboard..." wording
-- [ ] Ask for clarification when date, time, duration, timezone, or working-hours context is missing
+- [x] Implement `list_calendar_items`
+- [x] Implement `check_availability`
+- [x] Teach assistant to answer availability questions from internal calendar data with "Based on this dashboard..." wording
+- [x] Ask for clarification when date, time, duration, timezone, or working-hours context is missing
 
 ## Later MVP: Assistant Mutations
 
