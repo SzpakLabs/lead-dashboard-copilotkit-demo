@@ -13,6 +13,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run test && npm run format:check",
+    "design:research": "node design-variants/run-lazyweb-research.mjs",
+    "design:variants": "node design-variants/generate-redesign-worktrees.mjs",
+    "design:screenshots": "node design-variants/capture-fullpage-screenshots.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/lib/db/seed.ts"
