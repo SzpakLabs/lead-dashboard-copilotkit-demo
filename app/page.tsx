@@ -232,6 +232,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                 </CardHeader>
                 <CardContent>
                   <LeadDetailForm
+                    key={detail.id}
                     lead={{
                       id: detail.id,
                       title: detail.title,
@@ -260,6 +261,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                 </CardHeader>
                 <CardContent>
                   <LeadStatusForm
+                    key={detail.id}
                     leadId={detail.id}
                     status={detail.status as LeadStatus}
                   />
@@ -275,6 +277,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                 </CardHeader>
                 <CardContent>
                   <CustomFieldValuesForm
+                    key={detail.id}
                     leadId={detail.id}
                     definitions={customFieldDefinitionRows}
                     values={detailCustomFieldValues}
@@ -305,6 +308,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                 </CardHeader>
                 <CardContent>
                   <FollowUpsPanel
+                    key={detail.id}
                     leadId={detail.id}
                     followUps={detailFollowUps}
                   />
