@@ -93,17 +93,17 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Verification
 
-- [ ] Verify dashboard core flow manually with test-safe names
-- [ ] Verify pasted text creates a draft lead through the mock extractor
-- [ ] Verify user can review/edit/confirm the draft lead
-- [ ] Verify status and follow-up changes write audit/activity events
-- [ ] Verify simple metrics match seeded/demo data
-- [ ] Later: verify assistant search returns correct lead cards
-- [ ] Later: verify rejected assistant preview does not mutate data
-- [ ] Later: verify confirmed assistant mutation writes audit event
+- [x] Verify dashboard core flow manually with test-safe names
+- [x] Verify pasted text creates a draft lead through the mock extractor
+- [x] Verify user can review/edit/confirm the draft lead
+- [x] Verify status and follow-up changes write audit/activity events
+- [x] Verify simple metrics match seeded/demo data
+- [x] Later: verify assistant search returns correct lead cards
+- [x] Later: verify rejected assistant preview does not mutate data
+- [x] Later: verify confirmed assistant mutation writes audit event
 - [ ] Later: verify custom fields survive lead edits and filtering
-- [ ] Later: verify calendar color matches lead status
-- [ ] Later: verify assistant availability answers use scheduled lead/follow-up data
+- [x] Later: verify calendar color matches lead status
+- [x] Later: verify assistant availability answers use scheduled lead/follow-up data
 
 ## Optional Content Milestones
 
