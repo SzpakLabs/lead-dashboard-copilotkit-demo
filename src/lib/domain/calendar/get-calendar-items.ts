@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, type SQL } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { contacts, followUps, leads } from "@/lib/db/schema";
 import type { LeadStatus } from "@/lib/domain/leads/status";
@@ -46,8 +46,20 @@ type FollowUpCalendarRow = {
   company: string | null;
 };
 
-export async function getCalendarItems(): Promise<CalendarItem[]> {
+export async function getCalendarItems(options?: {
+  workspaceId?: string;
+}): Promise<CalendarItem[]> {
   const db = getDb();
+  const leadConditions = [
+    options?.workspaceId
+      ? eq(leads.workspaceId, options.workspaceId)
+      : undefined
+  ].filter((condition): condition is SQL => Boolean(condition));
+  const followUpConditions = [
+    options?.workspaceId
+      ? eq(followUps.workspaceId, options.workspaceId)
+      : undefined
+  ].filter((condition): condition is SQL => Boolean(condition));
   const leadRows = await db
     .select({
       id: leads.id,
@@ -61,6 +73,7 @@ export async function getCalendarItems(): Promise<CalendarItem[]> {
     })
     .from(leads)
     .innerJoin(contacts, eq(leads.contactId, contacts.id))
+    .where(leadConditions.length > 0 ? and(...leadConditions) : undefined)
     .orderBy(asc(leads.scheduledAt), asc(leads.followUpDueAt));
 
   const followUpRows = await db
@@ -79,6 +92,9 @@ export async function getCalendarItems(): Promise<CalendarItem[]> {
     .from(followUps)
     .innerJoin(leads, eq(followUps.leadId, leads.id))
     .innerJoin(contacts, eq(leads.contactId, contacts.id))
+    .where(
+      followUpConditions.length > 0 ? and(...followUpConditions) : undefined
+    )
     .orderBy(asc(followUps.followUpDueAt));
 
   return deriveCalendarItems(leadRows, followUpRows);
