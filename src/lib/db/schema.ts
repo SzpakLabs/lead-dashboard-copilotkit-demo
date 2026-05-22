@@ -6,6 +6,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid
 } from "drizzle-orm/pg-core";
 
@@ -42,7 +43,16 @@ export const eventTargetTypeEnum = pgEnum("event_target_type", [
   "lead",
   "contact",
   "follow_up",
-  "ingestion_event"
+  "ingestion_event",
+  "custom_field_definition",
+  "custom_field_value"
+]);
+
+export const customFieldTypeEnum = pgEnum("custom_field_type", [
+  "text",
+  "number",
+  "boolean",
+  "date"
 ]);
 
 export const workspaces = pgTable("workspaces", {
@@ -208,6 +218,69 @@ export const followUps = pgTable(
     workspaceIdx: index("follow_ups_workspace_id_idx").on(table.workspaceId),
     leadIdx: index("follow_ups_lead_id_idx").on(table.leadId),
     dueIdx: index("follow_ups_due_at_idx").on(table.followUpDueAt)
+  })
+);
+
+export const customFieldDefinitions = pgTable(
+  "custom_field_definitions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    label: text("label").notNull(),
+    fieldType: customFieldTypeEnum("field_type").notNull(),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+  },
+  (table) => ({
+    workspaceIdx: index("custom_field_definitions_workspace_id_idx").on(
+      table.workspaceId
+    ),
+    workspaceKeyIdx: uniqueIndex(
+      "custom_field_definitions_workspace_key_idx"
+    ).on(table.workspaceId, table.key)
+  })
+);
+
+export const customFieldValues = pgTable(
+  "custom_field_values",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    definitionId: uuid("definition_id")
+      .notNull()
+      .references(() => customFieldDefinitions.id, { onDelete: "cascade" }),
+    value: text("value"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+  },
+  (table) => ({
+    workspaceIdx: index("custom_field_values_workspace_id_idx").on(
+      table.workspaceId
+    ),
+    leadIdx: index("custom_field_values_lead_id_idx").on(table.leadId),
+    definitionIdx: index("custom_field_values_definition_id_idx").on(
+      table.definitionId
+    ),
+    leadDefinitionIdx: uniqueIndex(
+      "custom_field_values_lead_definition_idx"
+    ).on(table.leadId, table.definitionId)
   })
 );
 

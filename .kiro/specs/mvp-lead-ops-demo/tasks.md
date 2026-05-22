@@ -55,10 +55,10 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Later MVP: Custom Fields
 
-- [ ] Add custom field definition CRUD
-- [ ] Render custom fields in lead detail
-- [ ] Save custom field values
-- [ ] Validate field type changes and archived fields
+- [x] Add custom field definition CRUD
+- [x] Render custom fields in lead detail
+- [x] Save custom field values
+- [x] Validate field type changes and archived fields
 
 ## Later MVP: Calendar View
 

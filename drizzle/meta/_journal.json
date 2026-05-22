@@ -8,6 +8,13 @@
       "when": 1778258753752,
       "tag": "0000_exotic_violations",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779464059734,
+      "tag": "0001_gifted_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }

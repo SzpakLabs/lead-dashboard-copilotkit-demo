@@ -3,6 +3,8 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
   contacts,
+  customFieldDefinitions,
+  customFieldValues,
   followUps,
   ingestionEvents,
   leadEvents,
@@ -138,6 +140,47 @@ async function seed() {
       followUpDueAt: new Date("2026-05-10T09:00:00.000Z")
     })
     .returning();
+
+  const [priorityField] = await db
+    .insert(customFieldDefinitions)
+    .values({
+      workspaceId: workspace.id,
+      key: "priority",
+      label: "Priority",
+      fieldType: "text"
+    })
+    .returning();
+
+  const [requiresNdaField] = await db
+    .insert(customFieldDefinitions)
+    .values({
+      workspaceId: workspace.id,
+      key: "requires_nda",
+      label: "Requires NDA",
+      fieldType: "boolean"
+    })
+    .returning();
+
+  await db.insert(customFieldValues).values([
+    {
+      workspaceId: workspace.id,
+      leadId: alexLead.id,
+      definitionId: priorityField.id,
+      value: "High"
+    },
+    {
+      workspaceId: workspace.id,
+      leadId: alexLead.id,
+      definitionId: requiresNdaField.id,
+      value: "false"
+    },
+    {
+      workspaceId: workspace.id,
+      leadId: mariaLead.id,
+      definitionId: priorityField.id,
+      value: "Medium"
+    }
+  ]);
 
   const [alexFollowUp] = await db
     .insert(followUps)

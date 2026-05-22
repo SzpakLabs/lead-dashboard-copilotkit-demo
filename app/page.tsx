@@ -1,5 +1,13 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import Link from "next/link";
+import {
+  CustomFieldDefinitionsPanel,
+  type CustomFieldDefinitionItem
+} from "@/components/leads/custom-field-definitions-panel";
+import {
+  CustomFieldValuesForm,
+  type CustomFieldValueItem
+} from "@/components/leads/custom-field-values-form";
 import {
   FollowUpsPanel,
   type FollowUpListItem
@@ -11,6 +19,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDb } from "@/lib/db";
 import {
   contacts,
+  customFieldDefinitions,
+  customFieldValues,
   followUps,
   ingestionEvents,
   leadEvents,
@@ -67,6 +77,10 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
     : [];
   const detailActivity = activeLeadId
     ? await getLeadActivity(activeLeadId)
+    : [];
+  const customFieldDefinitionRows = await getCustomFieldDefinitions();
+  const detailCustomFieldValues = activeLeadId
+    ? await getLeadCustomFieldValues(activeLeadId)
     : [];
   const currentTime = await getCurrentTime();
   const metrics = await getDashboardMetrics(leadRows, currentTime);
@@ -241,6 +255,36 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
 
               <Card>
                 <CardHeader className="pb-3">
+                  <CardTitle>Custom fields</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Workspace-specific values for this lead.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <CustomFieldValuesForm
+                    leadId={detail.id}
+                    definitions={customFieldDefinitionRows}
+                    values={detailCustomFieldValues}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Field definitions</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Add, edit, or archive workspace custom fields.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <CustomFieldDefinitionsPanel
+                    definitions={customFieldDefinitionRows}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
                   <CardTitle>Follow-ups</CardTitle>
                   <p className="text-sm text-muted-foreground">
                     Track due and overdue next actions for this lead.
@@ -304,6 +348,50 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
       </section>
     </main>
   );
+}
+
+async function getCustomFieldDefinitions(): Promise<
+  CustomFieldDefinitionItem[]
+> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: customFieldDefinitions.id,
+      label: customFieldDefinitions.label,
+      fieldType: customFieldDefinitions.fieldType
+    })
+    .from(customFieldDefinitions)
+    .where(isNull(customFieldDefinitions.archivedAt))
+    .orderBy(asc(customFieldDefinitions.createdAt));
+
+  return rows;
+}
+
+async function getLeadCustomFieldValues(
+  leadId: string
+): Promise<CustomFieldValueItem[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      definitionId: customFieldValues.definitionId,
+      value: customFieldValues.value
+    })
+    .from(customFieldValues)
+    .innerJoin(
+      customFieldDefinitions,
+      eq(customFieldValues.definitionId, customFieldDefinitions.id)
+    )
+    .where(
+      and(
+        eq(customFieldValues.leadId, leadId),
+        isNull(customFieldDefinitions.archivedAt)
+      )
+    );
+
+  return rows.map((row) => ({
+    definitionId: row.definitionId,
+    value: row.value ?? ""
+  }));
 }
 
 async function getLeadDetail(leadId: string) {

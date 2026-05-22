@@ -47,6 +47,11 @@ Lead
   -> has many CalendarItems
   -> has many FollowUps
   -> has many Activities
+  -> has many CustomFieldValues
+
+CustomFieldDefinition
+  -> belongs to Workspace
+  -> has many CustomFieldValues
 ```
 
 ## Lead Identity Rules
@@ -102,6 +107,16 @@ Demo Core extractor target fields:
 
 Seed examples must use test-safe names, such as `Alex Test`, `Maria Test`, and `Test Company`.
 
+## Custom Fields
+
+Custom fields are workspace-scoped and stored outside the base lead schema.
+
+- `CustomFieldDefinition` stores the label, stable key, type, archive state, and workspace.
+- `CustomFieldValue` stores one lead value for one definition.
+- Supported field types are `text`, `number`, `boolean`, and `date`.
+- Archived definitions are hidden from lead detail and cannot accept new value updates.
+- Field type changes are allowed only when existing values can be validated against the new type.
+
 ## Calendar Availability Rule
 
 Assistant availability answers must be scoped to known dashboard data.
@@ -121,11 +136,11 @@ If working hours, duration, timezone, or external calendar context is missing, t
 - FollowUp
 - IngestionEvent
 - LeadEvent / Activity
+- CustomFieldDefinition
+- CustomFieldValue
 
 ## Later MVP Data Model
 
-- CustomFieldDefinition
-- CustomFieldValue
 - CalendarItem, if standalone editable calendar events are needed
 - AssistantActionLog
 - Conversation
