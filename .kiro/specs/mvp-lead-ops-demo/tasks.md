@@ -62,10 +62,10 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Later MVP: Calendar View
 
-- [ ] Build calendar item query/read model from lead/follow-up date fields
-- [ ] Add calendar screen with month/week/day scope as appropriate for MVP
-- [ ] Color-code calendar items by lead status
-- [ ] Link calendar items back to lead detail
+- [x] Build calendar item query/read model from lead/follow-up date fields
+- [x] Add calendar screen with month/week/day scope as appropriate for MVP
+- [x] Color-code calendar items by lead status
+- [x] Link calendar items back to lead detail
 
 ## Later MVP: Assistant Search
 

@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 import {
   CustomFieldDefinitionsPanel,
@@ -87,16 +88,25 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
-      <section className="space-y-3">
-        <p className="text-sm font-medium text-muted-foreground">Demo Core</p>
-        <h1 className="text-4xl font-semibold tracking-normal">
-          Lead Dashboard
-        </h1>
-        <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-          Paste lead text or a transcript, review extracted records, and keep
-          source context traceable while status and follow-up changes write
-          audit activity.
-        </p>
+      <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Demo Core</p>
+          <h1 className="text-4xl font-semibold tracking-normal">
+            Lead Dashboard
+          </h1>
+          <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+            Paste lead text or a transcript, review extracted records, and keep
+            source context traceable while status and follow-up changes write
+            audit activity.
+          </p>
+        </div>
+        <Link
+          className="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted"
+          href="/calendar"
+        >
+          <CalendarDays className="size-4" />
+          Calendar
+        </Link>
       </section>
 
       <section className="space-y-3">
