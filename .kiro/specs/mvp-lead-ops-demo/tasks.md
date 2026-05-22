@@ -84,12 +84,12 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Later MVP: Assistant Mutations
 
-- [ ] Implement mutation preview contract
-- [ ] Implement `update_lead_fields`
-- [ ] Implement `change_lead_status`
-- [ ] Implement `create_followup`
-- [ ] Require user confirmation before applying assistant mutations
-- [ ] Log assistant action lifecycle
+- [x] Implement mutation preview contract
+- [x] Implement `update_lead_fields`
+- [x] Implement `change_lead_status`
+- [x] Implement `create_followup`
+- [x] Require user confirmation before applying assistant mutations
+- [x] Log assistant action lifecycle
 
 ## Verification
 

@@ -1,8 +1,8 @@
 # Assistant Tool Catalog
 
-## Current Slice: Assistant Search and Calendar Awareness
+## Current Slice: Assistant Search, Calendar Awareness, and Mutations
 
-The dashboard assistant exposes read-only tools for the seeded software services demo workspace.
+The dashboard assistant exposes typed tools for the seeded software services demo workspace.
 
 ### `find_leads`
 
@@ -73,9 +73,92 @@ Output:
 
 The assistant must ask for clarification before calling this tool when date, time, duration, timezone, or working-hours context is missing.
 
+### Mutation Preview Contract
+
+Mutating tools use the same two-step contract:
+
+1. Call the tool with `mode: "preview"` to persist an assistant action preview.
+2. Show the preview to the user through `confirm_assistant_mutation`.
+3. Call the same tool with `mode: "apply"` and the returned `previewId` only when the user approves.
+4. Call `reject_assistant_mutation` with the `previewId` when the user rejects.
+
+Preview output:
+
+- `previewId`
+- tool name
+- target lead ID
+- summary
+- field-level changes
+- `requiresConfirmation: true`
+
+Apply output:
+
+- `previewId`
+- tool name
+- target lead ID
+- applied flag
+- summary
+
+The apply path reuses the stored preview payload, not a new assistant-generated payload.
+
+### `update_lead_fields`
+
+Previews or applies standard lead/contact field updates.
+
+Preview input:
+
+- `mode: "preview"`
+- `leadId` UUID
+- `fields` object with at least one standard editable field
+
+Apply input:
+
+- `mode: "apply"`
+- `previewId` UUID
+
+### `change_lead_status`
+
+Previews or applies a lead lifecycle status change.
+
+Preview input:
+
+- `mode: "preview"`
+- `leadId` UUID
+- `status` target lead lifecycle status
+
+Apply input:
+
+- `mode: "apply"`
+- `previewId` UUID
+
+### `create_followup`
+
+Previews or applies a new follow-up for a lead.
+
+Preview input:
+
+- `mode: "preview"`
+- `leadId` UUID
+- `note` follow-up note
+- `followUpDueAt` ISO date-time with timezone
+
+Apply input:
+
+- `mode: "apply"`
+- `previewId` UUID
+
+### `reject_assistant_mutation`
+
+Marks a preview as rejected after the user denies confirmation. It does not change lead data.
+
+Input:
+
+- `previewId` UUID
+
 ## Safety
 
-- These tools are read-only.
-- They scope reads to the seeded `software-services-demo` workspace.
+- Read tools scope reads to the seeded `software-services-demo` workspace.
+- Mutating tools scope writes to the same seeded workspace.
 - Calendar and availability answers must be framed as "Based on this dashboard..." because the app does not sync external calendars.
-- Mutating assistant tools remain deferred and must use preview plus confirmation before persistence.
+- Mutating assistant tools must use preview plus confirmation before persistence.
+- Assistant action previews, applied actions, rejected previews, and failed apply attempts are logged in `assistant_action_logs`.
