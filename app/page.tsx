@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import { CalendarDays } from "lucide-react";
 import Link from "next/link";
+import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import {
   CustomFieldDefinitionsPanel,
   type CustomFieldDefinitionItem
@@ -88,6 +89,8 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
+      <AssistantPanel />
+
       <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
           <p className="text-sm font-medium text-muted-foreground">Demo Core</p>

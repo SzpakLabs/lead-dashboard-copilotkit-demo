@@ -69,11 +69,11 @@ Status: draft only. Do not implement these tasks until the next implementation s
 
 ## Later MVP: Assistant Search
 
-- [ ] Add CopilotKit runtime route
-- [ ] Add assistant panel
-- [ ] Implement `find_leads`
-- [ ] Implement `open_lead`
-- [ ] Render assistant result cards
+- [x] Add CopilotKit runtime route
+- [x] Add assistant panel
+- [x] Implement `find_leads`
+- [x] Implement `open_lead`
+- [x] Render assistant result cards
 
 ## Later MVP: Assistant Calendar Awareness
 

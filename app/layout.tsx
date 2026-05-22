@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { CopilotProvider } from "@/components/assistant/copilot-provider";
 
 export const metadata: Metadata = {
   title: "Lead Dashboard",
@@ -13,7 +14,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        <link rel="stylesheet" href="/copilotkit-react-core-v2.css" />
+      </head>
+      <body>
+        <CopilotProvider>{children}</CopilotProvider>
+      </body>
     </html>
   );
 }
