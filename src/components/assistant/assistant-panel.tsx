@@ -1,12 +1,17 @@
 "use client";
 
 import { CopilotSidebar, useRenderTool } from "@copilotkit/react-core/v2";
-import { ExternalLink, Search } from "lucide-react";
+import { CalendarDays, Clock, ExternalLink, Search } from "lucide-react";
 import { z } from "zod";
 import {
+  checkAvailabilityInputSchema,
   findLeadsInputSchema,
+  listCalendarItemsInputSchema,
+  type AssistantCalendarItem,
   type AssistantLeadCard,
+  type CheckAvailabilityResult,
   type FindLeadsResult,
+  type ListCalendarItemsResult,
   openLeadInputSchema,
   type OpenLeadResult
 } from "@/lib/assistant/lead-tool-schemas";
@@ -36,6 +41,28 @@ export function AssistantPanel() {
     []
   );
 
+  useRenderTool(
+    {
+      name: "list_calendar_items",
+      parameters: listCalendarItemsInputSchema,
+      render: ({ status, result }) => (
+        <CalendarItemsCard status={status} result={parseToolResult(result)} />
+      )
+    },
+    []
+  );
+
+  useRenderTool(
+    {
+      name: "check_availability",
+      parameters: checkAvailabilityInputSchema,
+      render: ({ status, result }) => (
+        <AvailabilityCard status={status} result={parseToolResult(result)} />
+      )
+    },
+    []
+  );
+
   return (
     <CopilotSidebar
       agentId="default"
@@ -45,9 +72,9 @@ export function AssistantPanel() {
         modalHeaderTitle: "Lead assistant",
         chatToggleOpenLabel: "Open lead assistant",
         chatToggleCloseLabel: "Close lead assistant",
-        chatInputPlaceholder: "Search leads or open a lead...",
+        chatInputPlaceholder: "Search leads or check availability...",
         welcomeMessageText:
-          "Ask me to find leads by contact, company, status, project type, or next step.",
+          "Ask me to find leads, list scheduled work, or check a fully specified time slot.",
         chatDisclaimerText: "Read-only dashboard assistant."
       }}
     />
@@ -112,6 +139,83 @@ function OpenLeadCard({
   );
 }
 
+function CalendarItemsCard({
+  status,
+  result
+}: {
+  status: "inProgress" | "executing" | "complete";
+  result: ListCalendarItemsResult | null;
+}) {
+  if (status !== "complete" || !result) {
+    return (
+      <ToolShell
+        icon={<CalendarDays className="size-4" />}
+        title="Checking calendar"
+      />
+    );
+  }
+
+  return (
+    <ToolShell
+      icon={<CalendarDays className="size-4" />}
+      title={`${result.count} calendar item${result.count === 1 ? "" : "s"}`}
+    >
+      <div className="space-y-2">
+        {result.items.length > 0 ? (
+          result.items.map((item) => (
+            <CalendarResultItem key={item.id} item={item} />
+          ))
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            No lead-related calendar items in this range.
+          </p>
+        )}
+      </div>
+    </ToolShell>
+  );
+}
+
+function AvailabilityCard({
+  status,
+  result
+}: {
+  status: "inProgress" | "executing" | "complete";
+  result: CheckAvailabilityResult | null;
+}) {
+  if (status !== "complete" || !result) {
+    return (
+      <ToolShell
+        icon={<Clock className="size-4" />}
+        title="Checking availability"
+      />
+    );
+  }
+
+  return (
+    <ToolShell
+      icon={<Clock className="size-4" />}
+      title={result.available ? "Slot looks free" : "Slot is not free"}
+    >
+      <p className="text-sm text-muted-foreground">
+        {new Date(result.startsAt).toLocaleString()} -{" "}
+        {new Date(result.endsAt).toLocaleTimeString()} ({result.timezone})
+      </p>
+      {result.outsideWorkingHours ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          Outside provided working hours.
+        </p>
+      ) : null}
+      {result.conflicts.length > 0 ? (
+        <div className="mt-3 space-y-2">
+          {result.conflicts.map((item) => (
+            <CalendarResultItem key={item.id} item={item} />
+          ))}
+        </div>
+      ) : null}
+    </ToolShell>
+  );
+}
+
 function LeadResultItem({ lead }: { lead: AssistantLeadCard }) {
   return (
     <a
@@ -140,6 +244,37 @@ function LeadResultItem({ lead }: { lead: AssistantLeadCard }) {
         {lead.projectType ? <span>Project: {lead.projectType}</span> : null}
         {lead.timeline ? <span>Timeline: {lead.timeline}</span> : null}
       </div>
+    </a>
+  );
+}
+
+function CalendarResultItem({ item }: { item: AssistantCalendarItem }) {
+  return (
+    <a
+      className="block rounded-md border border-border bg-background p-3 hover:bg-muted/50"
+      href={item.url}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium">{item.title}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {new Date(item.startsAt).toLocaleString()} · {item.contactName}
+            {item.company ? `, ${item.company}` : ""}
+          </p>
+        </div>
+        <span
+          className={cn(
+            "shrink-0 rounded-md px-2 py-1 text-xs font-medium",
+            getLeadStatusColorClassName(item.status) ??
+              "bg-gray-100 text-gray-700"
+          )}
+        >
+          {item.statusLabel}
+        </span>
+      </div>
+      {item.note ? (
+        <p className="mt-2 text-xs text-muted-foreground">{item.note}</p>
+      ) : null}
     </a>
   );
 }

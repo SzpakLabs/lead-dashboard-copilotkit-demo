@@ -3,12 +3,22 @@ import { defineTool } from "@copilotkit/runtime/v2";
 import { getDb } from "@/lib/db";
 import { contacts, ingestionEvents, leads, workspaces } from "@/lib/db/schema";
 import {
+  checkAvailabilityInputSchema,
   findLeadsInputSchema,
+  listCalendarItemsInputSchema,
+  type AssistantCalendarItem,
   type AssistantLeadCard,
+  type CheckAvailabilityResult,
   type FindLeadsResult,
+  type ListCalendarItemsResult,
   openLeadInputSchema,
   type OpenLeadResult
 } from "@/lib/assistant/lead-tool-schemas";
+import { checkCalendarAvailability } from "@/lib/domain/calendar/check-availability";
+import {
+  getCalendarItems,
+  type CalendarItem
+} from "@/lib/domain/calendar/get-calendar-items";
 import { getLeadStatusLabel, type LeadStatus } from "@/lib/domain/leads/status";
 
 const demoWorkspaceSlug = "software-services-demo";
@@ -29,7 +39,28 @@ export const openLeadTool = defineTool({
   execute: openLead
 });
 
-export const assistantTools = [findLeadsTool, openLeadTool];
+export const listCalendarItemsTool = defineTool({
+  name: "list_calendar_items",
+  description:
+    "List internal lead-related calendar items in the current demo workspace for an explicit ISO date-time range. Use this for calendar questions that ask what is scheduled. Answers must start with 'Based on this dashboard...'.",
+  parameters: listCalendarItemsInputSchema,
+  execute: listCalendarItems
+});
+
+export const checkAvailabilityTool = defineTool({
+  name: "check_availability",
+  description:
+    "Check whether one explicit slot is free using internal lead-related calendar data only. Call this only after the user provides date, time, duration, timezone, and working-hours context. If any of those are missing, ask a clarifying question instead. Answers must start with 'Based on this dashboard...'.",
+  parameters: checkAvailabilityInputSchema,
+  execute: checkAvailability
+});
+
+export const assistantTools = [
+  findLeadsTool,
+  openLeadTool,
+  listCalendarItemsTool,
+  checkAvailabilityTool
+];
 
 export async function findLeads(input: unknown): Promise<FindLeadsResult> {
   const parsed = findLeadsInputSchema.parse(input);
@@ -137,6 +168,58 @@ export async function openLead(input: unknown): Promise<OpenLeadResult> {
   };
 }
 
+export async function listCalendarItems(
+  input: unknown
+): Promise<ListCalendarItemsResult> {
+  const parsed = listCalendarItemsInputSchema.parse(input);
+  const startsAt = new Date(parsed.startsAt);
+  const endsAt = new Date(parsed.endsAt);
+
+  if (endsAt <= startsAt) {
+    throw new Error("Calendar range end must be after start");
+  }
+
+  const workspaceId = await getDemoWorkspaceId();
+  const items = (await getCalendarItems({ workspaceId }))
+    .filter((item) => item.startsAt >= startsAt && item.startsAt < endsAt)
+    .slice(0, parsed.limit);
+
+  return {
+    startsAt: startsAt.toISOString(),
+    endsAt: endsAt.toISOString(),
+    count: items.length,
+    items: items.map(toAssistantCalendarItem),
+    answerPrefix: "Based on this dashboard"
+  };
+}
+
+export async function checkAvailability(
+  input: unknown
+): Promise<CheckAvailabilityResult> {
+  const parsed = checkAvailabilityInputSchema.parse(input);
+  const startsAt = new Date(parsed.startsAt);
+  const workspaceId = await getDemoWorkspaceId();
+  const result = checkCalendarAvailability({
+    startsAt,
+    durationMinutes: parsed.durationMinutes,
+    timezone: parsed.timezone,
+    workingHoursStart: parsed.workingHoursStart,
+    workingHoursEnd: parsed.workingHoursEnd,
+    items: await getCalendarItems({ workspaceId })
+  });
+
+  return {
+    available: result.available,
+    startsAt: result.startsAt.toISOString(),
+    endsAt: result.endsAt.toISOString(),
+    timezone: result.timezone,
+    outsideWorkingHours: result.outsideWorkingHours,
+    conflicts: result.conflicts.map(toAssistantCalendarItem),
+    answerPrefix: result.answerPrefix,
+    limitation: result.limitation
+  };
+}
+
 async function getDemoWorkspaceId() {
   const db = getDb();
   const [workspace] = await db
@@ -150,6 +233,22 @@ async function getDemoWorkspaceId() {
   }
 
   return workspace.id;
+}
+
+function toAssistantCalendarItem(item: CalendarItem): AssistantCalendarItem {
+  return {
+    id: item.id,
+    leadId: item.leadId,
+    url: `/?leadId=${item.leadId}`,
+    title: item.title,
+    contactName: item.contactName,
+    company: item.company,
+    status: item.status,
+    statusLabel: getLeadStatusLabel(item.status) ?? item.status,
+    kind: item.kind,
+    startsAt: item.startsAt.toISOString(),
+    note: item.note
+  };
 }
 
 function toAssistantLeadCard(row: {
