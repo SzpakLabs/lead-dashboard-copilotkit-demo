@@ -15,6 +15,13 @@
       "when": 1779464059734,
       "tag": "0001_gifted_lady_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779470051370,
+      "tag": "0002_assistant_action_logs",
+      "breakpoints": true
     }
   ]
 }

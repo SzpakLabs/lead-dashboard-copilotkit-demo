@@ -55,6 +55,13 @@ export const customFieldTypeEnum = pgEnum("custom_field_type", [
   "date"
 ]);
 
+export const assistantActionStatusEnum = pgEnum("assistant_action_status", [
+  "previewed",
+  "applied",
+  "rejected",
+  "failed"
+]);
+
 export const workspaces = pgTable("workspaces", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
@@ -308,5 +315,40 @@ export const leadEvents = pgTable(
   (table) => ({
     workspaceIdx: index("lead_events_workspace_id_idx").on(table.workspaceId),
     leadIdx: index("lead_events_lead_id_idx").on(table.leadId)
+  })
+);
+
+export const assistantActionLogs = pgTable(
+  "assistant_action_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    actorUserId: uuid("actor_user_id").references(() => users.id, {
+      onDelete: "set null"
+    }),
+    leadId: uuid("lead_id").references(() => leads.id, {
+      onDelete: "cascade"
+    }),
+    toolName: text("tool_name").notNull(),
+    status: assistantActionStatusEnum("status").notNull(),
+    summary: text("summary").notNull(),
+    preview: jsonb("preview").$type<Record<string, unknown>>().notNull(),
+    result: jsonb("result").$type<Record<string, unknown> | null>(),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+  },
+  (table) => ({
+    workspaceIdx: index("assistant_action_logs_workspace_id_idx").on(
+      table.workspaceId
+    ),
+    leadIdx: index("assistant_action_logs_lead_id_idx").on(table.leadId),
+    statusIdx: index("assistant_action_logs_status_idx").on(table.status)
   })
 );
