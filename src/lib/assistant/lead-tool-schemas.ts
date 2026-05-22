@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { leadStatusSchema, type LeadStatus } from "@/lib/domain/leads/status";
 
+const leadSourceSchema = z.enum([
+  "linkedin",
+  "upwork",
+  "referral",
+  "website",
+  "other"
+]);
+
 export const findLeadsInputSchema = z.object({
   query: z.string().trim().max(160).optional(),
   status: leadStatusSchema.optional(),
@@ -35,6 +43,62 @@ export const checkAvailabilityInputSchema = z.object({
     .describe("IANA timezone, for example Europe/Warsaw"),
   workingHoursStart: workingHourSchema.describe("Local working day start"),
   workingHoursEnd: workingHourSchema.describe("Local working day end")
+});
+
+const assistantMutationApplySchema = z.object({
+  mode: z.literal("apply"),
+  previewId: z.string().uuid()
+});
+
+const leadFieldPatchSchema = z
+  .object({
+    title: z.string().trim().min(1).max(180).optional(),
+    source: leadSourceSchema.optional(),
+    contactName: z.string().trim().min(1).max(160).optional(),
+    company: z.string().trim().max(160).nullable().optional(),
+    email: z.string().trim().email().max(180).nullable().optional(),
+    phone: z.string().trim().max(80).nullable().optional(),
+    projectType: z.string().trim().max(120).nullable().optional(),
+    problemSummary: z.string().trim().max(1_000).nullable().optional(),
+    requestedOutcome: z.string().trim().max(1_000).nullable().optional(),
+    budgetRange: z.string().trim().max(120).nullable().optional(),
+    timeline: z.string().trim().max(180).nullable().optional(),
+    nextStep: z.string().trim().max(240).nullable().optional()
+  })
+  .refine((fields) => Object.keys(fields).length > 0, {
+    message: "Provide at least one lead field to update"
+  });
+
+export const updateLeadFieldsInputSchema = z.discriminatedUnion("mode", [
+  z.object({
+    mode: z.literal("preview").default("preview"),
+    leadId: z.string().uuid(),
+    fields: leadFieldPatchSchema
+  }),
+  assistantMutationApplySchema
+]);
+
+export const changeLeadStatusToolInputSchema = z.discriminatedUnion("mode", [
+  z.object({
+    mode: z.literal("preview").default("preview"),
+    leadId: z.string().uuid(),
+    status: leadStatusSchema
+  }),
+  assistantMutationApplySchema
+]);
+
+export const createFollowUpToolInputSchema = z.discriminatedUnion("mode", [
+  z.object({
+    mode: z.literal("preview").default("preview"),
+    leadId: z.string().uuid(),
+    note: z.string().trim().min(1).max(1_000),
+    followUpDueAt: isoDateTimeSchema
+  }),
+  assistantMutationApplySchema
+]);
+
+export const rejectAssistantMutationInputSchema = z.object({
+  previewId: z.string().uuid()
 });
 
 export type AssistantLeadCard = {
@@ -113,3 +177,49 @@ export type CheckAvailabilityResult = {
   answerPrefix: "Based on this dashboard";
   limitation: string;
 };
+
+export type AssistantMutationChange = {
+  field: string;
+  before: string | null;
+  after: string | null;
+};
+
+export type AssistantMutationPreview = {
+  previewId: string;
+  toolName: string;
+  leadId: string;
+  summary: string;
+  changes: AssistantMutationChange[];
+  requiresConfirmation: true;
+};
+
+export type AssistantMutationApplied = {
+  previewId: string;
+  toolName: string;
+  leadId: string;
+  applied: true;
+  summary: string;
+};
+
+export type AssistantMutationResult =
+  | {
+      status: "preview";
+      preview: AssistantMutationPreview;
+    }
+  | {
+      status: "applied";
+      result: AssistantMutationApplied;
+    };
+
+export const confirmAssistantMutationInputSchema = z.object({
+  previewId: z.string().uuid(),
+  toolName: z.string(),
+  summary: z.string(),
+  changes: z.array(
+    z.object({
+      field: z.string(),
+      before: z.string().nullable(),
+      after: z.string().nullable()
+    })
+  )
+});

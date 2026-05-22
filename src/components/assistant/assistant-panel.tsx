@@ -1,21 +1,39 @@
 "use client";
 
-import { CopilotSidebar, useRenderTool } from "@copilotkit/react-core/v2";
-import { CalendarDays, Clock, ExternalLink, Search } from "lucide-react";
+import {
+  CopilotSidebar,
+  useHumanInTheLoop,
+  useRenderTool
+} from "@copilotkit/react-core/v2";
+import {
+  CalendarDays,
+  Check,
+  Clock,
+  ExternalLink,
+  Pencil,
+  Search,
+  X
+} from "lucide-react";
 import { z } from "zod";
 import {
+  changeLeadStatusToolInputSchema,
   checkAvailabilityInputSchema,
+  confirmAssistantMutationInputSchema,
+  createFollowUpToolInputSchema,
   findLeadsInputSchema,
   listCalendarItemsInputSchema,
   type AssistantCalendarItem,
   type AssistantLeadCard,
+  type AssistantMutationResult,
   type CheckAvailabilityResult,
   type FindLeadsResult,
   type ListCalendarItemsResult,
   openLeadInputSchema,
-  type OpenLeadResult
+  type OpenLeadResult,
+  updateLeadFieldsInputSchema
 } from "@/lib/assistant/lead-tool-schemas";
 import { getLeadStatusColorClassName } from "@/lib/domain/leads/status";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function AssistantPanel() {
@@ -63,6 +81,87 @@ export function AssistantPanel() {
     []
   );
 
+  useRenderTool(
+    {
+      name: "update_lead_fields",
+      parameters: updateLeadFieldsInputSchema,
+      render: ({ status, result }) => (
+        <MutationCard
+          status={status}
+          result={parseToolResult(result)}
+          title="Lead update"
+        />
+      )
+    },
+    []
+  );
+
+  useRenderTool(
+    {
+      name: "change_lead_status",
+      parameters: changeLeadStatusToolInputSchema,
+      render: ({ status, result }) => (
+        <MutationCard
+          status={status}
+          result={parseToolResult(result)}
+          title="Status change"
+        />
+      )
+    },
+    []
+  );
+
+  useRenderTool(
+    {
+      name: "create_followup",
+      parameters: createFollowUpToolInputSchema,
+      render: ({ status, result }) => (
+        <MutationCard
+          status={status}
+          result={parseToolResult(result)}
+          title="Follow-up"
+        />
+      )
+    },
+    []
+  );
+
+  useHumanInTheLoop({
+    name: "confirm_assistant_mutation",
+    description:
+      "Ask the user to approve or reject an assistant mutation preview before it is applied.",
+    parameters: confirmAssistantMutationInputSchema,
+    render: ({ status, args, respond }) => (
+      <ToolShell icon={<Pencil className="size-4" />} title="Confirm change">
+        <p className="text-sm font-medium">{args.summary}</p>
+        <ChangeList changes={args.changes ?? []} />
+        <div className="mt-3 flex gap-2">
+          <Button
+            size="sm"
+            disabled={status !== "executing"}
+            onClick={() =>
+              respond?.({ approved: true, previewId: args.previewId })
+            }
+          >
+            <Check className="mr-2 size-4" />
+            Apply
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={status !== "executing"}
+            onClick={() =>
+              respond?.({ approved: false, previewId: args.previewId })
+            }
+          >
+            <X className="mr-2 size-4" />
+            Reject
+          </Button>
+        </div>
+      </ToolShell>
+    )
+  });
+
   return (
     <CopilotSidebar
       agentId="default"
@@ -72,10 +171,11 @@ export function AssistantPanel() {
         modalHeaderTitle: "Lead assistant",
         chatToggleOpenLabel: "Open lead assistant",
         chatToggleCloseLabel: "Close lead assistant",
-        chatInputPlaceholder: "Search leads or check availability...",
+        chatInputPlaceholder:
+          "Search leads, check availability, or draft edits...",
         welcomeMessageText:
-          "Ask me to find leads, list scheduled work, or check a fully specified time slot.",
-        chatDisclaimerText: "Read-only dashboard assistant."
+          "Ask me to find leads, list scheduled work, check a fully specified time slot, or preview lead changes.",
+        chatDisclaimerText: "Assistant edits require your confirmation."
       }}
     />
   );
@@ -216,6 +316,38 @@ function AvailabilityCard({
   );
 }
 
+function MutationCard({
+  status,
+  result,
+  title
+}: {
+  status: "inProgress" | "executing" | "complete";
+  result: AssistantMutationResult | null;
+  title: string;
+}) {
+  if (status !== "complete" || !result) {
+    return <ToolShell icon={<Pencil className="size-4" />} title={title} />;
+  }
+
+  if (result.status === "applied") {
+    return (
+      <ToolShell icon={<Check className="size-4" />} title="Change applied">
+        <p className="text-sm text-muted-foreground">{result.result.summary}</p>
+      </ToolShell>
+    );
+  }
+
+  return (
+    <ToolShell icon={<Pencil className="size-4" />} title="Preview ready">
+      <p className="text-sm font-medium">{result.preview.summary}</p>
+      <ChangeList changes={result.preview.changes} />
+      <p className="mt-3 text-xs text-muted-foreground">
+        Confirmation required before this changes dashboard data.
+      </p>
+    </ToolShell>
+  );
+}
+
 function LeadResultItem({ lead }: { lead: AssistantLeadCard }) {
   return (
     <a
@@ -246,6 +378,42 @@ function LeadResultItem({ lead }: { lead: AssistantLeadCard }) {
       </div>
     </a>
   );
+}
+
+function ChangeList({
+  changes
+}: {
+  changes: Array<{
+    field: string;
+    before: string | null;
+    after: string | null;
+  }>;
+}) {
+  if (changes.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-3 space-y-2">
+      {changes.map((change) => (
+        <div
+          key={change.field}
+          className="rounded-md border border-border bg-background p-2 text-xs"
+        >
+          <p className="font-medium">{formatFieldLabel(change.field)}</p>
+          <p className="mt-1 text-muted-foreground">
+            {change.before ?? "Empty"} → {change.after ?? "Empty"}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function formatFieldLabel(field: string) {
+  return field
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
 }
 
 function CalendarResultItem({ item }: { item: AssistantCalendarItem }) {
