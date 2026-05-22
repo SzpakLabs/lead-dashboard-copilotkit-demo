@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, or, type SQL } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import { defineTool } from "@copilotkit/runtime/v2";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
@@ -165,10 +165,12 @@ export async function findLeads(input: unknown): Promise<FindLeadsResult> {
   const query = parsed.query?.trim() || null;
   const db = getDb();
   const workspaceId = await getDemoWorkspaceId();
+  const likeQuery = query ? `%${query}%` : null;
   const searchCondition = query
     ? or(
         ilike(leads.title, `%${query}%`),
-        ilike(leads.source, `%${query}%`),
+        sql`${leads.source}::text ilike ${likeQuery}`,
+        sql`${leads.status}::text ilike ${likeQuery}`,
         ilike(leads.projectType, `%${query}%`),
         ilike(leads.problemSummary, `%${query}%`),
         ilike(leads.timeline, `%${query}%`),
