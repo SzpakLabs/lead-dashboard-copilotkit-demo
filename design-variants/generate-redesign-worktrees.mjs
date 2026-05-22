@@ -112,7 +112,12 @@ for (const variant of variants) {
         "Choose a distinctive lead-operations dashboard direction that does not duplicate other variants.",
       appPath,
       researchPath:
-        config.researchOutput || "design-variants/lazyweb-research.md"
+        config.researchOutput || "design-variants/lazyweb-research.md",
+      redesignGoal:
+        config.redesignGoal ||
+        "Reorganize the app into a summary-led lead operations console with focused pages and dialog-based add/edit workflows.",
+      appStructure: formatPromptBlock(config.appStructure),
+      workflowExpectations: formatPromptBlock(config.workflowExpectations)
     });
 
     const agent = config.agent || {};
@@ -308,6 +313,12 @@ async function run(command, commandArgs, cwd, stdin) {
 
 function renderPrompt(template, values) {
   return template.replaceAll(/\{\{(\w+)\}\}/g, (_, key) => values[key] ?? "");
+}
+
+function formatPromptBlock(value) {
+  if (Array.isArray(value)) return value.map((item) => `- ${item}`).join("\n");
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return "- Use product judgment to create focused pages and dialog-based workflows that preserve existing behavior.";
 }
 
 function applyCodexOverrides(commandArgs, { model, reasoningEffort }) {
