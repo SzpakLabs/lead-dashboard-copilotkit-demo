@@ -17,6 +17,7 @@
     "design:variants": "node design-variants/generate-redesign-worktrees.mjs",
     "design:screenshots": "node design-variants/capture-fullpage-screenshots.mjs",
     "design:stats": "node design-variants/stats.mjs",
+    "design:restore": "node design-variants/restore-archive.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/lib/db/seed.ts"
