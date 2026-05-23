@@ -1,4 +1,14 @@
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  isNull,
+  or,
+  sql,
+  type SQL
+} from "drizzle-orm";
 import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
@@ -33,6 +43,8 @@ import { formatDate, formatDateTime } from "@/lib/date-format";
 import {
   getLeadStatusColorClassName,
   getLeadStatusLabel,
+  leadStatusOptions,
+  leadStatusSchema,
   type LeadStatus
 } from "@/lib/domain/leads/status";
 import { cn } from "@/lib/utils";
@@ -40,39 +52,49 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  searchParams: Promise<{ leadId?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function Home({ searchParams }: PageProps) {
-  const { leadId } = await searchParams;
+type LeadSource = "linkedin" | "upwork" | "referral" | "website" | "other";
 
-  return <Dashboard selectedLeadId={leadId} />;
+type DashboardFilters = {
+  query: string;
+  status: LeadStatus | "all";
+  source: LeadSource | "all";
+  customFields: Record<string, string>;
+};
+
+const leadSourceOptions: Array<{ value: LeadSource; label: string }> = [
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "upwork", label: "Upwork" },
+  { value: "referral", label: "Referral" },
+  { value: "website", label: "Website" },
+  { value: "other", label: "Other" }
+];
+
+export default async function Home({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+
+  return <Dashboard searchParams={resolvedSearchParams} />;
 }
 
-async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
-  const db = getDb();
-  const leadRows = await db
-    .select({
-      id: leads.id,
-      title: leads.title,
-      status: leads.status,
-      source: leads.source,
-      projectType: leads.projectType,
-      timeline: leads.timeline,
-      nextStep: leads.nextStep,
-      followUpDueAt: leads.followUpDueAt,
-      missingFields: leads.missingFields,
-      confidence: leads.confidence,
-      createdAt: leads.createdAt,
-      updatedAt: leads.updatedAt,
-      contactName: contacts.name,
-      company: contacts.company
-    })
-    .from(leads)
-    .innerJoin(contacts, eq(leads.contactId, contacts.id))
-    .orderBy(desc(leads.updatedAt));
+async function Dashboard({
+  searchParams
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
+  const selectedLeadId = getSingleSearchParam(searchParams.leadId);
+  const customFieldDefinitionRows = await getCustomFieldDefinitions();
+  const filters = parseDashboardFilters(
+    searchParams,
+    customFieldDefinitionRows
+  );
+  const leadRows = await getLeadRows(filters);
 
-  const activeLeadId = selectedLeadId ?? leadRows[0]?.id;
+  const activeLeadId =
+    leadRows.some((lead) => lead.id === selectedLeadId) && selectedLeadId
+      ? selectedLeadId
+      : leadRows[0]?.id;
   const detail = activeLeadId ? await getLeadDetail(activeLeadId) : null;
   const detailFollowUps = activeLeadId
     ? await getLeadFollowUps(activeLeadId)
@@ -80,7 +102,6 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
   const detailActivity = activeLeadId
     ? await getLeadActivity(activeLeadId)
     : [];
-  const customFieldDefinitionRows = await getCustomFieldDefinitions();
   const detailCustomFieldValues = activeLeadId
     ? await getLeadCustomFieldValues(activeLeadId)
     : [];
@@ -137,14 +158,18 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
         <Card className="overflow-hidden">
           <CardHeader className="border-b border-border pb-4">
-            <div className="flex items-end justify-between gap-4">
+            <div className="space-y-4">
               <div>
                 <CardTitle className="text-xl">Leads</CardTitle>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {leadRows.length} lead{leadRows.length === 1 ? "" : "s"} in
-                  the demo workspace
+                  {leadRows.length} matching lead
+                  {leadRows.length === 1 ? "" : "s"} in the demo workspace
                 </p>
               </div>
+              <LeadFiltersForm
+                definitions={customFieldDefinitionRows}
+                filters={filters}
+              />
             </div>
           </CardHeader>
           <CardContent className="p-0">
@@ -173,7 +198,7 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
                       <td className="px-5 py-4 align-top">
                         <Link
                           className="font-medium hover:underline"
-                          href={`/?leadId=${lead.id}`}
+                          href={getLeadHref(lead.id, filters)}
                         >
                           {lead.title}
                         </Link>
@@ -365,6 +390,257 @@ async function Dashboard({ selectedLeadId }: { selectedLeadId?: string }) {
       </section>
     </main>
   );
+}
+
+async function getLeadRows(filters: DashboardFilters) {
+  const db = getDb();
+  const conditions: SQL[] = [];
+
+  if (filters.query) {
+    const likeQuery = `%${filters.query}%`;
+    const queryCondition = or(
+      ilike(leads.title, likeQuery),
+      ilike(contacts.name, likeQuery),
+      ilike(contacts.company, likeQuery),
+      sql`${leads.source}::text ilike ${likeQuery}`,
+      sql`${leads.status}::text ilike ${likeQuery}`,
+      ilike(leads.projectType, likeQuery),
+      ilike(leads.problemSummary, likeQuery),
+      ilike(leads.requestedOutcome, likeQuery),
+      ilike(leads.timeline, likeQuery),
+      ilike(leads.nextStep, likeQuery)
+    );
+
+    if (queryCondition) {
+      conditions.push(queryCondition);
+    }
+  }
+
+  if (filters.status !== "all") {
+    conditions.push(eq(leads.status, filters.status));
+  }
+
+  if (filters.source !== "all") {
+    conditions.push(eq(leads.source, filters.source));
+  }
+
+  for (const [definitionId, value] of Object.entries(filters.customFields)) {
+    if (!value) {
+      continue;
+    }
+
+    conditions.push(
+      sql`exists (
+        select 1 from ${customFieldValues}
+        where ${customFieldValues.leadId} = ${leads.id}
+          and ${customFieldValues.definitionId} = ${definitionId}
+          and ${customFieldValues.value} ilike ${`%${value}%`}
+      )`
+    );
+  }
+
+  return db
+    .select({
+      id: leads.id,
+      title: leads.title,
+      status: leads.status,
+      source: leads.source,
+      projectType: leads.projectType,
+      timeline: leads.timeline,
+      nextStep: leads.nextStep,
+      followUpDueAt: leads.followUpDueAt,
+      missingFields: leads.missingFields,
+      confidence: leads.confidence,
+      createdAt: leads.createdAt,
+      updatedAt: leads.updatedAt,
+      contactName: contacts.name,
+      company: contacts.company
+    })
+    .from(leads)
+    .innerJoin(contacts, eq(leads.contactId, contacts.id))
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(leads.updatedAt));
+}
+
+function LeadFiltersForm({
+  definitions,
+  filters
+}: {
+  definitions: CustomFieldDefinitionItem[];
+  filters: DashboardFilters;
+}) {
+  return (
+    <form action="/" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <label className="space-y-1 text-sm font-medium">
+        Search
+        <input
+          className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          name="q"
+          placeholder="Lead, contact, status..."
+          defaultValue={filters.query}
+        />
+      </label>
+      <label className="space-y-1 text-sm font-medium">
+        Status
+        <select
+          className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          name="status"
+          defaultValue={filters.status}
+        >
+          <option value="all">All statuses</option>
+          {leadStatusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="space-y-1 text-sm font-medium">
+        Source
+        <select
+          className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          name="source"
+          defaultValue={filters.source}
+        >
+          <option value="all">All sources</option>
+          {leadSourceOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      {definitions.map((definition) => (
+        <CustomFieldFilter
+          key={definition.id}
+          definition={definition}
+          value={filters.customFields[definition.id] ?? ""}
+        />
+      ))}
+      <div className="flex items-end gap-2">
+        <button
+          className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          type="submit"
+        >
+          Apply
+        </button>
+        <Link
+          className="inline-flex h-9 items-center rounded-md border border-border px-4 text-sm font-medium hover:bg-muted"
+          href="/"
+        >
+          Clear
+        </Link>
+      </div>
+    </form>
+  );
+}
+
+function CustomFieldFilter({
+  definition,
+  value
+}: {
+  definition: CustomFieldDefinitionItem;
+  value: string;
+}) {
+  const name = getCustomFieldFilterParamName(definition.id);
+
+  if (definition.fieldType === "boolean") {
+    return (
+      <label className="space-y-1 text-sm font-medium">
+        {definition.label}
+        <select
+          className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          name={name}
+          defaultValue={value}
+        >
+          <option value="">Any</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </label>
+    );
+  }
+
+  return (
+    <label className="space-y-1 text-sm font-medium">
+      {definition.label}
+      <input
+        className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+        name={name}
+        type={definition.fieldType === "date" ? "date" : "text"}
+        defaultValue={value}
+      />
+    </label>
+  );
+}
+
+function parseDashboardFilters(
+  searchParams: Record<string, string | string[] | undefined>,
+  definitions: CustomFieldDefinitionItem[]
+): DashboardFilters {
+  const statusParam = getSingleSearchParam(searchParams.status);
+  const sourceParam = getSingleSearchParam(searchParams.source);
+  const status = leadStatusSchema.safeParse(statusParam).success
+    ? (statusParam as LeadStatus)
+    : "all";
+  const source = isLeadSource(sourceParam) ? sourceParam : "all";
+  const customFields = Object.fromEntries(
+    definitions.map((definition) => [
+      definition.id,
+      getSingleSearchParam(
+        searchParams[getCustomFieldFilterParamName(definition.id)]
+      ).trim()
+    ])
+  );
+
+  return {
+    query: getSingleSearchParam(searchParams.q).trim(),
+    status,
+    source,
+    customFields
+  };
+}
+
+function getLeadHref(leadId: string, filters: DashboardFilters) {
+  const params = new URLSearchParams();
+
+  params.set("leadId", leadId);
+
+  if (filters.query) {
+    params.set("q", filters.query);
+  }
+
+  if (filters.status !== "all") {
+    params.set("status", filters.status);
+  }
+
+  if (filters.source !== "all") {
+    params.set("source", filters.source);
+  }
+
+  for (const [definitionId, value] of Object.entries(filters.customFields)) {
+    if (value) {
+      params.set(getCustomFieldFilterParamName(definitionId), value);
+    }
+  }
+
+  return `/?${params.toString()}`;
+}
+
+function getSingleSearchParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function getCustomFieldFilterParamName(definitionId: string) {
+  return `custom_${definitionId}`;
+}
+
+function isLeadSource(value: string): value is LeadSource {
+  return leadSourceOptions.some((option) => option.value === value);
 }
 
 async function getCustomFieldDefinitions(): Promise<
