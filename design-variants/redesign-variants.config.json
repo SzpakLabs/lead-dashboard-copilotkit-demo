@@ -6,6 +6,8 @@
   "promptTemplate": "design-variants/redesign-agent-prompt.md",
   "researchPromptTemplate": "design-variants/lazyweb-research-prompt.md",
   "researchOutput": "design-variants/lazyweb-research.md",
+  "archiveDir": "design-variants/archive",
+  "existingVariants": "archive",
   "copyEnvFiles": [".env.local"],
   "redesignGoal": "Turn the current one-screen dashboard into a multi-view lead operations console. The home view should summarize the business state and expose fast entry points. Dedicated pages should handle leads, review/intake, follow-ups, activity/audit, and analytics when the variant direction supports them. Adding and editing should happen through dialogs, drawers, or focused forms instead of sprawling inline panels.",
   "appStructure": [

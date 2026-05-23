@@ -10,4 +10,5 @@ coverage
 *.tsbuildinfo
 design-variants/lazyweb-research.md
 design-variants/screenshots/
+design-variants/archive/
 .playwright-mcp/*.log

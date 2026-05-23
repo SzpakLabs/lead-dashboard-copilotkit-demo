@@ -15,6 +15,7 @@ const variantArg = valueArg("--variant");
 const branchArg = valueArg("--branch");
 const modelArg = valueArg("--model");
 const reasoningEffortArg = valueArg("--reasoning-effort");
+const existingArg = valueArg("--existing");
 const skipAgent = flags.has("--skip-agent");
 const skipScreenshots = flags.has("--skip-screenshots");
 const skipInstall = flags.has("--skip-install");
@@ -34,6 +35,7 @@ Options:
   --branch=BRANCH            Run one configured branch
   --model=MODEL              Pass a model to codex exec
   --reasoning-effort=EFFORT  Pass model_reasoning_effort to codex exec
+  --existing=MODE            keep|archive|clear. Default: archive
   --skip-research            Do not run Lazyweb research first
   --skip-agent               Create/install only, do not run Codex
   --skip-screenshots         Do not run screenshot capture after agent
@@ -50,6 +52,7 @@ const configPath = path.resolve(
 );
 const config = JSON.parse(await fs.readFile(configPath, "utf8"));
 const variants = selectVariants(expandVariants(config, getExpandCount()));
+const existingMode = existingArg || config.existingVariants || "archive";
 const sourceRepo = path.resolve(rootDir, config.sourceRepo);
 const worktreeRoot = path.resolve(
   rootDir,
@@ -70,8 +73,19 @@ if (!variants.length) {
   throw new Error("No variants selected.");
 }
 
+if (!["keep", "archive", "clear"].includes(existingMode)) {
+  throw new Error(`Unknown existing variant mode: ${existingMode}`);
+}
+
 if (!existsSync(sourceRepo)) {
   throw new Error(`sourceRepo does not exist: ${sourceRepo}`);
+}
+
+if (dryRun) {
+  printExistingPlan(variants);
+  printGlobalPlan();
+} else {
+  await prepareExistingVariants(variants);
 }
 
 if (!skipResearch && !dryRun) {
@@ -202,6 +216,256 @@ function expandVariants(config, count) {
   return variants.slice(0, count);
 }
 
+async function prepareExistingVariants(variants) {
+  if (existingMode === "keep") return;
+
+  const archiveRunDir =
+    existingMode === "archive" ? await createArchiveRunDir() : undefined;
+
+  for (const variant of variants) {
+    const variantDir = path.join(worktreeRoot, variant.name);
+    const hasWorktree = existsSync(path.join(variantDir, ".git"));
+    const hasBranch = await branchExists(variant.branch);
+    const hasVariantDir = existsSync(variantDir);
+
+    if (existingMode === "archive") {
+      await archiveVariant(variant, variantDir, archiveRunDir);
+    } else {
+      await clearScreenshots(variant);
+    }
+
+    if (hasWorktree) {
+      await run(
+        "git",
+        ["worktree", "remove", "--force", variantDir],
+        sourceRepo
+      );
+    } else if (hasVariantDir) {
+      await fs.rm(variantDir, { recursive: true, force: true });
+    }
+
+    if (hasBranch) {
+      if (existingMode === "archive") {
+        const archivedBranch = await uniqueArchivedBranchName(
+          archiveRunDir,
+          variant.branch
+        );
+        await run(
+          "git",
+          ["branch", "-m", variant.branch, archivedBranch],
+          sourceRepo
+        );
+      } else {
+        await run("git", ["branch", "-D", variant.branch], sourceRepo);
+      }
+    }
+  }
+
+  if (existingMode === "archive") {
+    await archiveSharedResearch(archiveRunDir);
+  } else if (existsSync(researchPath)) {
+    await fs.rm(researchPath, { force: true });
+  }
+}
+
+async function createArchiveRunDir() {
+  const archiveRoot = path.resolve(
+    rootDir,
+    config.archiveDir || "design-variants/archive"
+  );
+  const runDir = path.join(archiveRoot, timestampForPath());
+  await fs.mkdir(runDir, { recursive: true });
+  return runDir;
+}
+
+async function archiveVariant(variant, variantDir, archiveRunDir) {
+  const variantArchiveDir = path.join(archiveRunDir, variant.name);
+  await fs.mkdir(variantArchiveDir, { recursive: true });
+  await writeArchiveMetadata(variant, variantDir, variantArchiveDir);
+
+  if (existsSync(variantDir)) {
+    await copyDirectorySnapshot(
+      variantDir,
+      path.join(variantArchiveDir, "worktree")
+    );
+  }
+
+  await archiveScreenshots(variant, variantArchiveDir);
+}
+
+async function archiveScreenshots(variant, variantArchiveDir) {
+  const screenshotsRoot = path.resolve(
+    rootDir,
+    config.screenshots?.out || "design-variants/screenshots"
+  );
+  const screenshotsDir = path.join(screenshotsRoot, variant.name);
+  const archiveScreenshotsDir = path.join(variantArchiveDir, "screenshots");
+
+  if (existsSync(screenshotsDir)) {
+    await fs.mkdir(archiveScreenshotsDir, { recursive: true });
+    await fs.rename(
+      screenshotsDir,
+      path.join(archiveScreenshotsDir, variant.name)
+    );
+  }
+
+  if (!existsSync(screenshotsRoot)) return;
+
+  const entries = await fs.readdir(screenshotsRoot, { withFileTypes: true });
+  const flatFiles = entries.filter(
+    (entry) =>
+      entry.isFile() &&
+      entry.name.startsWith(`${variant.name}-`) &&
+      entry.name.endsWith(".png")
+  );
+
+  if (!flatFiles.length) return;
+
+  const flatArchiveDir = path.join(archiveScreenshotsDir, "flat");
+  await fs.mkdir(flatArchiveDir, { recursive: true });
+  for (const entry of flatFiles) {
+    await fs.rename(
+      path.join(screenshotsRoot, entry.name),
+      path.join(flatArchiveDir, entry.name)
+    );
+  }
+}
+
+async function clearScreenshots(variant) {
+  const screenshotsRoot = path.resolve(
+    rootDir,
+    config.screenshots?.out || "design-variants/screenshots"
+  );
+  const screenshotsDir = path.join(screenshotsRoot, variant.name);
+
+  if (existsSync(screenshotsDir)) {
+    await fs.rm(screenshotsDir, { recursive: true, force: true });
+  }
+
+  if (!existsSync(screenshotsRoot)) return;
+
+  const entries = await fs.readdir(screenshotsRoot, { withFileTypes: true });
+  for (const entry of entries) {
+    if (
+      entry.isFile() &&
+      entry.name.startsWith(`${variant.name}-`) &&
+      entry.name.endsWith(".png")
+    ) {
+      await fs.rm(path.join(screenshotsRoot, entry.name), { force: true });
+    }
+  }
+}
+
+async function archiveSharedResearch(archiveRunDir) {
+  if (!existsSync(researchPath)) return;
+  const target = path.join(
+    archiveRunDir,
+    path.basename(config.researchOutput || "lazyweb-research.md")
+  );
+  await fs.copyFile(researchPath, target);
+}
+
+async function writeArchiveMetadata(variant, variantDir, archiveDir) {
+  await fs.writeFile(
+    path.join(archiveDir, "variant.json"),
+    `${JSON.stringify(variant, null, 2)}\n`
+  );
+
+  if (!existsSync(path.join(variantDir, ".git"))) return;
+
+  await writeCommandOutput(
+    archiveDir,
+    "git-status.txt",
+    "git",
+    ["status", "--short"],
+    variantDir
+  );
+  await writeCommandOutput(
+    archiveDir,
+    "git-branch.txt",
+    "git",
+    ["branch", "--show-current"],
+    variantDir
+  );
+  await writeCommandOutput(
+    archiveDir,
+    "git-head.txt",
+    "git",
+    ["rev-parse", "HEAD"],
+    variantDir
+  );
+  await writeCommandOutput(
+    archiveDir,
+    "worktree.diff",
+    "git",
+    ["diff", "--binary"],
+    variantDir
+  );
+  await writeCommandOutput(
+    archiveDir,
+    "staged.diff",
+    "git",
+    ["diff", "--cached", "--binary"],
+    variantDir
+  );
+}
+
+async function writeCommandOutput(dir, fileName, command, commandArgs, cwd) {
+  const output = await capture(command, commandArgs, cwd);
+  await fs.writeFile(path.join(dir, fileName), output);
+}
+
+async function copyDirectorySnapshot(source, target) {
+  await fs.mkdir(path.dirname(target), { recursive: true });
+  await fs.cp(source, target, {
+    recursive: true,
+    force: true,
+    filter: (sourcePath) => !shouldSkipArchivePath(sourcePath, source)
+  });
+}
+
+function shouldSkipArchivePath(sourcePath, root) {
+  const relative = path.relative(root, sourcePath);
+  if (!relative) return false;
+  const parts = relative.split(path.sep);
+  const fileName = parts.at(-1);
+  if (fileName === ".env" || fileName?.startsWith(".env.")) return true;
+
+  return parts.some((part) =>
+    [
+      ".git",
+      ".next",
+      ".turbo",
+      "node_modules",
+      "coverage",
+      "dist",
+      "build"
+    ].includes(part)
+  );
+}
+
+async function uniqueArchivedBranchName(archiveRunDir, branch) {
+  const archiveName = path.basename(archiveRunDir);
+  const base = `archive/${archiveName}/${branch.replaceAll("/", "-")}`;
+  let candidate = base;
+  let index = 2;
+
+  while (await branchExists(candidate)) {
+    candidate = `${base}-${index}`;
+    index += 1;
+  }
+
+  return candidate;
+}
+
+async function branchExists(branch) {
+  return commandSucceeds(
+    "git",
+    ["rev-parse", "--verify", `refs/heads/${branch}`],
+    sourceRepo
+  );
+}
+
 async function ensureWorktree(variant, variantDir) {
   if (existsSync(path.join(variantDir, ".git"))) {
     console.log(`worktree exists: ${path.relative(rootDir, variantDir)}`);
@@ -261,11 +525,10 @@ function printPlan(variant, variantDir, appDir) {
   const steps = [];
 
   steps.push(
-    exists
+    exists && existingMode === "keep"
       ? "reuse worktree"
       : `create worktree from ${config.baseRef || "HEAD"}`
   );
-  if (!skipResearch) steps.push("run Lazyweb research");
   if (!skipInstall && !existsSync(path.join(appDir, "node_modules")))
     steps.push("npm install");
   if (!skipAgent) steps.push("run codex redesign prompt");
@@ -277,6 +540,23 @@ function printPlan(variant, variantDir, appDir) {
   console.log(`  port: ${variant.port}`);
   console.log(`  dir: ${path.relative(rootDir, variantDir)}`);
   console.log(`  steps: ${steps.join(" -> ")}`);
+}
+
+function printGlobalPlan() {
+  const steps = [];
+  if (!skipResearch) steps.push("run Lazyweb research once");
+  if (!steps.length) return;
+
+  console.log("global");
+  console.log(`  steps: ${steps.join(" -> ")}`);
+}
+
+function printExistingPlan(variants) {
+  console.log(`existing variants: ${existingMode}`);
+  if (existingMode === "keep") return;
+  for (const variant of variants) {
+    console.log(`  ${variant.name}: ${existingMode} worktree/screenshots`);
+  }
 }
 
 async function commandSucceeds(command, commandArgs, cwd) {
@@ -384,4 +664,11 @@ function removeConfig(commandArgs, key) {
       commandArgs.splice(index, 2);
     }
   }
+}
+
+function timestampForPath() {
+  return new Date()
+    .toISOString()
+    .replaceAll(":", "-")
+    .replace(/\.\d+Z$/, "Z");
 }
