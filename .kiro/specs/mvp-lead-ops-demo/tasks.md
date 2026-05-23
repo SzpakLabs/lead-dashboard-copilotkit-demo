@@ -101,7 +101,7 @@ Status: draft only. Do not implement these tasks until the next implementation s
 - [x] Later: verify assistant search returns correct lead cards
 - [x] Later: verify rejected assistant preview does not mutate data
 - [x] Later: verify confirmed assistant mutation writes audit event
-- [ ] Later: verify custom fields survive lead edits and filtering
+- [x] Later: verify custom fields survive lead edits and filtering
 - [x] Later: verify calendar color matches lead status
 - [x] Later: verify assistant availability answers use scheduled lead/follow-up data
 
