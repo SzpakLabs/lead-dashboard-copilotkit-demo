@@ -287,6 +287,33 @@ async function commandSucceeds(command, commandArgs, cwd) {
   });
 }
 
+async function capture(command, commandArgs, cwd) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, commandArgs, {
+      cwd,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env
+    });
+    const chunks = [];
+    const errorChunks = [];
+
+    child.stdout.on("data", (chunk) => chunks.push(chunk));
+    child.stderr.on("data", (chunk) => errorChunks.push(chunk));
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) {
+        resolve(Buffer.concat(chunks).toString("utf8"));
+      } else {
+        reject(
+          new Error(
+            `${command} ${commandArgs.join(" ")} failed with exit code ${code}: ${Buffer.concat(errorChunks).toString("utf8")}`
+          )
+        );
+      }
+    });
+  });
+}
+
 async function run(command, commandArgs, cwd, stdin) {
   const label = `${command} ${commandArgs.join(" ")}`;
   console.log(`[run] ${label}`);

@@ -31,7 +31,7 @@
   "screenshots": {
     "viewport": "both",
     "out": "design-variants/screenshots",
-    "path": "/"
+    "mobileMode": "sheet"
   },
   "agent": {
     "command": "codex",

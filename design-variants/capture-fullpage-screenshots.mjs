@@ -20,6 +20,8 @@ const selectedBranch = valueArg("--branch");
 const selectedViewport = valueArg("--viewport");
 const outputDirArg = valueArg("--out");
 const configArg = valueArg("--config");
+const routesArg = valueArg("--routes");
+const mobileModeArg = valueArg("--mobile-mode");
 const keepServers = args.has("--keep-servers");
 const noBuild = args.has("--no-build");
 const dryRun = args.has("--dry-run");
@@ -33,6 +35,8 @@ Options:
   --variant=variant-1-command     Capture only one variant by name
   --branch=redesign/name          Capture only one variant by branch
   --viewport=desktop|mobile|both  Default: desktop
+  --routes=/,/leads               Comma-separated routes; default discovers static App Router pages
+  --mobile-mode=sheet|fullpage     Default: sheet
   --out=DIR                       Default: design-variants/screenshots
   --keep-servers                  Leave Next dev servers running
   --no-build                      Skip npm run build before screenshots
@@ -42,10 +46,15 @@ Options:
 }
 
 const config = await readConfig(configArg);
+const mobileMode = mobileModeArg || config.screenshots?.mobileMode || "sheet";
+if (!["sheet", "fullpage"].includes(mobileMode)) {
+  throw new Error(`Unknown mobile mode: ${mobileMode}`);
+}
+
+const configuredViewport =
+  selectedViewport || config.screenshots?.viewport || "desktop";
 const viewportNames =
-  selectedViewport === "both"
-    ? ["desktop", "mobile"]
-    : [selectedViewport || "desktop"];
+  configuredViewport === "both" ? ["desktop", "mobile"] : [configuredViewport];
 
 for (const viewportName of viewportNames) {
   if (!viewports[viewportName])
@@ -89,22 +98,23 @@ try {
       variant.name
     );
     const appDir = path.resolve(variantDir, config.appPath || ".");
-    const pagePath = config.screenshots?.path || "/";
-    const url = `http://127.0.0.1:${variant.port}${pagePath}`;
+    const routes = await resolveRoutes(appDir, config);
 
     if (dryRun) {
       console.log(`${variant.name}`);
       console.log(`  branch: ${variant.branch || "(none)"}`);
       console.log(`  port: ${variant.port}`);
       console.log(`  dir: ${path.relative(rootDir, appDir)}`);
-      console.log(`  url: ${url}`);
+      console.log(`  routes: ${routes.join(", ")}`);
       console.log(`  viewports: ${viewportNames.join(", ")}`);
+      console.log(`  mobile mode: ${mobileMode}`);
       continue;
     }
 
     if (!noBuild) await run("npm", ["run", "build"], appDir);
 
-    const alreadyRunning = await isReachable(url);
+    const baseUrl = `http://127.0.0.1:${variant.port}`;
+    const alreadyRunning = await isReachable(baseUrl);
     let serverProcess;
     if (!alreadyRunning) {
       serverProcess = spawn(
@@ -134,20 +144,37 @@ try {
       );
     }
 
-    await waitForUrl(url, 45_000, serverProcess);
+    await waitForUrl(baseUrl, 45_000, serverProcess);
 
-    for (const viewportName of viewportNames) {
-      const viewport = viewports[viewportName];
-      const suffix =
-        viewportName === "desktop" ? "fullpage" : `${viewportName}-fullpage`;
-      const file = path.join(outputDir, `${variant.name}-${suffix}.png`);
-      const result = await captureFullPage(url, file, viewport);
-      const warningText = result.warnings
-        ? `, warnings: ${result.warnings}`
-        : "";
-      console.log(
-        `saved ${path.relative(rootDir, file)} (${result.width}x${result.height}, errors: ${result.errors}${warningText})`
-      );
+    const variantOutputDir = path.join(outputDir, variant.name);
+    await fs.mkdir(variantOutputDir, { recursive: true });
+
+    for (const route of routes) {
+      const url = new URL(route, baseUrl).toString();
+      for (const viewportName of viewportNames) {
+        const viewport = viewports[viewportName];
+        const routeSlug = routeToSlug(route);
+        const suffix =
+          viewportName === "desktop"
+            ? "desktop-fullpage"
+            : mobileMode === "sheet"
+              ? "mobile-sheet"
+              : "mobile-fullpage";
+        const file = path.join(variantOutputDir, `${routeSlug}-${suffix}.png`);
+        const result =
+          viewportName === "mobile" && mobileMode === "sheet"
+            ? await captureMobileSheet(url, file, viewport)
+            : await captureFullPage(url, file, viewport);
+        const warningText = result.warnings
+          ? `, warnings: ${result.warnings}`
+          : "";
+        const segmentText = result.segments
+          ? `, segments: ${result.segments}`
+          : "";
+        console.log(
+          `saved ${path.relative(rootDir, file)} (${result.width}x${result.height}, route: ${route}, errors: ${result.errors}${warningText}${segmentText})`
+        );
+      }
     }
   }
 } finally {
@@ -172,6 +199,95 @@ async function readConfig(configFile) {
     throw new Error(`${file} must contain a non-empty variants array`);
   }
   return parsed;
+}
+
+async function resolveRoutes(appDir, config) {
+  if (routesArg) return normalizeRoutes(routesArg.split(","));
+
+  const screenshotConfig = config.screenshots || {};
+  if (Array.isArray(screenshotConfig.paths)) {
+    return normalizeRoutes(screenshotConfig.paths);
+  }
+
+  if (typeof screenshotConfig.path === "string" && screenshotConfig.path) {
+    return normalizeRoutes([screenshotConfig.path]);
+  }
+
+  const discovered = await discoverAppRouterRoutes(appDir);
+  return discovered.length ? discovered : ["/"];
+}
+
+function normalizeRoutes(routes) {
+  return [
+    ...new Set(
+      routes
+        .map((route) => route.trim())
+        .filter(Boolean)
+        .map((route) => (route.startsWith("/") ? route : `/${route}`))
+        .map((route) => route.replace(/\/+$/, "") || "/")
+    )
+  ];
+}
+
+async function discoverAppRouterRoutes(appDir) {
+  const appRouterDir = path.join(appDir, "app");
+
+  try {
+    await fs.access(appRouterDir);
+  } catch {
+    return [];
+  }
+
+  const routes = [];
+  await walkAppRouter(appRouterDir, [], routes);
+  return normalizeRoutes(routes).sort((left, right) => {
+    if (left === "/") return -1;
+    if (right === "/") return 1;
+    return left.localeCompare(right);
+  });
+}
+
+async function walkAppRouter(dir, segments, routes) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const hasPage = entries.some(
+    (entry) => entry.isFile() && /^page\.(tsx|ts|jsx|js|mdx)$/.test(entry.name)
+  );
+
+  if (hasPage) routes.push(`/${segments.join("/")}`);
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    if (shouldSkipRouteDirectory(entry.name)) continue;
+
+    const nextSegments = routeSegmentsForDirectory(entry.name, segments);
+    await walkAppRouter(path.join(dir, entry.name), nextSegments, routes);
+  }
+}
+
+function shouldSkipRouteDirectory(name) {
+  return (
+    name === "api" ||
+    name.startsWith("_") ||
+    name.startsWith("@") ||
+    name.startsWith("[") ||
+    name.startsWith("(.)") ||
+    name.startsWith("(..)")
+  );
+}
+
+function routeSegmentsForDirectory(name, segments) {
+  if (name.startsWith("(") && name.endsWith(")")) return segments;
+  return [...segments, name];
+}
+
+function routeToSlug(route) {
+  if (route === "/") return "home";
+  return route
+    .replace(/^\/+/, "")
+    .replace(/\/+$/, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-|-$/g, "")
+    .toLowerCase();
 }
 
 function resolveAutoVariant(config, variantName, branchName) {
@@ -242,6 +358,14 @@ async function waitForUrl(url, timeoutMs, serverProcess) {
 }
 
 async function captureFullPage(url, outputFile, viewport) {
+  return capturePage(url, outputFile, viewport, "fullpage");
+}
+
+async function captureMobileSheet(url, outputFile, viewport) {
+  return capturePage(url, outputFile, viewport, "sheet");
+}
+
+async function capturePage(url, outputFile, viewport, mode) {
   const chrome = findChrome();
   const userDataDir = await fs.mkdtemp(
     path.join(os.tmpdir(), "lead-dashboard-capture-")
@@ -295,6 +419,20 @@ async function captureFullPage(url, outputFile, viewport) {
     const width = Math.max(viewport.width, dimensions.width);
     const height = Math.max(viewport.height, dimensions.height);
 
+    if (mode === "sheet") {
+      const sheet = await captureSheet(messages, viewport, width, height);
+      await fs.writeFile(outputFile, Buffer.from(sheet.data, "base64"));
+      ws.end();
+
+      return {
+        width: sheet.width,
+        height: sheet.height,
+        segments: sheet.segments,
+        errors,
+        warnings
+      };
+    }
+
     await messages.send("Emulation.setDeviceMetricsOverride", {
       ...viewport,
       width,
@@ -317,6 +455,119 @@ async function captureFullPage(url, outputFile, viewport) {
     await waitForProcessExit(chromeProcess, 3_000);
     await removeDir(userDataDir);
   }
+}
+
+async function captureSheet(messages, viewport, pageWidth, pageHeight) {
+  const segmentHeight = viewport.height;
+  const segments = Math.max(1, Math.ceil(pageHeight / segmentHeight));
+  const images = [];
+
+  await messages.send("Emulation.setDeviceMetricsOverride", {
+    ...viewport,
+    width: viewport.width,
+    height: viewport.height
+  });
+
+  for (let index = 0; index < segments; index += 1) {
+    const y = index * segmentHeight;
+    const height = Math.min(segmentHeight, pageHeight - y);
+    await evaluate(
+      messages,
+      `window.scrollTo(0, ${y}); window.dispatchEvent(new Event("scroll")); true;`
+    );
+    await sleep(180);
+
+    const screenshot = await messages.send("Page.captureScreenshot", {
+      format: "png",
+      fromSurface: true,
+      captureBeyondViewport: true,
+      clip: { x: 0, y, width: pageWidth, height, scale: 1 }
+    });
+    images.push({ data: screenshot.data, width: pageWidth, height });
+  }
+
+  await messages.send("Page.navigate", { url: "about:blank" });
+  await messages.waitForEvent("Page.loadEventFired", 20_000);
+  await evaluate(
+    messages,
+    `document.open(); document.write(${JSON.stringify(
+      sheetHtml(images, pageWidth, segmentHeight)
+    )}); document.close(); true;`
+  );
+  await evaluate(messages, "document.fonts?.ready", true);
+
+  const sheetWidth = pageWidth * images.length;
+  await messages.send("Emulation.setDeviceMetricsOverride", {
+    width: sheetWidth,
+    height: segmentHeight,
+    deviceScaleFactor: 1,
+    mobile: false
+  });
+
+  const sheet = await messages.send("Page.captureScreenshot", {
+    format: "png",
+    fromSurface: true,
+    captureBeyondViewport: true,
+    clip: {
+      x: 0,
+      y: 0,
+      width: sheetWidth,
+      height: segmentHeight,
+      scale: 1
+    }
+  });
+
+  return {
+    data: sheet.data,
+    width: sheetWidth,
+    height: segmentHeight,
+    segments: images.length
+  };
+}
+
+function sheetHtml(images, width, height) {
+  const body = images
+    .map(
+      (image) =>
+        `<div class="segment"><img src="data:image/png;base64,${image.data}" /></div>`
+    )
+    .join("");
+  const html = `<!doctype html>
+<html>
+  <head>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: ${width * images.length}px;
+        height: ${height}px;
+        overflow: hidden;
+        background: #ffffff;
+      }
+
+      body {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .segment {
+        width: ${width}px;
+        height: ${height}px;
+        overflow: hidden;
+        background: #ffffff;
+        flex: 0 0 auto;
+      }
+
+      img {
+        display: block;
+        width: ${width}px;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>${body}</body>
+</html>`;
+  return html;
 }
 
 async function preparePageForFullPageCapture(messages, viewportHeight) {
