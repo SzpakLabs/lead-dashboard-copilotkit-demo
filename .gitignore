@@ -8,7 +8,5 @@ coverage
 .env.local
 .env.*.local
 *.tsbuildinfo
-design-variants/lazyweb-research.md
-design-variants/screenshots/
-design-variants/archive/
+.design-variants/legacy
 .playwright-mcp/*.log
