@@ -1,6 +1,6 @@
 # Tasks: MVP Lead Ops Demo
 
-Status: draft only. Do not implement these tasks until the next implementation session.
+Status: implementation complete. Only optional content milestones remain unchecked, and they are not blockers for completing this spec.
 
 ## Planning
 
