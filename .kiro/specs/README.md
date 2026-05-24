@@ -10,6 +10,7 @@
 
 ## Deferred Specs
 
+- `demo-readiness-fixes` — clean demo seed/reset flow, assistant runtime readiness, favicon polish, and final deployment smoke checks.
 - `dashboard-redesign` — use `/Users/macos/Documents/prjk/design-variants/README.md` to generate, compare, and apply a dashboard redesign variant.
 - `telegram-ingestion` — Telegram text and voice-note intake.
 - `website-lead-capture-widget` — Nuxt/laptop-repair site capture flow into this system.
