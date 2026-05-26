@@ -4,8 +4,12 @@ import { CopilotProvider } from "@/components/assistant/copilot-provider";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 
 export const metadata: Metadata = {
-  title: "Lead Dashboard",
-  description: "AI-assisted lead operations dashboard"
+  title: "LeadOps Demo | AI-assisted lead dashboard",
+  description:
+    "Demo lead operations dashboard for turning unstructured sales conversations into structured follow-up-ready leads.",
+  icons: {
+    icon: "/favicon.ico"
+  }
 };
 
 export default function RootLayout({
