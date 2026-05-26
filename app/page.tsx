@@ -28,6 +28,7 @@ import { IngestionForm } from "@/components/leads/ingestion-form";
 import { LeadDetailForm } from "@/components/leads/lead-detail-form";
 import { LeadStatusForm } from "@/components/leads/lead-status-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
 import {
   contacts,
@@ -83,6 +84,7 @@ async function Dashboard({
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
+  const assistantEnabled = isAssistantRuntimeConfigured();
   const selectedLeadId = getSingleSearchParam(searchParams.leadId);
   const customFieldDefinitionRows = await getCustomFieldDefinitions();
   const filters = parseDashboardFilters(
@@ -110,7 +112,7 @@ async function Dashboard({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
-      <AssistantPanel />
+      {assistantEnabled ? <AssistantPanel /> : null}
 
       <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
