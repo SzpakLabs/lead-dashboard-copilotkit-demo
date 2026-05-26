@@ -20,7 +20,8 @@
     "design:restore": "node design-variants/restore-archive.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx src/lib/db/seed.ts"
+    "db:seed": "tsx src/lib/db/seed.ts --reset",
+    "db:reset-demo": "tsx src/lib/db/seed.ts --reset"
   },
   "dependencies": {
     "@copilotkit/react-core": "^1.57.4",

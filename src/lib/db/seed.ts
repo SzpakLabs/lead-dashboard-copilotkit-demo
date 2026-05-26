@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -24,13 +25,18 @@ if (!connectionString) {
 
 const client = postgres(connectionString, { max: 1 });
 const db = drizzle(client);
+const demoWorkspaceSlug = "software-services-demo";
 
-async function seed() {
+async function seed({ reset }: { reset: boolean }) {
+  if (reset) {
+    await db.delete(workspaces).where(eq(workspaces.slug, demoWorkspaceSlug));
+  }
+
   const [workspace] = await db
     .insert(workspaces)
     .values({
       name: "Software Services Demo",
-      slug: "software-services-demo"
+      slug: demoWorkspaceSlug
     })
     .returning();
 
@@ -248,7 +254,7 @@ async function seed() {
   ]);
 }
 
-seed()
+seed({ reset: process.argv.includes("--reset") })
   .then(async () => {
     await client.end();
   })
