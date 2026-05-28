@@ -8,5 +8,6 @@ coverage
 .env.local
 .env.*.local
 *.tsbuildinfo
+.design-variants/*
 .design-variants/legacy
 .playwright-mcp/*.log
