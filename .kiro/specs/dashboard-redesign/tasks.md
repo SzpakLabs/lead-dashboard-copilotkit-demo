@@ -1,17 +1,23 @@
 # Tasks: Dashboard Redesign
 
-Status: draft only. Do not implement until this spec is promoted to Active Spec.
+Status: active. Planning is complete; implementation should use the Service Ops Console direction only.
 
 ## Planning
 
-- [ ] Confirm this spec is active in `.kiro/specs/README.md`
-- [ ] Treat `.design-variants` artifacts as deprecated; do not use the CLI workflow for this session.
-- [ ] Use `Service Ops Console` as the only redesign direction; do not generate alternate variants.
-- [ ] Use `frontend-design` during implementation.
-- [ ] Use comparable product references only for patterns that support the Service Ops Console direction.
-- [ ] Confirm whether `/` remains the lead workspace or redirects to `/leads`.
-- [ ] Confirm whether lead detail gets a dedicated route, inspector, or both.
-- [ ] Confirm whether custom field definitions move to `/settings/fields`.
+- [x] Confirm this spec is active in `.kiro/specs/README.md`
+- [x] Treat `.design-variants` artifacts as deprecated; do not use the CLI workflow for this session.
+- [x] Use `Service Ops Console` as the only redesign direction; do not generate alternate variants.
+- [x] Use `frontend-design` during implementation.
+- [x] Use comparable product references only for patterns that support the Service Ops Console direction.
+- [x] Confirm whether `/` remains the lead workspace or redirects to `/leads`.
+- [x] Confirm whether lead detail gets a dedicated route, inspector, or both.
+- [x] Confirm whether custom field definitions move to `/settings/fields`.
+
+Planning decisions:
+
+- `/` remains the primary lead workspace for this redesign. Do not redirect it to `/leads` in the first implementation slice.
+- Lead detail should use both a desktop inspector for queue work and a dedicated `/leads/[leadId]` route for mobile, deep links, and focused review/editing.
+- Custom field definitions move to `/settings/fields`; selected-lead detail keeps custom field values only.
 
 ## Manual Redesign
 

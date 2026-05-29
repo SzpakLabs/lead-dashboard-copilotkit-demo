@@ -2,7 +2,11 @@
 
 ## Active Spec
 
-- `demo-readiness-fixes` — clean demo seed/reset flow, assistant runtime readiness, favicon polish, and final deployment smoke checks.
+- `dashboard-redesign` — manually redesign the dashboard into a dense lead-ops console using the Service Ops Console direction.
+
+## Paused Specs
+
+- `demo-readiness-fixes` — local demo readiness is complete; real configured LLM verification and public deployment smoke remain pending external credentials and deployment approval.
 
 ## Completed Specs
 
@@ -10,7 +14,6 @@
 
 ## Deferred Specs
 
-- `dashboard-redesign` — manually redesign the dashboard into a dense lead-ops console; `design-variants` artifacts are reference only until the tool is ready.
 - `telegram-ingestion` — Telegram text and voice-note intake.
 - `website-lead-capture-widget` — Nuxt/laptop-repair site capture flow into this system.
 - `telephony-recording-ingestion` — real call recording/transcript source.

@@ -8,6 +8,8 @@ Use a manual redesign workflow for the current implementation session.
 
 The implementation direction is fixed: use `Service Ops Console`. Do not generate alternate variants for this spec. The user will review the running app directly in the browser; if the direction misses, the next step is discussion plus targeted rollback or iteration.
 
+This spec is active as of 2026-05-30. The remaining `demo-readiness-fixes` external verification tasks are parked until credentials and deployment approval are available.
+
 ## Existing Inputs
 
 The repo contains previous redesign artifacts under `.design-variants`, including:
@@ -70,9 +72,9 @@ Primary surfaces:
 
 Preferred page split:
 
-- `/` or `/leads`: primary lead operations workspace.
+- `/`: primary lead operations workspace.
 - `/intake`: focused ingestion surface, also available as a drawer/sheet from the lead workspace.
-- `/leads/[leadId]`: full lead review and edit workspace, or a dedicated fallback for mobile/deep links if desktop uses an inspector.
+- `/leads/[leadId]`: full lead review and edit workspace for mobile, deep links, and focused editing; desktop may also use a selected-lead inspector in the main workspace.
 - `/calendar`: schedule board for lead-related scheduled work and follow-ups.
 - `/settings/fields`: workspace custom field definitions.
 

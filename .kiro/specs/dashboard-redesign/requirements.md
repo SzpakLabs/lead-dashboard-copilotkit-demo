@@ -8,7 +8,7 @@ This spec now uses a manual redesign workflow. The old `design-variants` workflo
 
 The chosen direction is the manual `Service Ops Console` plan. Do not generate competing variants for this spec. Older redesign notes have lower priority than this plan and Modern Web Guidance.
 
-This spec is not active until explicitly promoted in `.kiro/specs/README.md`.
+This spec is active as of 2026-05-30 after explicit user approval to start the planning phase.
 
 ## Requirement 1: Manual Redesign Workflow
 
@@ -95,8 +95,9 @@ THE SYSTEM SHALL include `Test` in every person name.
 - Starting Telegram, telephony, or website-widget ingestion
 - Publishing article/content milestones
 
-## Open Questions
+## Resolved Planning Decisions
 
-- Should this spec be promoted immediately after `demo-readiness-fixes` is closed, or should the remaining public deployment smoke happen first?
-- Should `/` remain the lead workspace route, or should the redesign introduce `/leads` and redirect `/`?
-- Should lead detail become a dedicated route, a desktop inspector, or both?
+- Promote `dashboard-redesign` now and park the remaining `demo-readiness-fixes` external verification tasks.
+- Keep `/` as the primary lead workspace route for the first redesign implementation slice.
+- Use both a desktop selected-lead inspector and a dedicated `/leads/[leadId]` route.
+- Move custom field definitions to `/settings/fields`; keep per-lead custom field values in lead detail.
