@@ -21,7 +21,8 @@ import {
   Plus,
   Search,
   Settings2,
-  SlidersHorizontal
+  SlidersHorizontal,
+  UserRound
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -102,6 +103,8 @@ async function Dashboard({
     customFieldDefinitionRows
   );
   const leadRows = await getLeadRows(filters);
+  const currentTime = await getCurrentTime();
+  const metrics = await getDashboardMetrics(currentTime);
 
   const activeLeadId =
     leadRows.some((lead) => lead.id === selectedLeadId) && selectedLeadId
@@ -117,9 +120,8 @@ async function Dashboard({
   const detailCustomFieldValues = activeLeadId
     ? await getLeadCustomFieldValues(activeLeadId)
     : [];
-  const currentTime = await getCurrentTime();
-  const metrics = await getDashboardMetrics(leadRows, currentTime);
   const activeLeadRow = leadRows.find((lead) => lead.id === activeLeadId);
+  const activeFilterCount = getActiveFilterCount(filters);
 
   return (
     <AppShell
@@ -220,6 +222,7 @@ async function Dashboard({
               <Filter className="size-4 text-muted-foreground" />
             </div>
             <LeadFiltersForm
+              activeFilterCount={activeFilterCount}
               definitions={customFieldDefinitionRows}
               filters={filters}
             />
@@ -329,10 +332,16 @@ function LeadLedger({
                 >
                   {lead.title}
                 </Link>
-                <p>
-                  {lead.contactName}
-                  {lead.company ? `, ${lead.company}` : ""}
+                <p className="ops-lead-contact">
+                  <UserRound className="size-3.5" />
+                  <span>
+                    {lead.contactName}
+                    {lead.company ? `, ${lead.company}` : ""}
+                  </span>
                 </p>
+                {lead.projectType ? (
+                  <p className="ops-lead-project">{lead.projectType}</p>
+                ) : null}
               </td>
               <td>
                 <StatusBadge status={lead.status} />
@@ -415,6 +424,14 @@ function LeadInspector({
           </div>
         </div>
       </div>
+
+      <nav className="ops-inspector-tabs" aria-label="Selected lead sections">
+        <a href="#review">Review</a>
+        <a href="#actions">Actions</a>
+        <a href="#custom-fields">Fields</a>
+        <a href="#source">Source</a>
+        <a href="#activity">Activity</a>
+      </nav>
 
       <InspectorSection
         id="review"
@@ -623,14 +640,20 @@ async function getLeadRows(filters: DashboardFilters) {
 }
 
 function LeadFiltersForm({
+  activeFilterCount,
   definitions,
   filters
 }: {
+  activeFilterCount: number;
   definitions: CustomFieldDefinitionItem[];
   filters: DashboardFilters;
 }) {
   return (
-    <form action="/" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <form action="/" className="ops-filter-form">
+      <div className="ops-filter-summary">
+        <span>{activeFilterCount} active</span>
+        <Link href="/">Reset</Link>
+      </div>
       <label className="space-y-1 text-sm font-medium">
         Search
         <input
@@ -678,16 +701,10 @@ function LeadFiltersForm({
         />
       ))}
       <div className="flex items-end gap-2">
-        <button
-          className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          type="submit"
-        >
+        <button className="ops-form-submit" type="submit">
           Apply
         </button>
-        <Link
-          className="inline-flex h-9 items-center rounded-md border border-border px-4 text-sm font-medium hover:bg-muted"
-          href="/"
-        >
+        <Link className="ops-form-secondary" href="/">
           Clear
         </Link>
       </div>
@@ -887,11 +904,13 @@ async function getCurrentTime() {
   return Date.now();
 }
 
-async function getDashboardMetrics(
-  leadRows: Array<{ status: LeadStatus }>,
-  currentTime: number
-) {
+async function getDashboardMetrics(currentTime: number) {
   const db = getDb();
+  const leadRows = await db
+    .select({
+      status: leads.status
+    })
+    .from(leads);
   const followUpRows = await db
     .select({
       status: followUps.status,
@@ -914,6 +933,15 @@ async function getDashboardMetrics(
         followUp.followUpDueAt.getTime() < currentTime
     ).length
   };
+}
+
+function getActiveFilterCount(filters: DashboardFilters) {
+  return [
+    filters.query,
+    filters.status !== "all" ? filters.status : "",
+    filters.source !== "all" ? filters.source : "",
+    ...Object.values(filters.customFields)
+  ].filter(Boolean).length;
 }
 
 async function getLeadFollowUps(leadId: string): Promise<FollowUpListItem[]> {
@@ -1079,7 +1107,7 @@ function FollowUpDueBadge({
 
 function Field({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="space-y-1">
+    <div className="ops-fact">
       <p className="text-xs font-medium uppercase text-muted-foreground">
         {label}
       </p>
