@@ -10,7 +10,7 @@
 
 ## Deferred Specs
 
-- `dashboard-redesign` — use `/Users/macos/Documents/prjk/design-variants/README.md` to generate, compare, and apply a dashboard redesign variant.
+- `dashboard-redesign` — manually redesign the dashboard into a dense lead-ops console; `design-variants` artifacts are reference only until the tool is ready.
 - `telegram-ingestion` — Telegram text and voice-note intake.
 - `website-lead-capture-widget` — Nuxt/laptop-repair site capture flow into this system.
 - `telephony-recording-ingestion` — real call recording/transcript source.

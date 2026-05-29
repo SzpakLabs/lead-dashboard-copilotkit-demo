@@ -5,40 +5,26 @@ Status: draft only. Do not implement until this spec is promoted to Active Spec.
 ## Planning
 
 - [ ] Confirm this spec is active in `.kiro/specs/README.md`
-- [ ] Read `/Users/macos/Documents/prjk/design-variants/README.md`
-- [ ] Inspect existing `.design-variants/legacy` config, prompts, research, screenshots, and archived diffs
-- [ ] Decide whether to reuse legacy Lazyweb research or run fresh research
-- [ ] Decide initial variant count and variant directions
+- [ ] Treat `.design-variants` artifacts as deprecated; do not use the CLI workflow for this session.
+- [ ] Use `Service Ops Console` as the only redesign direction; do not generate alternate variants.
+- [ ] Confirm whether `/` remains the lead workspace or redirects to `/leads`.
+- [ ] Confirm whether lead detail gets a dedicated route, inspector, or both.
+- [ ] Confirm whether custom field definitions move to `/settings/fields`.
 
-## Design Variants Setup
+## Manual Redesign
 
-- [ ] Add or update local `design-variants` dev dependency from `/Users/macos/Documents/prjk/design-variants`
-- [ ] Add current CLI scripts for init, research, generate, screenshots, stats, and restore
-- [ ] Run `design-variants init` or migrate equivalent current `.design-variants/config.json`
-- [ ] Preserve legacy artifacts under `.design-variants/legacy`
-- [ ] Run a dry-run generation command to verify config paths, worktree directory, app path, and ports
-
-## Variant Generation
-
-- [ ] Run optional Lazyweb research, or record that existing research is reused
-- [ ] Generate agreed dashboard redesign variants
-- [ ] Build or verify each generated variant
-- [ ] Capture desktop and mobile screenshots for each generated variant
-- [ ] Run variant stats
-
-## Selection
-
-- [ ] Compare screenshots, workflow fit, changed files, and implementation risk
-- [ ] Select one direction to apply to the main app
-- [ ] Record rejected variant reasons briefly in the spec or a small docs note
-
-## Adopted Redesign
-
-- [ ] Apply selected redesign direction to the main app
+- [ ] Apply the Service Ops Console direction to the main app.
+- [ ] Add or update shared app shell, navigation, command bar, and responsive layout tokens.
+- [ ] Rework the lead workspace into queue/filter rail, dense lead ledger, and selected-lead inspector.
+- [ ] Move ingestion into a drawer/sheet and optional focused route.
+- [ ] Reorganize lead detail into review, action, source, activity, and custom-field surfaces.
+- [ ] Move workspace custom field definitions out of selected-lead detail if confirmed.
+- [ ] Redesign calendar as a compact schedule board while preserving scope/date params.
 - [ ] Preserve ingestion, lead review, lead editing, statuses, follow-ups, custom fields, calendar, assistant, and audit behavior
 - [ ] Keep domain logic and API contracts stable unless a specific redesign task requires a small change
 - [ ] Split repeated or complex dashboard UI into components
 - [ ] Ensure desktop and mobile layouts do not clip or overlap text
+- [ ] Apply Modern Web Guidance accessibility, form, table, focus, and containment guidance.
 
 ## Verification
 
@@ -49,4 +35,5 @@ Status: draft only. Do not implement until this spec is promoted to Active Spec.
 - [ ] Manually verify custom fields remain usable
 - [ ] Manually verify calendar items link back to lead detail
 - [ ] Manually verify assistant search and mutation preview still work
-- [ ] Capture final desktop and mobile screenshots
+- [ ] Start the local app for direct browser review
+- [ ] Handle visual issues through discussion plus targeted iteration or rollback

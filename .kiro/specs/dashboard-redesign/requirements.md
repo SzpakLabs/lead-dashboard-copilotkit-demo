@@ -2,23 +2,30 @@
 
 ## Overview
 
-Redesign the lead dashboard into a more polished, dense, professional lead-ops product experience. Use the `design-variants` workflow documented in `/Users/macos/Documents/prjk/design-variants/README.md` to generate parallel redesign variants, capture screenshots, compare results, and apply one selected direction back to the main app.
+Redesign the lead dashboard into a more polished, dense, professional lead-ops product experience.
+
+This spec now uses a manual redesign workflow. The old `design-variants` workflow is intentionally out of scope because the tool is not ready enough to drive this implementation session. Existing redesign artifacts may be used as reference material, but the accepted direction should be implemented directly in the main app after the spec is explicitly promoted.
+
+The chosen direction is the manual `Service Ops Console` plan. Do not generate competing variants for this spec. Older redesign notes have lower priority than this plan and Modern Web Guidance.
 
 This spec is not active until explicitly promoted in `.kiro/specs/README.md`.
 
-## Requirement 1: Design Variants Workflow
+## Requirement 1: Manual Redesign Workflow
 
 WHEN the redesign work begins
-THE SYSTEM SHALL use the current package-shaped `design-variants` CLI workflow from `/Users/macos/Documents/prjk/design-variants/README.md`.
+THE SYSTEM SHALL use the existing `dashboard-redesign` requirements as product constraints, not as an automated variant-generation process.
 
-WHEN the repo is prepared for variant generation
-THE SYSTEM SHALL initialize or migrate `.design-variants/config.json`, prompt templates, and package scripts so future runs use the current CLI instead of only legacy scripts.
+WHEN old design-variant artifacts exist
+THE SYSTEM SHALL treat `.design-variants` artifacts, screenshots, research, prompts, and diffs as optional reference material only.
 
-WHEN old variant artifacts exist
-THE SYSTEM SHALL preserve or archive `.design-variants/legacy` artifacts and avoid deleting useful prior screenshots, research, prompts, or diffs unless explicitly requested.
+WHEN the redesign is planned
+THE SYSTEM SHALL use the `Service Ops Console` direction as the single implementation direction.
 
-WHEN variants are generated
-THE SYSTEM SHALL create multiple distinct dashboard redesign worktrees or variant branches rather than editing the main branch directly first.
+WHEN the redesign is implemented
+THE SYSTEM SHALL implement the chosen direction directly in the app while keeping changes scoped to dashboard IA, layout, components, and styling.
+
+WHEN the user reviews the redesign
+THE SYSTEM SHALL support direct browser review and iterative follow-up fixes instead of a variant comparison or screenshot approval workflow.
 
 ## Requirement 2: Redesign Scope
 
@@ -61,14 +68,14 @@ THE SYSTEM SHALL use appropriate UI controls such as icon buttons, tabs, filters
 
 ## Requirement 5: Verification
 
-WHEN a variant is generated
-THE SYSTEM SHALL capture desktop and mobile screenshots using the `design-variants screenshots` workflow where possible.
-
-WHEN a variant is considered for adoption
-THE SYSTEM SHALL compare screenshots, changed files, and implementation risk before choosing one direction.
-
-WHEN the selected redesign is applied to the main app
+WHEN the redesign is applied to the main app
 THE SYSTEM SHALL run the project verification gate using `npm run check` when available.
+
+WHEN browser verification is practical
+THE SYSTEM SHALL manually verify desktop and mobile layouts for clipping, overlap, broken dialogs/drawers, and unreadable lead rows.
+
+WHEN final visual review is needed
+THE SYSTEM SHALL prioritize running the app for direct browser inspection over generating screenshot sets.
 
 WHEN forms, chat, assistant, or browser tests use person names
 THE SYSTEM SHALL include `Test` in every person name.
@@ -84,6 +91,6 @@ THE SYSTEM SHALL include `Test` in every person name.
 
 ## Open Questions
 
-- How many redesign variants should be generated in the first run?
-- Should Lazyweb research run before generation, or should existing legacy research be reused first?
-- Should the final direction be selected by screenshot review only, or by trying each variant locally?
+- Should this spec be promoted immediately after `demo-readiness-fixes` is closed, or should the remaining public deployment smoke happen first?
+- Should `/` remain the lead workspace route, or should the redesign introduce `/leads` and redirect `/`?
+- Should lead detail become a dedicated route, a desktop inspector, or both?
