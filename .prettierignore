@@ -1,4 +1,6 @@
 .next
+.design-variants
+.playwright-mcp
 .raw
 coverage
 dist

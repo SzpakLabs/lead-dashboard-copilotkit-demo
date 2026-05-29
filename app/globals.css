@@ -3,16 +3,531 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --border: 214 32% 91%;
-  --primary: 222 47% 11%;
-  --primary-foreground: 210 40% 98%;
+  --background: 45 29% 97%;
+  --foreground: 213 28% 13%;
+  --muted: 44 24% 91%;
+  --muted-foreground: 213 11% 42%;
+  --border: 42 18% 79%;
+  --primary: 174 64% 21%;
+  --primary-foreground: 42 40% 96%;
+  --ops-surface: 48 30% 96%;
+  --ops-surface-strong: 0 0% 100%;
+  --ops-ink-soft: 213 14% 30%;
+  --ops-line: 42 18% 79%;
+  --ops-accent: 174 64% 21%;
+  --ops-warn: 38 92% 45%;
+  --ops-danger: 357 64% 45%;
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-feature-settings: "tnum";
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.ops-console {
+  background:
+    linear-gradient(90deg, rgb(29 78 72 / 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, rgb(29 78 72 / 0.05) 1px, transparent 1px),
+    hsl(var(--background));
+  background-size: 28px 28px;
+  padding: 1rem;
+}
+
+.ops-command-bar {
+  align-items: center;
+  background: hsl(var(--ops-surface-strong));
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-inline: auto;
+  max-width: 96rem;
+  padding: 0.875rem;
+  position: sticky;
+  top: 1rem;
+  z-index: 20;
+}
+
+.ops-command-bar h1 {
+  font-size: 1.35rem;
+  font-weight: 720;
+  line-height: 1.1;
+}
+
+.ops-eyebrow {
+  align-items: center;
+  color: hsl(var(--muted-foreground));
+  display: flex;
+  font-size: 0.72rem;
+  font-weight: 700;
+  gap: 0.375rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ops-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.ops-button,
+.ops-search,
+.ops-ledger-tools :where(a, span),
+.ops-section-action a {
+  align-items: center;
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 7px;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 650;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding-inline: 0.75rem;
+}
+
+.ops-search {
+  background: hsl(var(--muted) / 0.55);
+  color: hsl(var(--ops-ink-soft));
+  min-inline-size: 11rem;
+  justify-content: flex-start;
+}
+
+.ops-button,
+.ops-ledger-tools a,
+.ops-section-action a {
+  background: hsl(var(--ops-surface-strong));
+}
+
+.ops-button-primary {
+  background: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.ops-strip {
+  display: grid;
+  gap: 0.625rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 1rem auto;
+  max-width: 96rem;
+}
+
+.ops-metric {
+  align-items: center;
+  background: hsl(var(--ops-surface-strong));
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 8px;
+  display: flex;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.75rem;
+}
+
+.ops-metric-icon {
+  align-items: center;
+  background: hsl(var(--muted) / 0.75);
+  border-radius: 7px;
+  color: hsl(var(--primary));
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: 2rem;
+  min-inline-size: 2rem;
+}
+
+.ops-metric p,
+.ops-panel-heading p,
+.ops-ledger-header p,
+.ops-inspector-header p,
+.ops-section-heading p {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.ops-metric strong {
+  display: block;
+  font-size: 1.45rem;
+  line-height: 1.05;
+  margin-top: 0.2rem;
+}
+
+.ops-metric-warning .ops-metric-icon {
+  background: rgb(245 158 11 / 0.14);
+  color: hsl(var(--ops-warn));
+}
+
+.ops-metric-danger .ops-metric-icon {
+  background: rgb(220 38 38 / 0.12);
+  color: hsl(var(--ops-danger));
+}
+
+.ops-workbench {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(15rem, 0.72fr) minmax(34rem, 1.75fr) minmax(
+      22rem,
+      1fr
+    );
+  margin: 0 auto;
+  max-width: 96rem;
+}
+
+.ops-rail,
+.ops-inspector {
+  display: grid;
+  gap: 1rem;
+  position: sticky;
+  top: 6rem;
+}
+
+.ops-panel,
+.ops-ledger {
+  background: hsl(var(--ops-surface-strong));
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 8px;
+}
+
+.ops-panel {
+  padding: 0.875rem;
+}
+
+.ops-ledger {
+  contain: layout style paint;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ops-panel-heading,
+.ops-ledger-header,
+.ops-inspector-header,
+.ops-section-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.ops-panel-heading,
+.ops-ledger-header {
+  border-bottom: 1px solid hsl(var(--ops-line));
+  padding-bottom: 0.75rem;
+}
+
+.ops-ledger-header {
+  align-items: center;
+  padding: 0.875rem;
+}
+
+.ops-panel-heading h2,
+.ops-ledger-header h2,
+.ops-inspector-header h2,
+.ops-section-heading h3 {
+  font-size: 0.96rem;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.ops-ledger-tools {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.ops-ledger-tools :where(a, span),
+.ops-section-action a {
+  color: hsl(var(--ops-ink-soft));
+  font-size: 0.78rem;
+  min-height: 2rem;
+  padding-inline: 0.55rem;
+}
+
+.ops-queue-list {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.875rem;
+}
+
+.ops-queue-link {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: hsl(var(--ops-ink-soft));
+  display: flex;
+  font-size: 0.875rem;
+  justify-content: space-between;
+  min-height: 2.25rem;
+  padding-inline: 0.7rem;
+}
+
+.ops-queue-link:hover,
+.ops-queue-link.is-active {
+  background: hsl(var(--muted) / 0.75);
+  border-color: hsl(var(--ops-line));
+  color: hsl(var(--foreground));
+}
+
+.ops-intake-panel {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 34rem;
+}
+
+.ops-table-wrap {
+  overflow-x: auto;
+}
+
+.ops-table {
+  border-collapse: collapse;
+  min-width: 58rem;
+  width: 100%;
+}
+
+.ops-table caption {
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+.ops-table th {
+  background: hsl(var(--muted) / 0.68);
+  color: hsl(var(--muted-foreground));
+  font-size: 0.7rem;
+  font-weight: 750;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.ops-table td {
+  border-top: 1px solid hsl(var(--ops-line));
+  font-size: 0.84rem;
+  line-height: 1.35;
+  max-width: 14rem;
+  padding: 0.75rem;
+  vertical-align: top;
+}
+
+.ops-table tr {
+  background: hsl(var(--ops-surface-strong));
+}
+
+.ops-table tr:hover,
+.ops-table tr.is-selected {
+  background: rgb(20 111 101 / 0.07);
+}
+
+.ops-table tr.is-selected td:first-child {
+  box-shadow: inset 3px 0 0 hsl(var(--primary));
+}
+
+.ops-table td p {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.76rem;
+  margin-top: 0.2rem;
+}
+
+.ops-lead-link {
+  font-weight: 720;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.ops-lead-link:hover {
+  text-decoration-line: underline;
+}
+
+.ops-muted-cell {
+  color: hsl(var(--muted-foreground));
+}
+
+.ops-inspector-panel {
+  display: grid;
+  gap: 1rem;
+  max-height: calc(100dvh - 7rem);
+  overflow: auto;
+}
+
+.ops-inspector-header {
+  background: linear-gradient(
+    135deg,
+    rgb(20 111 101 / 0.12),
+    rgb(245 158 11 / 0.1)
+  );
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 8px;
+  padding: 0.875rem;
+}
+
+.ops-inspector-header h2 {
+  font-size: 1.1rem;
+  margin-top: 0.25rem;
+  overflow-wrap: break-word;
+}
+
+.ops-inspector-facts {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ops-inspector-section {
+  border-top: 1px solid hsl(var(--ops-line));
+  content-visibility: auto;
+  contain-intrinsic-size: auto 28rem;
+  padding-top: 1rem;
+}
+
+.ops-section-heading {
+  margin-bottom: 0.75rem;
+}
+
+.ops-source-copy {
+  background: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 7px;
+  color: hsl(var(--ops-ink-soft));
+  font-size: 0.86rem;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  padding: 0.75rem;
+}
+
+.ops-assistant-note {
+  align-items: center;
+  background: hsl(var(--muted) / 0.55);
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: 7px;
+  color: hsl(var(--muted-foreground));
+  display: flex;
+  font-size: 0.78rem;
+  gap: 0.5rem;
+  padding: 0.7rem;
+}
+
+.ops-review-badge {
+  background: hsl(var(--muted));
+  border-radius: 7px;
+  color: hsl(var(--muted-foreground));
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.28rem 0.5rem;
+  white-space: nowrap;
+}
+
+.ops-review-warning {
+  background: rgb(245 158 11 / 0.13);
+  color: rgb(146 64 14);
+}
+
+.ops-panel :where(input, select, textarea),
+.ops-inspector :where(input, select, textarea) {
+  border-radius: 7px;
+  box-shadow: none;
+}
+
+.ops-panel form,
+.ops-inspector form {
+  margin-top: 0.875rem;
+}
+
+.ops-rail .ops-panel form {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 1180px) {
+  .ops-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ops-workbench {
+    grid-template-columns: minmax(14rem, 0.75fr) minmax(0, 1.5fr);
+  }
+
+  .ops-inspector {
+    grid-column: 1 / -1;
+    max-width: none;
+    position: static;
+  }
+
+  .ops-inspector-panel {
+    max-height: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .ops-console {
+    padding: 0.75rem;
+  }
+
+  .ops-command-bar {
+    align-items: stretch;
+    flex-direction: column;
+    position: static;
+  }
+
+  .ops-actions {
+    justify-content: stretch;
+  }
+
+  .ops-actions > * {
+    flex: 1 1 9rem;
+  }
+
+  .ops-search {
+    min-inline-size: 0;
+  }
+
+  .ops-strip,
+  .ops-workbench,
+  .ops-inspector-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .ops-rail {
+    position: static;
+  }
+
+  .ops-table {
+    min-width: 48rem;
+  }
+
+  .ops-inspector-section {
+    content-visibility: visible;
+  }
+
+  .ops-section-heading,
+  .ops-inspector-section .items-start.justify-between {
+    flex-wrap: wrap;
+  }
+
+  .ops-section-action,
+  .ops-inspector-section .items-start.justify-between > * {
+    min-width: 0;
+  }
+}
+
+@media (pointer: coarse) {
+  .ops-button,
+  .ops-search,
+  .ops-queue-link,
+  .ops-ledger-tools :where(a, span),
+  .ops-section-action a {
+    min-height: 2.75rem;
+  }
 }

@@ -10,4 +10,4 @@ coverage
 *.tsbuildinfo
 .design-variants/*
 .design-variants/legacy
-.playwright-mcp/*.log
+.playwright-mcp

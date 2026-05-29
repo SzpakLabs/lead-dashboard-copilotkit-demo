@@ -11,7 +11,12 @@ const eslintConfig = [
     }
   },
   {
-    ignores: [".next/**", "node_modules/**", "drizzle/meta/**"]
+    ignores: [
+      ".design-variants/**",
+      ".next/**",
+      "node_modules/**",
+      "drizzle/meta/**"
+    ]
   }
 ];
 

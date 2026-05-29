@@ -9,13 +9,25 @@ import {
   sql,
   type SQL
 } from "drizzle-orm";
-import { CalendarDays } from "lucide-react";
-import Link from "next/link";
-import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import {
-  CustomFieldDefinitionsPanel,
-  type CustomFieldDefinitionItem
-} from "@/components/leads/custom-field-definitions-panel";
+  AlertTriangle,
+  Bot,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  DatabaseZap,
+  Filter,
+  LayoutDashboard,
+  ListChecks,
+  Plus,
+  Search,
+  Settings2,
+  SlidersHorizontal
+} from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import {
   CustomFieldValuesForm,
   type CustomFieldValueItem
@@ -27,7 +39,6 @@ import {
 import { IngestionForm } from "@/components/leads/ingestion-form";
 import { LeadDetailForm } from "@/components/leads/lead-detail-form";
 import { LeadStatusForm } from "@/components/leads/lead-status-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
 import {
@@ -109,288 +120,440 @@ async function Dashboard({
     : [];
   const currentTime = await getCurrentTime();
   const metrics = await getDashboardMetrics(leadRows, currentTime);
+  const activeLeadRow = leadRows.find((lead) => lead.id === activeLeadId);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
+    <main className="ops-console min-h-screen">
       {assistantEnabled ? <AssistantPanel /> : null}
 
-      <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">Demo Core</p>
-          <h1 className="text-4xl font-semibold tracking-normal">
-            Lead Dashboard
-          </h1>
-          <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-            Paste lead text or a transcript, review extracted records, and keep
-            source context traceable while status and follow-up changes write
-            audit activity.
+      <header className="ops-command-bar">
+        <div className="min-w-0">
+          <p className="ops-eyebrow">
+            <LayoutDashboard className="size-4" />
+            Service Ops Console
           </p>
+          <h1>Lead operations</h1>
         </div>
-        <Link
-          className="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted"
-          href="/calendar"
-        >
-          <CalendarDays className="size-4" />
-          Calendar
-        </Link>
-      </section>
-
-      <section className="space-y-3">
-        <div>
-          <h2 className="text-xl font-semibold">Lead ingestion</h2>
-          <p className="text-sm text-muted-foreground">
-            Drafts are stored with the source ingestion event and audit
-            activity.
-          </p>
+        <div className="ops-actions" aria-label="Workspace actions">
+          <a className="ops-search" href="#lead-filters">
+            <Search className="size-4" />
+            <span>Search leads</span>
+          </a>
+          <a className="ops-button ops-button-primary" href="#intake">
+            <Plus className="size-4" />
+            <span>New intake</span>
+          </a>
+          <Link className="ops-button" href="/calendar">
+            <CalendarDays className="size-4" />
+            <span>Calendar</span>
+          </Link>
         </div>
-        <IngestionForm />
-      </section>
+      </header>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <MetricCard label="Total leads" value={metrics.totalLeads} />
-        <MetricCard label="Needs review" value={metrics.needsReview} />
-        <MetricCard label="Scheduled" value={metrics.scheduled} />
-        <MetricCard label="Won / lost" value={metrics.wonLost} />
+      <section className="ops-strip" aria-label="Operational health">
         <MetricCard
+          icon={<DatabaseZap className="size-4" />}
+          label="Total leads"
+          value={metrics.totalLeads}
+        />
+        <MetricCard
+          icon={<AlertTriangle className="size-4" />}
+          label="Needs review"
+          value={metrics.needsReview}
+          tone={metrics.needsReview > 0 ? "warning" : "neutral"}
+        />
+        <MetricCard
+          icon={<CalendarDays className="size-4" />}
+          label="Scheduled"
+          value={metrics.scheduled}
+        />
+        <MetricCard
+          icon={<CheckCircle2 className="size-4" />}
+          label="Won / lost"
+          value={metrics.wonLost}
+        />
+        <MetricCard
+          icon={<Clock3 className="size-4" />}
           label="Overdue follow-ups"
           value={metrics.overdueFollowUps}
+          tone={metrics.overdueFollowUps > 0 ? "danger" : "neutral"}
         />
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <Card className="overflow-hidden">
-          <CardHeader className="border-b border-border pb-4">
-            <div className="space-y-4">
+      <div className="ops-workbench">
+        <aside className="ops-rail" aria-label="Lead queues and filters">
+          <section className="ops-panel">
+            <div className="ops-panel-heading">
               <div>
-                <CardTitle className="text-xl">Leads</CardTitle>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {leadRows.length} matching lead
-                  {leadRows.length === 1 ? "" : "s"} in the demo workspace
-                </p>
+                <h2>Queues</h2>
+                <p>Pressure points</p>
               </div>
-              <LeadFiltersForm
-                definitions={customFieldDefinitionRows}
-                filters={filters}
+              <ListChecks className="size-4 text-muted-foreground" />
+            </div>
+            <nav className="ops-queue-list" aria-label="Lead queues">
+              <QueueLink
+                href="/?status=needs_review"
+                label="Needs review"
+                value={metrics.needsReview}
+                active={filters.status === "needs_review"}
               />
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[780px] text-left text-sm">
-                <thead className="border-b border-border bg-muted/60 text-xs font-medium uppercase text-muted-foreground">
-                  <tr>
-                    <th className="px-5 py-3">Lead</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3">Source</th>
-                    <th className="px-5 py-3">Timeline</th>
-                    <th className="px-5 py-3">Next step</th>
-                    <th className="px-5 py-3">Follow-up</th>
-                    <th className="px-5 py-3">Review</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leadRows.map((lead) => (
-                    <tr
-                      key={lead.id}
-                      className={cn(
-                        "border-b border-border last:border-b-0",
-                        lead.id === activeLeadId ? "bg-muted/40" : "bg-white"
-                      )}
-                    >
-                      <td className="px-5 py-4 align-top">
-                        <Link
-                          className="font-medium hover:underline"
-                          href={getLeadHref(lead.id, filters)}
-                        >
-                          {lead.title}
-                        </Link>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {lead.contactName}
-                          {lead.company ? `, ${lead.company}` : ""}
-                        </p>
-                      </td>
-                      <td className="px-5 py-4 align-top">
-                        <StatusBadge status={lead.status} />
-                      </td>
-                      <td className="px-5 py-4 align-top capitalize text-muted-foreground">
-                        {lead.source}
-                      </td>
-                      <td className="max-w-40 px-5 py-4 align-top text-muted-foreground">
-                        {lead.timeline ?? "Missing"}
-                      </td>
-                      <td className="max-w-48 px-5 py-4 align-top text-muted-foreground">
-                        {lead.nextStep ?? "Missing"}
-                      </td>
-                      <td className="px-5 py-4 align-top">
-                        <FollowUpDueBadge
-                          followUpDueAt={lead.followUpDueAt}
-                          currentTime={currentTime}
-                        />
-                      </td>
-                      <td className="px-5 py-4 align-top">
-                        <span className="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-                          {lead.missingFields.length > 0
-                            ? `${lead.missingFields.length} missing`
-                            : `${lead.confidence} confidence`}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {leadRows.length === 0 ? (
-              <div className="p-5 text-sm text-muted-foreground">
-                No leads yet. Create a draft from pasted text.
+              <QueueLink
+                href="/?status=scheduled"
+                label="Scheduled work"
+                value={metrics.scheduled}
+                active={filters.status === "scheduled"}
+              />
+              <QueueLink
+                href="/"
+                label="All active leads"
+                value={metrics.totalLeads}
+                active={
+                  filters.status === "all" &&
+                  filters.source === "all" &&
+                  !filters.query
+                }
+              />
+            </nav>
+          </section>
+
+          <section id="lead-filters" className="ops-panel">
+            <div className="ops-panel-heading">
+              <div>
+                <h2>Filters</h2>
+                <p>Ledger scope</p>
               </div>
-            ) : null}
-          </CardContent>
-        </Card>
+              <Filter className="size-4 text-muted-foreground" />
+            </div>
+            <LeadFiltersForm
+              definitions={customFieldDefinitionRows}
+              filters={filters}
+            />
+          </section>
 
-        <aside className="space-y-5">
+          <section id="intake" className="ops-panel ops-intake-panel">
+            <div className="ops-panel-heading">
+              <div>
+                <h2>Intake</h2>
+                <p>Paste transcript</p>
+              </div>
+              <Plus className="size-4 text-muted-foreground" />
+            </div>
+            <IngestionForm />
+          </section>
+        </aside>
+
+        <section className="ops-ledger" aria-labelledby="lead-ledger-title">
+          <div className="ops-ledger-header">
+            <div>
+              <h2 id="lead-ledger-title">Lead ledger</h2>
+              <p>
+                {leadRows.length} matching lead
+                {leadRows.length === 1 ? "" : "s"} in the demo workspace
+              </p>
+            </div>
+            <div className="ops-ledger-tools">
+              <span>
+                <SlidersHorizontal className="size-4" />
+                Dense
+              </span>
+              <Link href="/settings/fields">
+                <Settings2 className="size-4" />
+                Fields
+              </Link>
+            </div>
+          </div>
+          <LeadLedger
+            activeLeadId={activeLeadId}
+            currentTime={currentTime}
+            filters={filters}
+            leads={leadRows}
+          />
+        </section>
+
+        <aside className="ops-inspector" aria-label="Selected lead inspector">
           {detail ? (
-            <>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Lead detail</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Edit standard lead and contact fields.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <LeadDetailForm
-                    key={detail.id}
-                    lead={{
-                      id: detail.id,
-                      title: detail.title,
-                      source: detail.source,
-                      contactName: detail.contactName,
-                      company: detail.company ?? "",
-                      email: detail.email ?? "",
-                      phone: detail.phone ?? "",
-                      projectType: detail.projectType ?? "",
-                      problemSummary: detail.problemSummary ?? "",
-                      requestedOutcome: detail.requestedOutcome ?? "",
-                      budgetRange: detail.budgetRange ?? "",
-                      timeline: detail.timeline ?? "",
-                      nextStep: detail.nextStep ?? ""
-                    }}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Status</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Move the lead through allowed lifecycle transitions.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <LeadStatusForm
-                    key={detail.id}
-                    leadId={detail.id}
-                    status={detail.status as LeadStatus}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Custom fields</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Workspace-specific values for this lead.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <CustomFieldValuesForm
-                    key={detail.id}
-                    leadId={detail.id}
-                    definitions={customFieldDefinitionRows}
-                    values={detailCustomFieldValues}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Field definitions</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Add, edit, or archive workspace custom fields.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <CustomFieldDefinitionsPanel
-                    definitions={customFieldDefinitionRows}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Follow-ups</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Track due and overdue next actions for this lead.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <FollowUpsPanel
-                    key={detail.id}
-                    leadId={detail.id}
-                    followUps={detailFollowUps}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Source context</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Original transcript or pasted text remains read-only.
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-1">
-                    <Field
-                      label="Source"
-                      value={formatSource(
-                        detail.sourceType,
-                        detail.sourceChannel
-                      )}
-                    />
-                    <Field
-                      label="Created"
-                      value={formatDateTime(detail.ingestedAt)}
-                    />
-                  </div>
-                  <div className="rounded-md border border-border bg-muted/40 p-3 text-sm leading-6">
-                    {detail.rawText}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Activity</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Lead edits, status changes, and follow-up changes.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <ActivityList activity={detailActivity} />
-                </CardContent>
-              </Card>
-            </>
+            <LeadInspector
+              activity={detailActivity}
+              customFieldDefinitions={customFieldDefinitionRows}
+              customFieldValues={detailCustomFieldValues}
+              detail={detail}
+              followUps={detailFollowUps}
+              leadRow={activeLeadRow}
+            />
           ) : (
-            <Card>
-              <CardContent className="pt-5 text-sm text-muted-foreground">
+            <section className="ops-panel">
+              <p className="text-sm text-muted-foreground">
                 Select a lead to review details.
-              </CardContent>
-            </Card>
+              </p>
+            </section>
           )}
         </aside>
-      </section>
+      </div>
     </main>
+  );
+}
+
+function LeadLedger({
+  activeLeadId,
+  currentTime,
+  filters,
+  leads
+}: {
+  activeLeadId: string | undefined;
+  currentTime: number;
+  filters: DashboardFilters;
+  leads: Awaited<ReturnType<typeof getLeadRows>>;
+}) {
+  return (
+    <div className="ops-table-wrap">
+      <table className="ops-table">
+        <caption>
+          Lead status, source, timeline, next action, and review state
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Lead</th>
+            <th scope="col">Status</th>
+            <th scope="col">Source</th>
+            <th scope="col">Timeline</th>
+            <th scope="col">Next step</th>
+            <th scope="col">Follow-up</th>
+            <th scope="col">Review</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leads.map((lead) => (
+            <tr
+              key={lead.id}
+              className={cn(lead.id === activeLeadId ? "is-selected" : "")}
+            >
+              <td>
+                <Link
+                  className="ops-lead-link"
+                  href={getLeadHref(lead.id, filters)}
+                >
+                  {lead.title}
+                </Link>
+                <p>
+                  {lead.contactName}
+                  {lead.company ? `, ${lead.company}` : ""}
+                </p>
+              </td>
+              <td>
+                <StatusBadge status={lead.status} />
+              </td>
+              <td className="capitalize text-muted-foreground">
+                {lead.source}
+              </td>
+              <td className="ops-muted-cell">{lead.timeline ?? "Missing"}</td>
+              <td className="ops-muted-cell">{lead.nextStep ?? "Missing"}</td>
+              <td>
+                <FollowUpDueBadge
+                  followUpDueAt={lead.followUpDueAt}
+                  currentTime={currentTime}
+                />
+              </td>
+              <td>
+                <ReviewBadge
+                  confidence={lead.confidence}
+                  missingFields={lead.missingFields}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {leads.length === 0 ? (
+        <div className="p-5 text-sm text-muted-foreground">
+          No leads match this queue. Create a draft from pasted text.
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function LeadInspector({
+  activity,
+  customFieldDefinitions,
+  customFieldValues,
+  detail,
+  followUps,
+  leadRow
+}: {
+  activity: Awaited<ReturnType<typeof getLeadActivity>>;
+  customFieldDefinitions: CustomFieldDefinitionItem[];
+  customFieldValues: CustomFieldValueItem[];
+  detail: NonNullable<Awaited<ReturnType<typeof getLeadDetail>>>;
+  followUps: FollowUpListItem[];
+  leadRow: Awaited<ReturnType<typeof getLeadRows>>[number] | undefined;
+}) {
+  return (
+    <section className="ops-panel ops-inspector-panel">
+      <div className="ops-inspector-header">
+        <div className="min-w-0">
+          <p className="ops-eyebrow">Selected lead</p>
+          <h2>{detail.title}</h2>
+          <p>
+            {detail.contactName}
+            {detail.company ? `, ${detail.company}` : ""}
+          </p>
+        </div>
+        <StatusBadge status={detail.status as LeadStatus} />
+      </div>
+
+      <div className="ops-inspector-facts" aria-label="Lead review state">
+        <Field
+          label="Source"
+          value={formatSource(detail.sourceType, detail.sourceChannel)}
+        />
+        <Field label="Created" value={formatDateTime(detail.ingestedAt)} />
+        <Field label="Timeline" value={detail.timeline} />
+        <div>
+          <p className="text-xs font-medium uppercase text-muted-foreground">
+            Review
+          </p>
+          <div className="mt-1">
+            <ReviewBadge
+              confidence={leadRow?.confidence ?? 0}
+              missingFields={leadRow?.missingFields ?? []}
+            />
+          </div>
+        </div>
+      </div>
+
+      <InspectorSection
+        id="review"
+        title="Review"
+        description="Edit extracted lead and contact fields."
+      >
+        <LeadDetailForm
+          key={`detail-${detail.id}`}
+          lead={{
+            id: detail.id,
+            title: detail.title,
+            source: detail.source,
+            contactName: detail.contactName,
+            company: detail.company ?? "",
+            email: detail.email ?? "",
+            phone: detail.phone ?? "",
+            projectType: detail.projectType ?? "",
+            problemSummary: detail.problemSummary ?? "",
+            requestedOutcome: detail.requestedOutcome ?? "",
+            budgetRange: detail.budgetRange ?? "",
+            timeline: detail.timeline ?? "",
+            nextStep: detail.nextStep ?? ""
+          }}
+        />
+      </InspectorSection>
+
+      <InspectorSection
+        id="actions"
+        title="Actions"
+        description="Update lifecycle and follow-up commitments."
+      >
+        <div className="space-y-5">
+          <LeadStatusForm
+            key={`status-${detail.id}`}
+            leadId={detail.id}
+            status={detail.status as LeadStatus}
+          />
+          <FollowUpsPanel
+            key={`followups-${detail.id}`}
+            leadId={detail.id}
+            followUps={followUps}
+          />
+        </div>
+      </InspectorSection>
+
+      <InspectorSection
+        id="custom-fields"
+        title="Custom fields"
+        description="Lead-specific values. Definitions live in settings."
+        action={
+          <Link href="/settings/fields">
+            <Settings2 className="size-4" />
+            Manage
+          </Link>
+        }
+      >
+        <CustomFieldValuesForm
+          key={`custom-fields-${detail.id}`}
+          leadId={detail.id}
+          definitions={customFieldDefinitions}
+          values={customFieldValues}
+        />
+      </InspectorSection>
+
+      <InspectorSection
+        id="source"
+        title="Source"
+        description="Original transcript remains read-only."
+      >
+        <div className="ops-source-copy">{detail.rawText}</div>
+      </InspectorSection>
+
+      <InspectorSection
+        id="activity"
+        title="Activity"
+        description="Audited lead, status, and follow-up changes."
+      >
+        <ActivityList activity={activity} />
+      </InspectorSection>
+
+      <div className="ops-assistant-note">
+        <Bot className="size-4" />
+        <span>Assistant changes still require preview and confirmation.</span>
+      </div>
+    </section>
+  );
+}
+
+function InspectorSection({
+  action,
+  children,
+  description,
+  id,
+  title
+}: {
+  action?: ReactNode;
+  children: ReactNode;
+  description: string;
+  id: string;
+  title: string;
+}) {
+  return (
+    <section className="ops-inspector-section" aria-labelledby={`${id}-title`}>
+      <div className="ops-section-heading">
+        <div>
+          <h3 id={`${id}-title`}>{title}</h3>
+          <p>{description}</p>
+        </div>
+        {action ? <div className="ops-section-action">{action}</div> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function QueueLink({
+  active,
+  href,
+  label,
+  value
+}: {
+  active: boolean;
+  href: string;
+  label: string;
+  value: number | string;
+}) {
+  return (
+    <Link
+      className={cn("ops-queue-link", active ? "is-active" : "")}
+      href={href}
+    >
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </Link>
   );
 }
 
@@ -800,21 +963,24 @@ async function getLeadActivity(leadId: string) {
 }
 
 function MetricCard({
+  icon,
   label,
+  tone = "neutral",
   value
 }: {
+  icon: ReactNode;
   label: string;
+  tone?: "neutral" | "warning" | "danger";
   value: number | string;
 }) {
   return (
-    <Card>
-      <CardContent className="p-4">
-        <p className="text-xs font-medium uppercase text-muted-foreground">
-          {label}
-        </p>
-        <p className="mt-2 text-2xl font-semibold">{value}</p>
-      </CardContent>
-    </Card>
+    <div className={cn("ops-metric", `ops-metric-${tone}`)}>
+      <div className="ops-metric-icon">{icon}</div>
+      <div>
+        <p>{label}</p>
+        <strong>{value}</strong>
+      </div>
+    </div>
   );
 }
 
@@ -867,6 +1033,24 @@ function StatusBadge({ status }: { status: LeadStatus }) {
       {getLeadStatusLabel(status)}
     </span>
   );
+}
+
+function ReviewBadge({
+  confidence,
+  missingFields
+}: {
+  confidence: number | string;
+  missingFields: string[];
+}) {
+  if (missingFields.length > 0) {
+    return (
+      <span className="ops-review-badge ops-review-warning">
+        {missingFields.length} missing
+      </span>
+    );
+  }
+
+  return <span className="ops-review-badge">{confidence} confidence</span>;
 }
 
 function FollowUpDueBadge({
