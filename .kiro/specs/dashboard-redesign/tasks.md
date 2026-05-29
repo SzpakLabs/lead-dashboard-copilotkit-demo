@@ -22,7 +22,7 @@ Planning decisions:
 ## Manual Redesign
 
 - [x] Apply the Service Ops Console direction to the main app.
-- [ ] Add or update shared app shell, navigation, command bar, and responsive layout tokens.
+- [x] Add or update shared app shell, navigation, command bar, and responsive layout tokens.
 - [ ] Rework the lead workspace into queue/filter rail, dense lead ledger, and selected-lead inspector.
 - [ ] Move ingestion into a drawer/sheet and optional focused route.
 - [ ] Reorganize lead detail into review, action, source, activity, and custom-field surfaces.

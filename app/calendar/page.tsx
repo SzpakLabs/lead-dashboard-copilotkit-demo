@@ -1,6 +1,7 @@
 import { CalendarDays, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { AppShell } from "@/components/dashboard/app-shell";
 import { formatDate, formatDateTime } from "@/lib/date-format";
 import {
   type CalendarItem,
@@ -31,63 +32,60 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   );
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-10">
-      <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-3">
-          <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <CalendarDays className="size-4" />
-            Later MVP
+    <AppShell
+      actions={
+        <Link className="ops-button" href="/">
+          <LayoutDashboard className="size-4" />
+          <span>Dashboard</span>
+        </Link>
+      }
+      activeSection="calendar"
+      eyebrow="Lead schedule"
+      eyebrowIcon={<CalendarDays className="size-4" />}
+      title="Calendar"
+    >
+      <div className="ops-page-stack">
+        <section className="ops-page-intro">
+          <p>
+            Derived from scheduled lead work, completed work, and follow-up
+            dates already stored on leads and follow-ups.
           </p>
+        </section>
+
+        <section className="ops-toolbar-panel">
           <div>
-            <h1 className="text-4xl font-semibold tracking-normal">Calendar</h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-              Derived from scheduled lead work, completed work, and follow-up
-              dates already stored on leads and follow-ups.
+            <p className="text-sm font-medium">{range.label}</p>
+            <p className="text-sm text-muted-foreground">
+              {scopedItems.length} item{scopedItems.length === 1 ? "" : "s"}
             </p>
           </div>
-        </div>
-        <Link
-          className="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted"
-          href="/"
-        >
-          <LayoutDashboard className="size-4" />
-          Dashboard
-        </Link>
-      </section>
+          <div className="flex flex-wrap gap-2">
+            {(["month", "week", "day"] satisfies CalendarScope[]).map(
+              (option) => (
+                <Link
+                  key={option}
+                  className={cn(
+                    "rounded-md px-3 py-2 text-sm font-medium capitalize",
+                    scope === option
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border hover:bg-muted"
+                  )}
+                  href={`/calendar?scope=${option}&date=${toDateParam(anchorDate)}`}
+                >
+                  {option}
+                </Link>
+              )
+            )}
+          </div>
+        </section>
 
-      <section className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-medium">{range.label}</p>
-          <p className="text-sm text-muted-foreground">
-            {scopedItems.length} item{scopedItems.length === 1 ? "" : "s"}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {(["month", "week", "day"] satisfies CalendarScope[]).map(
-            (option) => (
-              <Link
-                key={option}
-                className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium capitalize",
-                  scope === option
-                    ? "bg-primary text-primary-foreground"
-                    : "border border-border hover:bg-muted"
-                )}
-                href={`/calendar?scope=${option}&date=${toDateParam(anchorDate)}`}
-              >
-                {option}
-              </Link>
-            )
-          )}
-        </div>
-      </section>
-
-      {scope === "month" ? (
-        <MonthCalendar anchorDate={anchorDate} items={scopedItems} />
-      ) : (
-        <Agenda items={scopedItems} />
-      )}
-    </main>
+        {scope === "month" ? (
+          <MonthCalendar anchorDate={anchorDate} items={scopedItems} />
+        ) : (
+          <Agenda items={scopedItems} />
+        )}
+      </div>
+    </AppShell>
   );
 }
 

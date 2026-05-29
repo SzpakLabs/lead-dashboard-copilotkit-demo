@@ -1,6 +1,7 @@
 import { asc, isNull } from "drizzle-orm";
 import { ArrowLeft, Settings2 } from "lucide-react";
 import Link from "next/link";
+import { AppShell } from "@/components/dashboard/app-shell";
 import {
   CustomFieldDefinitionsPanel,
   type CustomFieldDefinitionItem
@@ -14,24 +15,19 @@ export default async function FieldSettingsPage() {
   const definitions = await getCustomFieldDefinitions();
 
   return (
-    <main className="ops-console min-h-screen">
-      <header className="ops-command-bar">
-        <div className="min-w-0">
-          <p className="ops-eyebrow">
-            <Settings2 className="size-4" />
-            Workspace settings
-          </p>
-          <h1>Custom fields</h1>
-        </div>
-        <div className="ops-actions">
-          <Link className="ops-button" href="/">
-            <ArrowLeft className="size-4" />
-            <span>Back to console</span>
-          </Link>
-        </div>
-      </header>
-
-      <section className="mx-auto mt-4 max-w-3xl">
+    <AppShell
+      actions={
+        <Link className="ops-button" href="/">
+          <ArrowLeft className="size-4" />
+          <span>Back to console</span>
+        </Link>
+      }
+      activeSection="fields"
+      eyebrow="Workspace settings"
+      eyebrowIcon={<Settings2 className="size-4" />}
+      title="Custom fields"
+    >
+      <section className="ops-page-stack ops-narrow-page">
         <div className="ops-panel">
           <div className="ops-panel-heading">
             <div>
@@ -42,7 +38,7 @@ export default async function FieldSettingsPage() {
           <CustomFieldDefinitionsPanel definitions={definitions} />
         </div>
       </section>
-    </main>
+    </AppShell>
   );
 }
 

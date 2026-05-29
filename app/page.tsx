@@ -17,7 +17,6 @@ import {
   Clock3,
   DatabaseZap,
   Filter,
-  LayoutDashboard,
   ListChecks,
   Plus,
   Search,
@@ -26,7 +25,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import { AppShell } from "@/components/dashboard/app-shell";
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import {
   CustomFieldValuesForm,
@@ -123,18 +122,9 @@ async function Dashboard({
   const activeLeadRow = leadRows.find((lead) => lead.id === activeLeadId);
 
   return (
-    <main className="ops-console min-h-screen">
-      {assistantEnabled ? <AssistantPanel /> : null}
-
-      <header className="ops-command-bar">
-        <div className="min-w-0">
-          <p className="ops-eyebrow">
-            <LayoutDashboard className="size-4" />
-            Service Ops Console
-          </p>
-          <h1>Lead operations</h1>
-        </div>
-        <div className="ops-actions" aria-label="Workspace actions">
+    <AppShell
+      actions={
+        <>
           <a className="ops-search" href="#lead-filters">
             <Search className="size-4" />
             <span>Search leads</span>
@@ -147,9 +137,14 @@ async function Dashboard({
             <CalendarDays className="size-4" />
             <span>Calendar</span>
           </Link>
-        </div>
-      </header>
-
+        </>
+      }
+      activeSection="console"
+      assistantEnabled={assistantEnabled}
+      eyebrow="Service Ops Console"
+      eyebrowIcon={<DatabaseZap className="size-4" />}
+      title="Lead operations"
+    >
       <section className="ops-strip" aria-label="Operational health">
         <MetricCard
           icon={<DatabaseZap className="size-4" />}
@@ -289,7 +284,7 @@ async function Dashboard({
           )}
         </aside>
       </div>
-    </main>
+    </AppShell>
   );
 }
 
