@@ -7,6 +7,8 @@ Status: draft only. Do not implement until this spec is promoted to Active Spec.
 - [ ] Confirm this spec is active in `.kiro/specs/README.md`
 - [ ] Treat `.design-variants` artifacts as deprecated; do not use the CLI workflow for this session.
 - [ ] Use `Service Ops Console` as the only redesign direction; do not generate alternate variants.
+- [ ] Use `frontend-design` during implementation.
+- [ ] Use comparable product references only for patterns that support the Service Ops Console direction.
 - [ ] Confirm whether `/` remains the lead workspace or redirects to `/leads`.
 - [ ] Confirm whether lead detail gets a dedicated route, inspector, or both.
 - [ ] Confirm whether custom field definitions move to `/settings/fields`.

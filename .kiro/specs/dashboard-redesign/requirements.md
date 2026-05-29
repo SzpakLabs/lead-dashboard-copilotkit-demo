@@ -46,11 +46,17 @@ THE SYSTEM SHALL preserve existing lead ingestion, review, editing, status, foll
 WHEN visual direction is chosen
 THE SYSTEM SHALL keep the app professional, dense, and operational for small service-business lead management.
 
+WHEN visual implementation begins
+THE SYSTEM SHALL use the `frontend-design` skill to keep the interface distinctive, polished, and intentionally designed for the lead-ops domain.
+
 WHEN designing dashboard surfaces
 THE SYSTEM SHALL avoid marketing-page structure, oversized hero sections, decorative-only visuals, low-density cards, generic AI aesthetics, and chart-first analytics.
 
 WHEN displaying lead data
 THE SYSTEM SHALL keep status, review state, next follow-up, source context, scheduled/completed dates, and recent activity easy to scan.
+
+WHEN borrowing from comparable products
+THE SYSTEM SHALL use analogue patterns only when they support the `Service Ops Console` direction, especially lead attention queues, follow-up reminders, AI-assisted next actions, source traceability, and human-reviewed automation.
 
 WHEN displaying AI-assisted features
 THE SYSTEM SHALL keep the dashboard as the system of record and keep assistant actions previewable, confirmable, and auditable.

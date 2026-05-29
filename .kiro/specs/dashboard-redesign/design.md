@@ -27,6 +27,32 @@ Older plans and artifacts have lower priority than:
 - Current product steering and safety rules.
 - Preserving the working behavior of the implemented MVP.
 
+## Comparable Product References
+
+Use these products as market and pattern references, not as UX to copy directly:
+
+- [Capther](https://capther.com/) — AI-native CRM positioning around capturing leads, calls, deals, conversations, transcription, lead creation, and follow-up scheduling.
+- [Followo](https://followo.app/) — AI CRM focused on lead attention, scheduled follow-ups, AI nudges, and human-reviewed drafted messages.
+- [FlowX](https://useflowx.com/) — small-business AI CRM patterns around conversation summaries, lead scoring, follow-up drafting, and next-best-action recommendations.
+- [Callably](https://callably.co/) — communication CRM reference for call/text-to-lead workflows, appointment intent, follow-ups, and automatic lead scoring.
+- [Waiflow](https://waiflow.app/) — WhatsApp-native lead manager reference for chat-first lead organization, auto-labeling, qualification, scoring, and follow-up automation.
+- [Front snooze/follow-up docs](https://help.front.com/en/articles/2088) — workflow reference for snoozing conversations and follow-up queues.
+
+Patterns to borrow:
+
+- Attention queues for leads that need review, follow-up, or reactivation.
+- Follow-up state as a first-class workflow, not a secondary note.
+- AI suggestions that stay under human control before mutation or sending.
+- Source-linked summaries so follow-up decisions can reference the original conversation.
+- Inbox/queue ergonomics for small teams that cannot afford CRM administration overhead.
+
+Patterns to avoid:
+
+- Fully automated mutation or outreach without explicit review.
+- Sales-team-heavy CRM chrome that assumes managers, reps, territories, and enterprise reporting.
+- Generic pipeline-first UI when the core problem is unstructured input, review, and next action.
+- Marketing dashboard visual language where charts dominate the operational queue.
+
 ## Target Experience
 
 The redesigned app should feel like a lead operations console, not a demo landing page.
@@ -84,6 +110,8 @@ Mobile layout:
 Direction: Service Ops Console.
 
 The UI should feel like a compact operations desk for a small service-business owner, not a broad analytics product.
+
+Use `frontend-design` during implementation. The result should have a clear aesthetic point of view and should not look like default Tailwind/shadcn cards with a header added. The design can be restrained, but it must feel deliberately composed for lead operations: queue pressure, source evidence, follow-up urgency, and selected-lead action should be visually memorable.
 
 Visual rules:
 
