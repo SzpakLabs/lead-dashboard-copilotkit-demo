@@ -36,12 +36,12 @@ Planning decisions:
 
 ## Verification
 
-- [ ] Run `npm run check`
-- [ ] Manually verify pasted text creates a draft lead using a test-safe name
-- [ ] Manually verify lead edit and status change flows
-- [ ] Manually verify follow-up create, update, and complete flows
-- [ ] Manually verify custom fields remain usable
-- [ ] Manually verify calendar items link back to lead detail
-- [ ] Manually verify assistant search and mutation preview still work
-- [ ] Start the local app for direct browser review
-- [ ] Handle visual issues through discussion plus targeted iteration or rollback
+- [x] Run `npm run check`
+- [x] Manually verify pasted text creates a draft lead using a test-safe name
+- [x] Manually verify lead edit and status change flows
+- [x] Manually verify follow-up create, update, and complete flows
+- [x] Manually verify custom fields remain usable
+- [x] Manually verify calendar items link back to lead detail
+- [x] Manually verify assistant search and mutation preview still work
+- [x] Start the local app for direct browser review
+- [x] Handle visual issues through discussion plus targeted iteration or rollback
