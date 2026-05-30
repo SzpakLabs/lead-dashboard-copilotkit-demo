@@ -1201,6 +1201,17 @@ body {
   width: 100%;
 }
 
+body[data-intake-drawer-open="true"]
+  div[data-copilotkit]:has([data-copilot-popup]),
+body[data-intake-drawer-open="true"]
+  button[data-testid="copilot-chat-toggle"]:is(
+    [aria-label="Open lead assistant"],
+    [aria-label="Close lead assistant"]
+  ) {
+  right: calc(min(34rem, 100dvw) + 1rem) !important;
+  z-index: 90 !important;
+}
+
 .ops-drawer-overlay.is-open .ops-intake-drawer {
   transform: translateX(0);
 }
@@ -1255,6 +1266,18 @@ body {
   .ops-drawer-overlay,
   .ops-intake-drawer {
     transition: none;
+  }
+}
+
+@media (max-width: 42rem) {
+  body[data-intake-drawer-open="true"]
+    div[data-copilotkit]:has([data-copilot-popup]),
+  body[data-intake-drawer-open="true"]
+    button[data-testid="copilot-chat-toggle"]:is(
+      [aria-label="Open lead assistant"],
+      [aria-label="Close lead assistant"]
+    ) {
+    display: none !important;
   }
 }
 

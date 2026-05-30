@@ -21,8 +21,12 @@ export function IntakeDrawer() {
     returnFocusRef.current = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     const appShell = document.getElementById("ops-app-shell");
+    const appHeader = appShell?.querySelector("header");
+    const appMain = document.getElementById("ops-main-content");
     document.body.style.overflow = "hidden";
-    appShell?.setAttribute("inert", "");
+    document.body.dataset.intakeDrawerOpen = "true";
+    appHeader?.setAttribute("inert", "");
+    appMain?.setAttribute("inert", "");
     sheetRef.current?.focus();
 
     function closeOnEscape(event: KeyboardEvent) {
@@ -35,7 +39,9 @@ export function IntakeDrawer() {
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      appShell?.removeAttribute("inert");
+      delete document.body.dataset.intakeDrawerOpen;
+      appHeader?.removeAttribute("inert");
+      appMain?.removeAttribute("inert");
       document.removeEventListener("keydown", closeOnEscape);
       returnFocusRef.current?.focus();
     };
