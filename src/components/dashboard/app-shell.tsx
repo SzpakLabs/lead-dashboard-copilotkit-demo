@@ -52,7 +52,14 @@ export function AppShell({
   title
 }: AppShellProps) {
   return (
-    <main className="ops-console min-h-screen" data-density="compact">
+    <div
+      className="ops-console min-h-screen"
+      data-density="compact"
+      id="ops-app-shell"
+    >
+      <a className="ops-skip-link" href="#ops-main-content">
+        Skip to lead workspace
+      </a>
       {assistantEnabled ? <AssistantPanel /> : null}
 
       <header className="ops-command-bar">
@@ -72,7 +79,7 @@ export function AppShell({
           ) : null}
         </div>
 
-        <nav className="ops-primary-nav" aria-label="Primary navigation">
+        <nav className="ops-primary-nav" aria-label="Primary">
           {navItems.map((item) => (
             <Link
               aria-current={item.section === activeSection ? "page" : undefined}
@@ -96,7 +103,9 @@ export function AppShell({
         ) : null}
       </header>
 
-      {children}
-    </main>
+      <main id="ops-main-content" tabIndex={-1}>
+        {children}
+      </main>
+    </div>
   );
 }

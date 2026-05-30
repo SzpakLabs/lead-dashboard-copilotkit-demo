@@ -20,7 +20,9 @@ export function IntakeDrawer() {
 
     returnFocusRef.current = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
+    const appShell = document.getElementById("ops-app-shell");
     document.body.style.overflow = "hidden";
+    appShell?.setAttribute("inert", "");
     sheetRef.current?.focus();
 
     function closeOnEscape(event: KeyboardEvent) {
@@ -33,6 +35,7 @@ export function IntakeDrawer() {
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      appShell?.removeAttribute("inert");
       document.removeEventListener("keydown", closeOnEscape);
       returnFocusRef.current?.focus();
     };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -21,6 +21,9 @@ export function CustomFieldDefinitionsPanel({
   definitions
 }: CustomFieldDefinitionsPanelProps) {
   const router = useRouter();
+  const newLabelId = useId();
+  const newTypeId = useId();
+  const messageId = useId();
   const [newLabel, setNewLabel] = useState("");
   const [newType, setNewType] =
     useState<CustomFieldDefinitionItem["fieldType"]>("text");
@@ -119,22 +122,30 @@ export function CustomFieldDefinitionsPanel({
     <div className="space-y-4">
       <form
         className="grid gap-3"
+        aria-describedby={message ? messageId : undefined}
         onSubmit={(event) => {
           event.preventDefault();
           createField();
         }}
       >
-        <label className="space-y-1 text-sm font-medium">
-          Label
+        <div className="space-y-1 text-sm font-medium">
+          <label htmlFor={newLabelId}>Label</label>
           <Input
+            id={newLabelId}
+            name="label"
             value={newLabel}
             onChange={(event) => setNewLabel(event.target.value)}
           />
-        </label>
-        <label className="space-y-1 text-sm font-medium">
-          Type
-          <FieldTypeSelect value={newType} onChange={setNewType} />
-        </label>
+        </div>
+        <div className="space-y-1 text-sm font-medium">
+          <label htmlFor={newTypeId}>Type</label>
+          <FieldTypeSelect
+            id={newTypeId}
+            name="fieldType"
+            value={newType}
+            onChange={setNewType}
+          />
+        </div>
         <Button type="submit" disabled={isPending}>
           Add field
         </Button>
@@ -149,13 +160,29 @@ export function CustomFieldDefinitionsPanel({
               key={definition.id}
               className="space-y-3 rounded-md border border-border bg-muted/30 p-3"
             >
+              <label
+                className="text-sm font-medium"
+                htmlFor={`custom-field-label-${definition.id}`}
+              >
+                Label
+              </label>
               <Input
+                id={`custom-field-label-${definition.id}`}
+                name={`label-${definition.id}`}
                 value={draft.label}
                 onChange={(event) =>
                   updateDraft(definition.id, "label", event.target.value)
                 }
               />
+              <label
+                className="text-sm font-medium"
+                htmlFor={`custom-field-type-${definition.id}`}
+              >
+                Type
+              </label>
               <FieldTypeSelect
+                id={`custom-field-type-${definition.id}`}
+                name={`fieldType-${definition.id}`}
                 value={draft.fieldType}
                 onChange={(value) =>
                   updateDraft(definition.id, "fieldType", value)
@@ -191,22 +218,34 @@ export function CustomFieldDefinitionsPanel({
       ) : null}
 
       {message ? (
-        <p className="text-sm text-muted-foreground">{message}</p>
+        <p
+          aria-live="polite"
+          className="text-sm text-muted-foreground"
+          id={messageId}
+        >
+          {message}
+        </p>
       ) : null}
     </div>
   );
 }
 
 function FieldTypeSelect({
+  id,
+  name,
   value,
   onChange
 }: {
+  id: string;
+  name: string;
   value: CustomFieldDefinitionItem["fieldType"];
   onChange: (value: CustomFieldDefinitionItem["fieldType"]) => void;
 }) {
   return (
     <select
       className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+      id={id}
+      name={name}
       value={value}
       onChange={(event) =>
         onChange(event.target.value as CustomFieldDefinitionItem["fieldType"])

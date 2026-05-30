@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { CustomFieldDefinitionItem } from "./custom-field-definitions-panel";
@@ -23,6 +23,7 @@ export function CustomFieldValuesForm({
   values
 }: CustomFieldValuesFormProps) {
   const router = useRouter();
+  const messageId = useId();
   const [form, setForm] = useState<Record<string, string>>(() => {
     const valueMap = new Map(
       values.map((value) => [value.definitionId, value.value])
@@ -73,6 +74,7 @@ export function CustomFieldValuesForm({
   return (
     <form
       className="space-y-4"
+      aria-describedby={message ? messageId : undefined}
       onSubmit={(event) => {
         event.preventDefault();
         saveValues();
@@ -91,7 +93,13 @@ export function CustomFieldValuesForm({
           {isPending ? "Saving..." : "Save custom fields"}
         </Button>
         {message ? (
-          <p className="text-sm text-muted-foreground">{message}</p>
+          <p
+            aria-live="polite"
+            className="text-sm text-muted-foreground"
+            id={messageId}
+          >
+            {message}
+          </p>
         ) : null}
       </div>
     </form>
@@ -109,10 +117,14 @@ function CustomFieldInput({
 }) {
   if (definition.fieldType === "boolean") {
     return (
-      <label className="space-y-1 text-sm font-medium">
-        {definition.label}
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor={`custom-field-${definition.id}`}>
+          {definition.label}
+        </label>
         <select
           className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          id={`custom-field-${definition.id}`}
+          name={definition.id}
           value={value}
           onChange={(event) => onChange(event.target.value)}
         >
@@ -120,19 +132,23 @@ function CustomFieldInput({
           <option value="true">Yes</option>
           <option value="false">No</option>
         </select>
-      </label>
+      </div>
     );
   }
 
   return (
-    <label className="space-y-1 text-sm font-medium">
-      {definition.label}
+    <div className="space-y-1 text-sm font-medium">
+      <label htmlFor={`custom-field-${definition.id}`}>
+        {definition.label}
+      </label>
       <Input
+        id={`custom-field-${definition.id}`}
+        name={definition.id}
         type={definition.fieldType === "date" ? "date" : definition.fieldType}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-    </label>
+    </div>
   );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   allowedLeadStatusTransitions,
@@ -17,6 +17,8 @@ type LeadStatusFormProps = {
 
 export function LeadStatusForm({ leadId, status }: LeadStatusFormProps) {
   const router = useRouter();
+  const statusId = useId();
+  const messageId = useId();
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -54,15 +56,18 @@ export function LeadStatusForm({ leadId, status }: LeadStatusFormProps) {
   return (
     <form
       className="space-y-3"
+      aria-describedby={messageId}
       onSubmit={(event) => {
         event.preventDefault();
         saveStatus();
       }}
     >
-      <label className="space-y-1 text-sm font-medium">
-        Status
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor={statusId}>Status</label>
         <select
           className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          id={statusId}
+          name="status"
           value={selectedStatus}
           onChange={(event) =>
             setSelectedStatus(event.target.value as LeadStatus)
@@ -78,7 +83,7 @@ export function LeadStatusForm({ leadId, status }: LeadStatusFormProps) {
             </option>
           ))}
         </select>
-      </label>
+      </div>
       <div className="flex flex-wrap items-center gap-3">
         <Button
           type="submit"
@@ -87,7 +92,11 @@ export function LeadStatusForm({ leadId, status }: LeadStatusFormProps) {
         >
           {isPending ? "Saving..." : "Change status"}
         </Button>
-        <p className="text-sm text-muted-foreground">
+        <p
+          aria-live="polite"
+          className="text-sm text-muted-foreground"
+          id={messageId}
+        >
           {message ?? `Current: ${getLeadStatusLabel(status)}`}
         </p>
       </div>

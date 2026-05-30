@@ -323,6 +323,7 @@ function LeadLedger({
             >
               <td>
                 <Link
+                  aria-current={lead.id === activeLeadId ? "page" : undefined}
                   className="ops-lead-link"
                   href={getLeadHref(lead.id, filters)}
                 >
@@ -582,24 +583,26 @@ function LeadFiltersForm({
   filters: DashboardFilters;
 }) {
   return (
-    <form action="/" className="ops-filter-form">
+    <form action="/" className="ops-filter-form" method="get">
       <div className="ops-filter-summary">
         <span>{activeFilterCount} active</span>
         <Link href="/">Reset</Link>
       </div>
-      <label className="space-y-1 text-sm font-medium">
-        Search
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor="lead-filter-query">Search</label>
         <input
           className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          id="lead-filter-query"
           name="q"
           placeholder="Lead, contact, status..."
           defaultValue={filters.query}
         />
-      </label>
-      <label className="space-y-1 text-sm font-medium">
-        Status
+      </div>
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor="lead-filter-status">Status</label>
         <select
           className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          id="lead-filter-status"
           name="status"
           defaultValue={filters.status}
         >
@@ -610,11 +613,12 @@ function LeadFiltersForm({
             </option>
           ))}
         </select>
-      </label>
-      <label className="space-y-1 text-sm font-medium">
-        Source
+      </div>
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor="lead-filter-source">Source</label>
         <select
           className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          id="lead-filter-source"
           name="source"
           defaultValue={filters.source}
         >
@@ -625,7 +629,7 @@ function LeadFiltersForm({
             </option>
           ))}
         </select>
-      </label>
+      </div>
       {definitions.map((definition) => (
         <CustomFieldFilter
           key={definition.id}
@@ -656,10 +660,11 @@ function CustomFieldFilter({
 
   if (definition.fieldType === "boolean") {
     return (
-      <label className="space-y-1 text-sm font-medium">
-        {definition.label}
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor={name}>{definition.label}</label>
         <select
           className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+          id={name}
           name={name}
           defaultValue={value}
         >
@@ -667,20 +672,21 @@ function CustomFieldFilter({
           <option value="true">Yes</option>
           <option value="false">No</option>
         </select>
-      </label>
+      </div>
     );
   }
 
   return (
-    <label className="space-y-1 text-sm font-medium">
-      {definition.label}
+    <div className="space-y-1 text-sm font-medium">
+      <label htmlFor={name}>{definition.label}</label>
       <input
         className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+        id={name}
         name={name}
         type={definition.fieldType === "date" ? "date" : "text"}
         defaultValue={value}
       />
-    </label>
+    </div>
   );
 }
 

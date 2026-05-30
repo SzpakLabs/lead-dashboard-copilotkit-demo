@@ -32,7 +32,7 @@ Planning decisions:
 - [x] Keep domain logic and API contracts stable unless a specific redesign task requires a small change
 - [x] Split repeated or complex dashboard UI into components
 - [x] Ensure desktop and mobile layouts do not clip or overlap text
-- [ ] Apply Modern Web Guidance accessibility, form, table, focus, and containment guidance.
+- [x] Apply Modern Web Guidance accessibility, form, table, focus, and containment guidance.
 
 ## Verification
 

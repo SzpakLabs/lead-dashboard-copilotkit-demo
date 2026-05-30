@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/date-format";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,9 @@ type FollowUpsPanelProps = {
 
 export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
   const router = useRouter();
+  const newNoteId = useId();
+  const newDueAtId = useId();
+  const messageId = useId();
   const [newNote, setNewNote] = useState("");
   const [newDueAt, setNewDueAt] = useState("");
   const [editing, setEditing] = useState<Record<string, FollowUpDraft>>(
@@ -106,34 +109,45 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
     <div className="space-y-5">
       <form
         className="space-y-3"
+        aria-describedby={message ? messageId : undefined}
         onSubmit={(event) => {
           event.preventDefault();
           createFollowUp();
         }}
       >
-        <label className="space-y-1 text-sm font-medium">
-          New follow-up note
+        <div className="space-y-1 text-sm font-medium">
+          <label htmlFor={newNoteId}>New follow-up note</label>
           <textarea
             className="min-h-20 w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm leading-6"
+            id={newNoteId}
+            name="note"
             value={newNote}
             onChange={(event) => setNewNote(event.target.value)}
           />
-        </label>
-        <label className="space-y-1 text-sm font-medium">
-          Due
+        </div>
+        <div className="space-y-1 text-sm font-medium">
+          <label htmlFor={newDueAtId}>Due</label>
           <input
             className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+            id={newDueAtId}
+            name="followUpDueAt"
             type="datetime-local"
             value={newDueAt}
             onChange={(event) => setNewDueAt(event.target.value)}
           />
-        </label>
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" size="sm" disabled={isPending}>
             {isPending ? "Saving..." : "Add follow-up"}
           </Button>
           {message ? (
-            <p className="text-sm text-muted-foreground">{message}</p>
+            <p
+              aria-live="polite"
+              className="text-sm text-muted-foreground"
+              id={messageId}
+            >
+              {message}
+            </p>
           ) : null}
         </div>
       </form>
@@ -181,10 +195,12 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
                   </Button>
                 ) : null}
               </div>
-              <label className="space-y-1 text-sm font-medium">
-                Note
+              <div className="space-y-1 text-sm font-medium">
+                <label htmlFor={`follow-up-note-${followUp.id}`}>Note</label>
                 <textarea
                   className="min-h-16 w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm leading-6 disabled:opacity-60"
+                  id={`follow-up-note-${followUp.id}`}
+                  name={`followUpNote-${followUp.id}`}
                   value={draft?.note ?? ""}
                   disabled={isComplete}
                   onChange={(event) =>
@@ -197,11 +213,13 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
                     }))
                   }
                 />
-              </label>
-              <label className="space-y-1 text-sm font-medium">
-                Due
+              </div>
+              <div className="space-y-1 text-sm font-medium">
+                <label htmlFor={`follow-up-due-${followUp.id}`}>Due</label>
                 <input
                   className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm disabled:opacity-60"
+                  id={`follow-up-due-${followUp.id}`}
+                  name={`followUpDueAt-${followUp.id}`}
                   type="datetime-local"
                   value={draft?.followUpDueAt ?? ""}
                   disabled={isComplete}
@@ -215,7 +233,7 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
                     }))
                   }
                 />
-              </label>
+              </div>
               {!isComplete ? (
                 <Button
                   type="button"

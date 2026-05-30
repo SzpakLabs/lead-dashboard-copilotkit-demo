@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,11 @@ const sampleText =
 
 export function IngestionForm({ className }: { className?: string }) {
   const router = useRouter();
+  const sourceChannelId = useId();
+  const sourceTypeId = useId();
+  const textId = useId();
+  const hintId = useId();
+  const messageId = useId();
   const [text, setText] = useState(sampleText);
   const [sourceChannel, setSourceChannel] = useState("linkedin");
   const [sourceType, setSourceType] = useState("pasted_text");
@@ -37,17 +42,24 @@ export function IngestionForm({ className }: { className?: string }) {
   }
 
   return (
-    <div
+    <form
       className={cn(
         "space-y-4 rounded-lg border border-border bg-background p-5",
         className
       )}
+      aria-describedby={`${hintId}${message ? ` ${messageId}` : ""}`}
+      onSubmit={(event) => {
+        event.preventDefault();
+        submitIngestion();
+      }}
     >
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="space-y-1 text-sm font-medium">
-          Source
+        <div className="space-y-1 text-sm font-medium">
+          <label htmlFor={sourceChannelId}>Source</label>
           <select
             className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+            id={sourceChannelId}
+            name="sourceChannel"
             value={sourceChannel}
             onChange={(event) => setSourceChannel(event.target.value)}
           >
@@ -57,35 +69,49 @@ export function IngestionForm({ className }: { className?: string }) {
             <option value="website">Website</option>
             <option value="other">Other</option>
           </select>
-        </label>
-        <label className="space-y-1 text-sm font-medium">
-          Input type
+        </div>
+        <div className="space-y-1 text-sm font-medium">
+          <label htmlFor={sourceTypeId}>Input type</label>
           <select
             className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
+            id={sourceTypeId}
+            name="sourceType"
             value={sourceType}
             onChange={(event) => setSourceType(event.target.value)}
           >
             <option value="pasted_text">Pasted text</option>
             <option value="pasted_transcript">Pasted transcript</option>
           </select>
-        </label>
+        </div>
       </div>
-      <label className="space-y-1 text-sm font-medium">
-        Text or transcript
+      <div className="space-y-1 text-sm font-medium">
+        <label htmlFor={textId}>Text or transcript</label>
+        <p className="text-xs font-normal text-muted-foreground" id={hintId}>
+          Paste the source artifact exactly as received for review.
+        </p>
         <textarea
           className="min-h-36 w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm leading-6"
+          id={textId}
+          name="text"
+          required
           value={text}
           onChange={(event) => setText(event.target.value)}
         />
-      </label>
+      </div>
       <div className="flex items-center gap-3">
-        <Button type="button" disabled={isPending} onClick={submitIngestion}>
+        <Button type="submit" disabled={isPending}>
           {isPending ? "Creating..." : "Create draft lead"}
         </Button>
         {message ? (
-          <p className="text-sm text-muted-foreground">{message}</p>
+          <p
+            aria-live="polite"
+            className="text-sm text-muted-foreground"
+            id={messageId}
+          >
+            {message}
+          </p>
         ) : null}
       </div>
-    </div>
+    </form>
   );
 }

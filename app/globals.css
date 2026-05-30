@@ -43,6 +43,34 @@ body {
   outline-offset: 2px;
 }
 
+#ops-main-content:focus-visible {
+  outline: none;
+}
+
+.ops-skip-link {
+  background: hsl(var(--primary));
+  border-radius: var(--ops-control-radius);
+  color: hsl(var(--primary-foreground));
+  font-weight: 800;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  padding: 0.62rem 0.8rem;
+  position: fixed;
+  transform: translateY(-150%);
+  transition: transform 120ms ease;
+  z-index: 100;
+}
+
+.ops-skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+[inert],
+[inert] * {
+  cursor: default;
+  user-select: none;
+}
+
 .ops-console {
   background:
     linear-gradient(90deg, rgb(29 78 72 / 0.05) 1px, transparent 1px),
