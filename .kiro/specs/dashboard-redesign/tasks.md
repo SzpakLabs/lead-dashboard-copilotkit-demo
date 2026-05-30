@@ -29,8 +29,8 @@ Planning decisions:
 - [x] Move workspace custom field definitions out of selected-lead detail if confirmed.
 - [x] Redesign calendar as a compact schedule board while preserving scope/date params.
 - [x] Preserve ingestion, lead review, lead editing, statuses, follow-ups, custom fields, calendar, assistant, and audit behavior
-- [ ] Keep domain logic and API contracts stable unless a specific redesign task requires a small change
-- [ ] Split repeated or complex dashboard UI into components
+- [x] Keep domain logic and API contracts stable unless a specific redesign task requires a small change
+- [x] Split repeated or complex dashboard UI into components
 - [ ] Ensure desktop and mobile layouts do not clip or overlap text
 - [ ] Apply Modern Web Guidance accessibility, form, table, focus, and containment guidance.
 

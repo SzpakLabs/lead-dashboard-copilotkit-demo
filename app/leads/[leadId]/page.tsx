@@ -1,7 +1,6 @@
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import {
   ArrowLeft,
-  Bot,
   ClipboardCheck,
   Clock3,
   DatabaseZap,
@@ -11,8 +10,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 import { AppShell } from "@/components/dashboard/app-shell";
+import {
+  ActivityList,
+  AssistantPreviewNote,
+  DetailSection,
+  Field,
+  StatusBadge
+} from "@/components/dashboard/lead-ui";
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import {
   CustomFieldValuesForm,
@@ -36,12 +41,7 @@ import {
   users
 } from "@/lib/db/schema";
 import { formatDateTime } from "@/lib/date-format";
-import {
-  getLeadStatusColorClassName,
-  getLeadStatusLabel,
-  type LeadStatus
-} from "@/lib/domain/leads/status";
-import { cn } from "@/lib/utils";
+import { type LeadStatus } from "@/lib/domain/leads/status";
 
 export const dynamic = "force-dynamic";
 
@@ -100,17 +100,12 @@ export default async function LeadDetailPage({ params }: PageProps) {
               <Field label="Next step" value={detail.nextStep} />
             </div>
 
-            <div className="ops-assistant-note">
-              <Bot className="size-4" />
-              <span>
-                Assistant changes still require preview and confirmation.
-              </span>
-            </div>
+            <AssistantPreviewNote />
           </div>
 
           <div className="ops-lead-detail-main">
             <DetailSection
-              icon={<ClipboardCheck className="size-4" />}
+              icon={ClipboardCheck}
               title="Review and edit"
               description="Confirm extracted contact, scope, and qualification fields."
             >
@@ -135,7 +130,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
             </DetailSection>
 
             <DetailSection
-              icon={<Clock3 className="size-4" />}
+              icon={Clock3}
               title="Status and follow-ups"
               description="Keep lifecycle state and follow-up commitments current."
             >
@@ -154,7 +149,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
             </DetailSection>
 
             <DetailSection
-              icon={<Tags className="size-4" />}
+              icon={Tags}
               title="Custom fields"
               description="Lead-specific values. Definitions live in settings."
               action={
@@ -175,7 +170,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
 
           <aside className="ops-lead-detail-side" aria-label="Source and audit">
             <DetailSection
-              icon={<DatabaseZap className="size-4" />}
+              icon={DatabaseZap}
               title="Source"
               description="Read-only source artifact behind this lead."
             >
@@ -202,7 +197,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
             </DetailSection>
 
             <DetailSection
-              icon={<History className="size-4" />}
+              icon={History}
               title="Activity"
               description="Audited lead, status, and follow-up changes."
             >
@@ -212,42 +207,6 @@ export default async function LeadDetailPage({ params }: PageProps) {
         </section>
       </div>
     </AppShell>
-  );
-}
-
-function DetailSection({
-  action,
-  children,
-  description,
-  icon,
-  title
-}: {
-  action?: ReactNode;
-  children: ReactNode;
-  description: string;
-  icon: ReactNode;
-  title: string;
-}) {
-  const titleId = title.toLowerCase().replace(/\W+/g, "-");
-
-  return (
-    <section
-      className="ops-panel ops-lead-detail-section"
-      aria-labelledby={titleId}
-    >
-      <div className="ops-section-heading">
-        <div>
-          <p className="ops-eyebrow">
-            {icon}
-            Workspace
-          </p>
-          <h2 id={titleId}>{title}</h2>
-          <p>{description}</p>
-        </div>
-        {action ? <div className="ops-section-action">{action}</div> : null}
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -366,75 +325,6 @@ async function getLeadActivity(leadId: string) {
     .leftJoin(users, eq(leadEvents.actorUserId, users.id))
     .where(eq(leadEvents.leadId, leadId))
     .orderBy(desc(leadEvents.createdAt));
-}
-
-function ActivityList({
-  activity
-}: {
-  activity: Awaited<ReturnType<typeof getLeadActivity>>;
-}) {
-  if (activity.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No activity has been recorded yet.
-      </p>
-    );
-  }
-
-  return (
-    <ol className="space-y-3">
-      {activity.map((event) => (
-        <li
-          key={event.id}
-          className="rounded-md border border-border bg-muted/30 p-3"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium">{event.summary}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {formatActivityAction(event.action)} by{" "}
-                {event.actorName ?? "System"}
-              </p>
-            </div>
-            <time className="shrink-0 text-right text-xs text-muted-foreground">
-              {formatDateTime(event.createdAt)}
-            </time>
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function StatusBadge({ status }: { status: LeadStatus }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex rounded-md px-2 py-1 text-xs font-medium",
-        getLeadStatusColorClassName(status) ?? "bg-gray-100 text-gray-700"
-      )}
-    >
-      {getLeadStatusLabel(status)}
-    </span>
-  );
-}
-
-function Field({ label, value }: { label: string; value: string | null }) {
-  return (
-    <div className="ops-fact">
-      <p className="text-xs font-medium uppercase text-muted-foreground">
-        {label}
-      </p>
-      <p className="text-sm leading-6">{value ?? "Missing"}</p>
-    </div>
-  );
-}
-
-function formatActivityAction(action: string) {
-  return action
-    .split(".")
-    .map((part) => part.replace("_", " "))
-    .join(" ");
 }
 
 function formatNullableDateTime(value: Date | null) {
