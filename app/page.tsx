@@ -14,13 +14,16 @@ import {
   Bot,
   CalendarDays,
   CheckCircle2,
+  ClipboardCheck,
   Clock3,
   DatabaseZap,
   Filter,
+  History,
   ListChecks,
   Search,
   Settings2,
   SlidersHorizontal,
+  Tags,
   UserRound
 } from "lucide-react";
 import Link from "next/link";
@@ -411,18 +414,32 @@ function LeadInspector({
       </div>
 
       <nav className="ops-inspector-tabs" aria-label="Selected lead sections">
-        <a href="#review">Review</a>
-        <a href="#actions">Actions</a>
-        <a href="#custom-fields">Fields</a>
-        <a href="#source">Source</a>
-        <a href="#activity">Activity</a>
+        <SurfaceLink
+          href="#review"
+          icon={<ClipboardCheck className="size-4" />}
+        >
+          Review
+        </SurfaceLink>
+        <SurfaceLink href="#actions" icon={<Clock3 className="size-4" />}>
+          Action
+        </SurfaceLink>
+        <SurfaceLink href="#source" icon={<DatabaseZap className="size-4" />}>
+          Source
+        </SurfaceLink>
+        <SurfaceLink href="#activity" icon={<History className="size-4" />}>
+          Activity
+        </SurfaceLink>
+        <SurfaceLink href="#custom-fields" icon={<Tags className="size-4" />}>
+          Fields
+        </SurfaceLink>
       </nav>
 
       <InspectorSection
         id="review"
         title="Review"
-        description="Edit extracted lead and contact fields."
+        description="Confirm extracted contact, scope, and qualification fields."
       >
+        <LeadReviewSurface detail={detail} leadRow={leadRow} />
         <LeadDetailForm
           key={`detail-${detail.id}`}
           lead={{
@@ -445,10 +462,11 @@ function LeadInspector({
 
       <InspectorSection
         id="actions"
-        title="Actions"
-        description="Update lifecycle and follow-up commitments."
+        title="Action"
+        description="Set lifecycle state and keep follow-up commitments current."
       >
         <div className="space-y-5">
+          <ActionSummary detail={detail} followUps={followUps} />
           <LeadStatusForm
             key={`status-${detail.id}`}
             leadId={detail.id}
@@ -460,6 +478,22 @@ function LeadInspector({
             followUps={followUps}
           />
         </div>
+      </InspectorSection>
+
+      <InspectorSection
+        id="source"
+        title="Source"
+        description="Trace the read-only artifact behind this lead."
+      >
+        <SourceSurface detail={detail} />
+      </InspectorSection>
+
+      <InspectorSection
+        id="activity"
+        title="Activity"
+        description="Audited lead, status, and follow-up changes."
+      >
+        <ActivityList activity={activity} />
       </InspectorSection>
 
       <InspectorSection
@@ -481,27 +515,114 @@ function LeadInspector({
         />
       </InspectorSection>
 
-      <InspectorSection
-        id="source"
-        title="Source"
-        description="Original transcript remains read-only."
-      >
-        <div className="ops-source-copy">{detail.rawText}</div>
-      </InspectorSection>
-
-      <InspectorSection
-        id="activity"
-        title="Activity"
-        description="Audited lead, status, and follow-up changes."
-      >
-        <ActivityList activity={activity} />
-      </InspectorSection>
-
       <div className="ops-assistant-note">
         <Bot className="size-4" />
         <span>Assistant changes still require preview and confirmation.</span>
       </div>
     </section>
+  );
+}
+
+function SurfaceLink({
+  children,
+  href,
+  icon
+}: {
+  children: ReactNode;
+  href: string;
+  icon: ReactNode;
+}) {
+  return (
+    <a href={href}>
+      {icon}
+      <span>{children}</span>
+    </a>
+  );
+}
+
+function LeadReviewSurface({
+  detail,
+  leadRow
+}: {
+  detail: NonNullable<Awaited<ReturnType<typeof getLeadDetail>>>;
+  leadRow: Awaited<ReturnType<typeof getLeadRows>>[number] | undefined;
+}) {
+  const missingFields = leadRow?.missingFields ?? [];
+
+  return (
+    <div className="ops-review-surface" aria-label="Review summary">
+      <div className="ops-review-status">
+        <div>
+          <p className="ops-eyebrow">Extraction review</p>
+          <h4>{missingFields.length > 0 ? "Needs confirmation" : "Ready"}</h4>
+        </div>
+        <ReviewBadge
+          confidence={leadRow?.confidence ?? 0}
+          missingFields={missingFields}
+        />
+      </div>
+      {missingFields.length > 0 ? (
+        <div className="ops-missing-fields">
+          {missingFields.map((field) => (
+            <span key={field}>{formatMissingField(field)}</span>
+          ))}
+        </div>
+      ) : (
+        <p className="ops-review-copy">
+          Core extracted fields are present. Verify the details before moving
+          the lead out of review.
+        </p>
+      )}
+      <div className="ops-review-grid">
+        <Field label="Contact" value={detail.contactName} />
+        <Field label="Company" value={detail.company} />
+        <Field label="Project type" value={detail.projectType} />
+        <Field label="Budget" value={detail.budgetRange} />
+      </div>
+    </div>
+  );
+}
+
+function ActionSummary({
+  detail,
+  followUps
+}: {
+  detail: NonNullable<Awaited<ReturnType<typeof getLeadDetail>>>;
+  followUps: FollowUpListItem[];
+}) {
+  const openFollowUps = followUps.filter(
+    (followUp) => followUp.status === "open"
+  );
+
+  return (
+    <div className="ops-action-summary">
+      <Field label="Current next step" value={detail.nextStep} />
+      <Field
+        label="Open follow-ups"
+        value={openFollowUps.length > 0 ? String(openFollowUps.length) : "None"}
+      />
+    </div>
+  );
+}
+
+function SourceSurface({
+  detail
+}: {
+  detail: NonNullable<Awaited<ReturnType<typeof getLeadDetail>>>;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="ops-review-grid">
+        <Field label="Channel" value={detail.sourceChannel} />
+        <Field
+          label="Source type"
+          value={detail.sourceType.replace("_", " ")}
+        />
+        <Field label="Captured" value={formatDateTime(detail.ingestedAt)} />
+        <Field label="Lead source" value={detail.source} />
+      </div>
+      <div className="ops-source-copy">{detail.rawText}</div>
+    </div>
   );
 }
 
@@ -1099,6 +1220,13 @@ function Field({ label, value }: { label: string; value: string | null }) {
       <p className="text-sm leading-6">{value ?? "Missing"}</p>
     </div>
   );
+}
+
+function formatMissingField(field: string) {
+  return field
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]/g, " ")
+    .toLowerCase();
 }
 
 function formatSource(sourceType: string, sourceChannel: string) {

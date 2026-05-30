@@ -601,13 +601,16 @@ body {
 }
 
 .ops-inspector-tabs a {
+  align-items: center;
   background: hsl(var(--muted) / 0.5);
   border: 1px solid hsl(var(--ops-line));
   border-radius: var(--ops-control-radius);
   color: hsl(var(--ops-ink-soft));
+  display: inline-flex;
   flex: 0 0 auto;
   font-size: 0.76rem;
   font-weight: 760;
+  gap: 0.35rem;
   min-height: 2rem;
   padding: 0.42rem 0.58rem;
 }
@@ -626,6 +629,60 @@ body {
 
 .ops-section-heading {
   margin-bottom: 0.75rem;
+}
+
+.ops-review-surface {
+  background: hsl(var(--muted) / 0.28);
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: var(--ops-control-radius);
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+}
+
+.ops-review-status {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.ops-review-status h4 {
+  font-size: 0.95rem;
+  font-weight: 760;
+  line-height: 1.25;
+  margin-top: 0.2rem;
+}
+
+.ops-review-copy {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.ops-review-grid,
+.ops-action-summary {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ops-missing-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ops-missing-fields span {
+  background: rgb(245 158 11 / 0.13);
+  border: 1px solid rgb(245 158 11 / 0.24);
+  border-radius: var(--ops-control-radius);
+  color: rgb(146 64 14);
+  font-size: 0.74rem;
+  font-weight: 720;
+  padding: 0.24rem 0.45rem;
+  text-transform: capitalize;
 }
 
 .ops-source-copy {
@@ -881,7 +938,9 @@ body {
 
   .ops-strip,
   .ops-workbench,
-  .ops-inspector-facts {
+  .ops-inspector-facts,
+  .ops-review-grid,
+  .ops-action-summary {
     grid-template-columns: 1fr;
   }
 

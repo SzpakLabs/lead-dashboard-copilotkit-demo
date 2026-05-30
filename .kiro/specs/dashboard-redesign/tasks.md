@@ -25,7 +25,7 @@ Planning decisions:
 - [x] Add or update shared app shell, navigation, command bar, and responsive layout tokens.
 - [x] Rework the lead workspace into queue/filter rail, dense lead ledger, and selected-lead inspector.
 - [x] Move ingestion into a drawer/sheet and optional focused route.
-- [ ] Reorganize lead detail into review, action, source, activity, and custom-field surfaces.
+- [x] Reorganize lead detail into review, action, source, activity, and custom-field surfaces.
 - [ ] Move workspace custom field definitions out of selected-lead detail if confirmed.
 - [ ] Redesign calendar as a compact schedule board while preserving scope/date params.
 - [ ] Preserve ingestion, lead review, lead editing, statuses, follow-ups, custom fields, calendar, assistant, and audit behavior
