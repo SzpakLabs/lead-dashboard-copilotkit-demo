@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { cn } from "@/lib/utils";
 
-type AppShellSection = "console" | "calendar" | "fields";
+type AppShellSection = "console" | "calendar" | "fields" | "intake";
 
 type AppShellProps = {
   actions?: ReactNode;

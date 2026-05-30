@@ -3,11 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const sampleText =
   "Carlos Test from Test Studio asked about a client dashboard for tracking inbound leads. Budget around $5k. Wants a discovery call next Tuesday and follow-up tomorrow.";
 
-export function IngestionForm() {
+export function IngestionForm({ className }: { className?: string }) {
   const router = useRouter();
   const [text, setText] = useState(sampleText);
   const [sourceChannel, setSourceChannel] = useState("linkedin");
@@ -36,7 +37,12 @@ export function IngestionForm() {
   }
 
   return (
-    <div className="space-y-4 rounded-lg border border-border bg-background p-5">
+    <div
+      className={cn(
+        "space-y-4 rounded-lg border border-border bg-background p-5",
+        className
+      )}
+    >
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="space-y-1 text-sm font-medium">
           Source

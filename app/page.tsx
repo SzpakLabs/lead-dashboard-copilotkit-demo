@@ -18,7 +18,6 @@ import {
   DatabaseZap,
   Filter,
   ListChecks,
-  Plus,
   Search,
   Settings2,
   SlidersHorizontal,
@@ -36,7 +35,7 @@ import {
   FollowUpsPanel,
   type FollowUpListItem
 } from "@/components/leads/follow-ups-panel";
-import { IngestionForm } from "@/components/leads/ingestion-form";
+import { IntakeDrawer } from "@/components/leads/intake-drawer";
 import { LeadDetailForm } from "@/components/leads/lead-detail-form";
 import { LeadStatusForm } from "@/components/leads/lead-status-form";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
@@ -131,10 +130,7 @@ async function Dashboard({
             <Search className="size-4" />
             <span>Search leads</span>
           </a>
-          <a className="ops-button ops-button-primary" href="#intake">
-            <Plus className="size-4" />
-            <span>New intake</span>
-          </a>
+          <IntakeDrawer />
           <Link className="ops-button" href="/calendar">
             <CalendarDays className="size-4" />
             <span>Calendar</span>
@@ -226,17 +222,6 @@ async function Dashboard({
               definitions={customFieldDefinitionRows}
               filters={filters}
             />
-          </section>
-
-          <section id="intake" className="ops-panel ops-intake-panel">
-            <div className="ops-panel-heading">
-              <div>
-                <h2>Intake</h2>
-                <p>Paste transcript</p>
-              </div>
-              <Plus className="size-4 text-muted-foreground" />
-            </div>
-            <IngestionForm />
           </section>
         </aside>
 

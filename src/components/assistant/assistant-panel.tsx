@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  CopilotSidebar,
+  CopilotPopup,
   useHumanInTheLoop,
   useRenderTool
 } from "@copilotkit/react-core/v2";
@@ -163,10 +163,9 @@ export function AssistantPanel() {
   });
 
   return (
-    <CopilotSidebar
+    <CopilotPopup
       agentId="default"
       defaultOpen={false}
-      width={420}
       labels={{
         modalHeaderTitle: "Lead assistant",
         chatToggleOpenLabel: "Open lead assistant",
