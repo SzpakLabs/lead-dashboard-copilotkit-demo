@@ -1,6 +1,16 @@
-import { CalendarDays, LayoutDashboard } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarCheck2,
+  CalendarClock,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  LayoutDashboard,
+  RotateCcw
+} from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import type { ReactNode } from "react";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { formatDate, formatDateTime } from "@/lib/date-format";
 import {
@@ -30,6 +40,9 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   const scopedItems = allItems.filter((item) =>
     isInRange(item.startsAt, range.start, range.end)
   );
+  const boardDays =
+    scope === "month" ? getMonthGridDays(anchorDate) : getBoardDays(range);
+  const boardStats = getBoardStats(scopedItems);
 
   return (
     <AppShell
@@ -44,67 +57,116 @@ export default async function CalendarPage({ searchParams }: PageProps) {
       eyebrowIcon={<CalendarDays className="size-4" />}
       title="Calendar"
     >
-      <div className="ops-page-stack">
-        <section className="ops-page-intro">
-          <p>
-            Derived from scheduled lead work, completed work, and follow-up
-            dates already stored on leads and follow-ups.
-          </p>
-        </section>
-
-        <section className="ops-toolbar-panel">
-          <div>
-            <p className="text-sm font-medium">{range.label}</p>
-            <p className="text-sm text-muted-foreground">
-              {scopedItems.length} item{scopedItems.length === 1 ? "" : "s"}
-            </p>
+      <div className="ops-page-stack ops-calendar-page">
+        <section
+          className="ops-calendar-board"
+          aria-labelledby="calendar-title"
+        >
+          <div className="ops-calendar-header">
+            <div className="min-w-0">
+              <p className="ops-eyebrow">
+                <CalendarClock className="size-4" />
+                Schedule board
+              </p>
+              <h2 id="calendar-title">{range.label}</h2>
+              <p>
+                Lead work, completed work, and follow-up dates from the demo
+                workspace.
+              </p>
+            </div>
+            <div className="ops-calendar-controls" aria-label="Calendar range">
+              <Link
+                aria-label="Previous range"
+                className="ops-icon-button"
+                href={getCalendarHref(
+                  scope,
+                  getAdjacentAnchor(scope, anchorDate, -1)
+                )}
+              >
+                <ArrowLeft className="size-4" />
+              </Link>
+              <Link
+                className="ops-calendar-today"
+                href={getCalendarHref(scope, new Date())}
+              >
+                <RotateCcw className="size-4" />
+                <span>Today</span>
+              </Link>
+              <Link
+                aria-label="Next range"
+                className="ops-icon-button"
+                href={getCalendarHref(
+                  scope,
+                  getAdjacentAnchor(scope, anchorDate, 1)
+                )}
+              >
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {(["month", "week", "day"] satisfies CalendarScope[]).map(
-              (option) => (
-                <Link
-                  key={option}
-                  className={cn(
-                    "rounded-md px-3 py-2 text-sm font-medium capitalize",
-                    scope === option
-                      ? "bg-primary text-primary-foreground"
-                      : "border border-border hover:bg-muted"
-                  )}
-                  href={`/calendar?scope=${option}&date=${toDateParam(anchorDate)}`}
-                >
-                  {option}
-                </Link>
-              )
-            )}
-          </div>
-        </section>
 
-        {scope === "month" ? (
-          <MonthCalendar anchorDate={anchorDate} items={scopedItems} />
-        ) : (
-          <Agenda items={scopedItems} />
-        )}
+          <div className="ops-calendar-toolbar">
+            <nav className="ops-scope-tabs" aria-label="Calendar scope">
+              {(["month", "week", "day"] satisfies CalendarScope[]).map(
+                (option) => (
+                  <Link
+                    key={option}
+                    aria-current={scope === option ? "page" : undefined}
+                    className={cn(scope === option ? "is-active" : "")}
+                    href={getCalendarHref(option, anchorDate)}
+                  >
+                    {option}
+                  </Link>
+                )
+              )}
+            </nav>
+            <div className="ops-calendar-stats" aria-label="Calendar totals">
+              <CalendarStat
+                icon={<CalendarCheck2 className="size-4" />}
+                label="Scheduled"
+                value={boardStats.scheduled}
+              />
+              <CalendarStat
+                icon={<Clock3 className="size-4" />}
+                label="Follow-ups"
+                value={boardStats.followUps}
+              />
+              <CalendarStat
+                icon={<CheckCircle2 className="size-4" />}
+                label="Completed"
+                value={boardStats.completed}
+              />
+            </div>
+          </div>
+
+          {scope === "month" ? (
+            <MonthBoard
+              anchorDate={anchorDate}
+              days={boardDays}
+              items={scopedItems}
+            />
+          ) : (
+            <AgendaBoard days={boardDays} items={scopedItems} scope={scope} />
+          )}
+        </section>
       </div>
     </AppShell>
   );
 }
 
-function MonthCalendar({
+function MonthBoard({
   anchorDate,
+  days,
   items
 }: {
   anchorDate: Date;
+  days: Date[];
   items: CalendarItem[];
 }) {
-  const days = getMonthGridDays(anchorDate);
-
   return (
-    <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-7">
+    <div className="ops-month-board" aria-label="Monthly schedule">
       {weekDayLabels.map((label) => (
-        <div
-          key={label}
-          className="hidden bg-muted px-3 py-2 text-xs font-medium uppercase text-muted-foreground md:block"
-        >
+        <div key={label} className="ops-month-weekday">
           {label}
         </div>
       ))}
@@ -115,43 +177,92 @@ function MonthCalendar({
         const isCurrentMonth = day.getUTCMonth() === anchorDate.getUTCMonth();
 
         return (
-          <div
+          <section
             key={day.toISOString()}
             className={cn(
-              "min-h-36 bg-background p-3",
-              !isCurrentMonth ? "text-muted-foreground" : ""
+              "ops-month-cell",
+              !isCurrentMonth ? "is-muted" : "",
+              isSameUtcDay(day, new Date()) ? "is-today" : ""
             )}
+            aria-label={formatDate(day)}
           >
-            <p className="text-sm font-medium">{day.getUTCDate()}</p>
-            <div className="mt-3 space-y-2">
+            <div className="ops-month-date">
+              <span>{day.getUTCDate()}</span>
+              {dayItems.length > 0 ? <strong>{dayItems.length}</strong> : null}
+            </div>
+            <div className="ops-calendar-items">
               {dayItems.map((item) => (
                 <CalendarItemLink key={item.id} item={item} compact />
               ))}
             </div>
-          </div>
+          </section>
         );
       })}
-    </section>
+    </div>
   );
 }
 
-function Agenda({ items }: { items: CalendarItem[] }) {
-  if (items.length === 0) {
-    return (
-      <Card>
-        <CardContent className="pt-5 text-sm text-muted-foreground">
-          No lead-related work is visible for this scope.
-        </CardContent>
-      </Card>
-    );
-  }
-
+function AgendaBoard({
+  days,
+  items,
+  scope
+}: {
+  days: Date[];
+  items: CalendarItem[];
+  scope: CalendarScope;
+}) {
   return (
-    <section className="space-y-3">
-      {items.map((item) => (
-        <CalendarItemLink key={item.id} item={item} />
-      ))}
-    </section>
+    <div
+      className={cn(
+        "ops-agenda-board",
+        scope === "day" ? "ops-agenda-board-day" : ""
+      )}
+      aria-label={`${scope} schedule`}
+    >
+      {days.map((day) => {
+        const dayItems = items.filter((item) =>
+          isSameUtcDay(item.startsAt, day)
+        );
+
+        return (
+          <section className="ops-agenda-lane" key={day.toISOString()}>
+            <div className="ops-agenda-lane-header">
+              <div>
+                <p>{dayNameFormatter.format(day)}</p>
+                <h3>{formatDate(day)}</h3>
+              </div>
+              <strong>{dayItems.length}</strong>
+            </div>
+            <div className="ops-calendar-items">
+              {dayItems.map((item) => (
+                <CalendarItemLink key={item.id} item={item} />
+              ))}
+              {dayItems.length === 0 ? (
+                <p className="ops-calendar-empty">No lead work scheduled.</p>
+              ) : null}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function CalendarStat({
+  icon,
+  label,
+  value
+}: {
+  icon: ReactNode;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="ops-calendar-stat">
+      {icon}
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
@@ -165,33 +276,24 @@ function CalendarItemLink({
   return (
     <Link
       className={cn(
-        "block rounded-md border border-border bg-background hover:bg-muted/50",
-        compact ? "p-2" : "p-4"
+        "ops-calendar-item",
+        `ops-calendar-item-${item.kind}`,
+        compact ? "is-compact" : ""
       )}
       href={`/?leadId=${item.leadId}`}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="ops-calendar-item-main">
         <div className="min-w-0">
-          <p
-            className={cn(
-              "font-medium leading-5",
-              compact ? "text-xs" : "text-sm"
-            )}
-          >
+          <p className="ops-calendar-item-time">
             {compact
               ? formatTime(item.startsAt)
               : formatDateTime(item.startsAt)}
           </p>
-          <p
-            className={cn(
-              "mt-1 truncate leading-5",
-              compact ? "text-xs" : "text-sm"
-            )}
-          >
+          <p className="ops-calendar-item-title">
             {formatCalendarKind(item.kind)}: {item.title}
           </p>
           {!compact ? (
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="ops-calendar-item-meta">
               {item.contactName}
               {item.company ? `, ${item.company}` : ""}
               {item.note ? ` - ${item.note}` : ""}
@@ -200,7 +302,7 @@ function CalendarItemLink({
         </div>
         <span
           className={cn(
-            "shrink-0 rounded-md px-2 py-1 text-xs font-medium",
+            "ops-calendar-status",
             getLeadStatusColorClassName(item.status) ??
               "bg-gray-100 text-gray-700"
           )}
@@ -276,6 +378,61 @@ function getMonthGridDays(anchorDate: Date) {
   return Array.from({ length: 42 }, (_, index) => addUtcDays(gridStart, index));
 }
 
+function getBoardDays(range: { start: Date; end: Date }) {
+  const dayCount = Math.max(
+    1,
+    Math.round(
+      (range.end.getTime() - range.start.getTime()) / (24 * 60 * 60 * 1000)
+    )
+  );
+
+  return Array.from({ length: dayCount }, (_, index) =>
+    addUtcDays(range.start, index)
+  );
+}
+
+function getAdjacentAnchor(
+  scope: CalendarScope,
+  anchorDate: Date,
+  direction: -1 | 1
+) {
+  if (scope === "month") {
+    return new Date(
+      Date.UTC(
+        anchorDate.getUTCFullYear(),
+        anchorDate.getUTCMonth() + direction,
+        1
+      )
+    );
+  }
+
+  return addUtcDays(anchorDate, scope === "week" ? direction * 7 : direction);
+}
+
+function getCalendarHref(scope: CalendarScope, value: Date) {
+  return `/calendar?scope=${scope}&date=${toDateParam(startOfUtcDay(value))}`;
+}
+
+function getBoardStats(items: CalendarItem[]) {
+  return items.reduce(
+    (stats, item) => {
+      if (item.kind === "scheduled") {
+        stats.scheduled += 1;
+      } else if (
+        item.kind === "completed" ||
+        item.kind === "follow_up_completed"
+      ) {
+        stats.completed += 1;
+      } else {
+        stats.followUps += 1;
+      }
+
+      return stats;
+    },
+    { completed: 0, followUps: 0, scheduled: 0 }
+  );
+}
+
 function startOfUtcWeek(value: Date) {
   return addUtcDays(startOfUtcDay(value), -value.getUTCDay());
 }
@@ -332,5 +489,10 @@ const monthFormatter = new Intl.DateTimeFormat("en-US", {
 const timeFormatter = new Intl.DateTimeFormat("en-US", {
   hour: "numeric",
   minute: "2-digit",
+  timeZone: "UTC"
+});
+
+const dayNameFormatter = new Intl.DateTimeFormat("en-US", {
+  weekday: "short",
   timeZone: "UTC"
 });

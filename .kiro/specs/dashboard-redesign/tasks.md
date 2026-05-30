@@ -26,8 +26,8 @@ Planning decisions:
 - [x] Rework the lead workspace into queue/filter rail, dense lead ledger, and selected-lead inspector.
 - [x] Move ingestion into a drawer/sheet and optional focused route.
 - [x] Reorganize lead detail into review, action, source, activity, and custom-field surfaces.
-- [ ] Move workspace custom field definitions out of selected-lead detail if confirmed.
-- [ ] Redesign calendar as a compact schedule board while preserving scope/date params.
+- [x] Move workspace custom field definitions out of selected-lead detail if confirmed.
+- [x] Redesign calendar as a compact schedule board while preserving scope/date params.
 - [ ] Preserve ingestion, lead review, lead editing, statuses, follow-ups, custom fields, calendar, assistant, and audit behavior
 - [ ] Keep domain logic and API contracts stable unless a specific redesign task requires a small change
 - [ ] Split repeated or complex dashboard UI into components
