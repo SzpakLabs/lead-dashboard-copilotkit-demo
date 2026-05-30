@@ -137,7 +137,7 @@ export function LeadDetailForm({ lead }: LeadDetailFormProps) {
           onChange={(value) => updateField("nextStep", value)}
         />
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={isPending}>
           {isPending ? "Saving..." : "Save edits"}
         </Button>

@@ -86,7 +86,7 @@ export function CustomFieldValuesForm({
           onChange={(value) => updateValue(definition.id, value)}
         />
       ))}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={isPending}>
           {isPending ? "Saving..." : "Save custom fields"}
         </Button>

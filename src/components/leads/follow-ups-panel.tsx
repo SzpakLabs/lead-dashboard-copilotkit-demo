@@ -128,7 +128,7 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
             onChange={(event) => setNewDueAt(event.target.value)}
           />
         </label>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" size="sm" disabled={isPending}>
             {isPending ? "Saving..." : "Add follow-up"}
           </Button>
@@ -153,7 +153,7 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
                   : ""
               )}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium">
                     {formatDueDate(followUp.followUpDueAt)}

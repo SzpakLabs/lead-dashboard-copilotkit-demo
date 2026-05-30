@@ -33,6 +33,11 @@ body {
   font-feature-settings: "tnum";
 }
 
+.ops-console,
+.ops-console * {
+  min-width: 0;
+}
+
 :where(a, button, input, select, textarea):focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
@@ -52,9 +57,9 @@ body {
   background: hsl(var(--ops-surface-strong));
   border: 1px solid hsl(var(--ops-line));
   border-radius: var(--ops-radius);
-  display: flex;
+  display: grid;
   gap: 1rem;
-  justify-content: space-between;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   margin-inline: auto;
   max-width: var(--ops-shell-max);
   padding: var(--ops-compact-inline);
@@ -74,6 +79,7 @@ body {
   font-size: 1.35rem;
   font-weight: 720;
   line-height: 1.1;
+  overflow-wrap: anywhere;
 }
 
 .ops-eyebrow {
@@ -90,9 +96,10 @@ body {
 .ops-actions {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   justify-content: flex-end;
+  min-width: 0;
 }
 
 .ops-primary-nav {
@@ -118,6 +125,18 @@ body {
   min-height: 2rem;
   padding-inline: 0.62rem;
   white-space: nowrap;
+}
+
+.ops-nav-link span,
+.ops-assistant-state,
+.ops-button span,
+.ops-search span,
+.ops-calendar-today span,
+.ops-calendar-stat span,
+.ops-ledger-tools :where(a, span),
+.ops-section-action a {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .ops-nav-link:hover,
@@ -154,7 +173,7 @@ body {
 .ops-search {
   background: hsl(var(--muted) / 0.55);
   color: hsl(var(--ops-ink-soft));
-  min-inline-size: 11rem;
+  min-inline-size: min(11rem, 100%);
   justify-content: flex-start;
 }
 
@@ -241,6 +260,7 @@ body {
 .ops-calendar-toolbar {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: space-between;
   padding: 0.875rem;
@@ -600,9 +620,9 @@ body {
   display: grid;
   gap: var(--ops-panel-gap);
   grid-template-columns:
-    minmax(15.5rem, 0.68fr)
-    minmax(38rem, 1.78fr)
-    minmax(23rem, 0.96fr);
+    minmax(13rem, 0.62fr)
+    minmax(0, 1.72fr)
+    minmax(19rem, 0.9fr);
   margin: 0 auto;
   max-width: var(--ops-shell-max);
 }
@@ -646,6 +666,7 @@ body {
 .ops-section-heading {
   align-items: flex-start;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   justify-content: space-between;
 }
@@ -699,9 +720,14 @@ body {
   color: hsl(var(--ops-ink-soft));
   display: flex;
   font-size: 0.875rem;
+  gap: 0.75rem;
   justify-content: space-between;
   min-height: var(--ops-control-height);
   padding-inline: 0.7rem;
+}
+
+.ops-queue-link span {
+  overflow-wrap: anywhere;
 }
 
 .ops-queue-link:hover,
@@ -754,6 +780,7 @@ body {
   justify-content: center;
   min-height: var(--ops-control-height);
   padding-inline: 0.82rem;
+  text-align: center;
 }
 
 .ops-form-submit {
@@ -852,6 +879,10 @@ body {
   display: flex;
   gap: 0.3rem;
   min-width: 0;
+}
+
+.ops-lead-contact svg {
+  flex: 0 0 auto;
 }
 
 .ops-lead-contact span,
@@ -966,6 +997,7 @@ body {
 .ops-review-status {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   justify-content: space-between;
 }
@@ -1030,6 +1062,14 @@ body {
   padding: 0.7rem;
 }
 
+.ops-assistant-note svg {
+  flex: 0 0 auto;
+}
+
+.ops-assistant-note span {
+  overflow-wrap: anywhere;
+}
+
 .ops-lead-detail-page {
   align-items: start;
   display: grid;
@@ -1067,7 +1107,8 @@ body {
   font-size: 0.74rem;
   font-weight: 700;
   padding: 0.28rem 0.5rem;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .ops-review-warning {

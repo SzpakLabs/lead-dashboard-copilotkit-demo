@@ -9,8 +9,7 @@ import {
   sql,
   type SQL
 } from "drizzle-orm";
-import { CalendarDays, DatabaseZap, Search } from "lucide-react";
-import Link from "next/link";
+import { DatabaseZap, Search } from "lucide-react";
 import { AppShell } from "@/components/dashboard/app-shell";
 import {
   getCustomFieldFilterParamName,
@@ -94,10 +93,6 @@ async function Dashboard({
             <span>Search leads</span>
           </a>
           <IntakeDrawer />
-          <Link className="ops-button" href="/calendar">
-            <CalendarDays className="size-4" />
-            <span>Calendar</span>
-          </Link>
         </>
       }
       activeSection="console"

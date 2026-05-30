@@ -79,7 +79,7 @@ export function LeadStatusForm({ leadId, status }: LeadStatusFormProps) {
           ))}
         </select>
       </label>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           type="submit"
           disabled={isPending || selectedStatus === status}
