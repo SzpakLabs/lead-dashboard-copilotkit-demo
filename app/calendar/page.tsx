@@ -280,7 +280,7 @@ function CalendarItemLink({
         `ops-calendar-item-${item.kind}`,
         compact ? "is-compact" : ""
       )}
-      href={`/?leadId=${item.leadId}`}
+      href={`/leads/${item.leadId}`}
     >
       <div className="ops-calendar-item-main">
         <div className="min-w-0">

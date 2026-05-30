@@ -788,7 +788,7 @@ function toAssistantCalendarItem(item: CalendarItem): AssistantCalendarItem {
   return {
     id: item.id,
     leadId: item.leadId,
-    url: `/?leadId=${item.leadId}`,
+    url: `/leads/${item.leadId}`,
     title: item.title,
     contactName: item.contactName,
     company: item.company,
@@ -815,7 +815,7 @@ function toAssistantLeadCard(row: {
 }): AssistantLeadCard {
   return {
     id: row.id,
-    url: `/?leadId=${row.id}`,
+    url: `/leads/${row.id}`,
     title: row.title,
     status: row.status,
     statusLabel: getLeadStatusLabel(row.status) ?? row.status,

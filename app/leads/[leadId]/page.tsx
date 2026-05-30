@@ -1,0 +1,442 @@
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import {
+  ArrowLeft,
+  Bot,
+  ClipboardCheck,
+  Clock3,
+  DatabaseZap,
+  History,
+  Settings2,
+  Tags
+} from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+import { AppShell } from "@/components/dashboard/app-shell";
+import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
+import {
+  CustomFieldValuesForm,
+  type CustomFieldValueItem
+} from "@/components/leads/custom-field-values-form";
+import {
+  FollowUpsPanel,
+  type FollowUpListItem
+} from "@/components/leads/follow-ups-panel";
+import { LeadDetailForm } from "@/components/leads/lead-detail-form";
+import { LeadStatusForm } from "@/components/leads/lead-status-form";
+import { getDb } from "@/lib/db";
+import {
+  contacts,
+  customFieldDefinitions,
+  customFieldValues,
+  followUps,
+  ingestionEvents,
+  leadEvents,
+  leads,
+  users
+} from "@/lib/db/schema";
+import { formatDateTime } from "@/lib/date-format";
+import {
+  getLeadStatusColorClassName,
+  getLeadStatusLabel,
+  type LeadStatus
+} from "@/lib/domain/leads/status";
+import { cn } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
+
+type PageProps = {
+  params: Promise<{ leadId: string }>;
+};
+
+export default async function LeadDetailPage({ params }: PageProps) {
+  const { leadId } = await params;
+  const detail = await getLeadDetail(leadId);
+
+  if (!detail) {
+    notFound();
+  }
+
+  const [customFieldDefinitions, customFieldValues, leadFollowUps, activity] =
+    await Promise.all([
+      getCustomFieldDefinitions(),
+      getLeadCustomFieldValues(leadId),
+      getLeadFollowUps(leadId),
+      getLeadActivity(leadId)
+    ]);
+
+  return (
+    <AppShell
+      actions={
+        <Link className="ops-button" href={`/?leadId=${detail.id}`}>
+          <ArrowLeft className="size-4" />
+          <span>Back to console</span>
+        </Link>
+      }
+      activeSection="console"
+      eyebrow="Lead workspace"
+      eyebrowIcon={<ClipboardCheck className="size-4" />}
+      title={detail.title}
+    >
+      <div className="ops-page-stack">
+        <section className="ops-lead-detail-page" aria-label="Lead detail">
+          <div className="ops-panel ops-lead-detail-summary">
+            <div className="ops-inspector-header">
+              <div className="min-w-0">
+                <p className="ops-eyebrow">Focused review</p>
+                <h2>{detail.title}</h2>
+                <p>
+                  {detail.contactName}
+                  {detail.company ? `, ${detail.company}` : ""}
+                </p>
+              </div>
+              <StatusBadge status={detail.status as LeadStatus} />
+            </div>
+
+            <div className="ops-inspector-facts">
+              <Field label="Source" value={detail.source} />
+              <Field label="Created" value={formatDateTime(detail.createdAt)} />
+              <Field label="Timeline" value={detail.timeline} />
+              <Field label="Next step" value={detail.nextStep} />
+            </div>
+
+            <div className="ops-assistant-note">
+              <Bot className="size-4" />
+              <span>
+                Assistant changes still require preview and confirmation.
+              </span>
+            </div>
+          </div>
+
+          <div className="ops-lead-detail-main">
+            <DetailSection
+              icon={<ClipboardCheck className="size-4" />}
+              title="Review and edit"
+              description="Confirm extracted contact, scope, and qualification fields."
+            >
+              <LeadDetailForm
+                key={`detail-${detail.id}`}
+                lead={{
+                  id: detail.id,
+                  title: detail.title,
+                  source: detail.source,
+                  contactName: detail.contactName,
+                  company: detail.company ?? "",
+                  email: detail.email ?? "",
+                  phone: detail.phone ?? "",
+                  projectType: detail.projectType ?? "",
+                  problemSummary: detail.problemSummary ?? "",
+                  requestedOutcome: detail.requestedOutcome ?? "",
+                  budgetRange: detail.budgetRange ?? "",
+                  timeline: detail.timeline ?? "",
+                  nextStep: detail.nextStep ?? ""
+                }}
+              />
+            </DetailSection>
+
+            <DetailSection
+              icon={<Clock3 className="size-4" />}
+              title="Status and follow-ups"
+              description="Keep lifecycle state and follow-up commitments current."
+            >
+              <div className="space-y-5">
+                <LeadStatusForm
+                  key={`status-${detail.id}`}
+                  leadId={detail.id}
+                  status={detail.status as LeadStatus}
+                />
+                <FollowUpsPanel
+                  key={`followups-${detail.id}`}
+                  leadId={detail.id}
+                  followUps={leadFollowUps}
+                />
+              </div>
+            </DetailSection>
+
+            <DetailSection
+              icon={<Tags className="size-4" />}
+              title="Custom fields"
+              description="Lead-specific values. Definitions live in settings."
+              action={
+                <Link href="/settings/fields">
+                  <Settings2 className="size-4" />
+                  Manage
+                </Link>
+              }
+            >
+              <CustomFieldValuesForm
+                key={`custom-fields-${detail.id}`}
+                leadId={detail.id}
+                definitions={customFieldDefinitions}
+                values={customFieldValues}
+              />
+            </DetailSection>
+          </div>
+
+          <aside className="ops-lead-detail-side" aria-label="Source and audit">
+            <DetailSection
+              icon={<DatabaseZap className="size-4" />}
+              title="Source"
+              description="Read-only source artifact behind this lead."
+            >
+              <div className="space-y-3">
+                <div className="ops-review-grid">
+                  <Field
+                    label="Channel"
+                    value={detail.sourceChannel ?? detail.source}
+                  />
+                  <Field
+                    label="Source type"
+                    value={detail.sourceType?.replace("_", " ") ?? "Missing"}
+                  />
+                  <Field
+                    label="Captured"
+                    value={formatNullableDateTime(detail.ingestedAt)}
+                  />
+                  <Field label="Lead source" value={detail.source} />
+                </div>
+                <div className="ops-source-copy">
+                  {detail.rawText ?? "No source artifact is linked."}
+                </div>
+              </div>
+            </DetailSection>
+
+            <DetailSection
+              icon={<History className="size-4" />}
+              title="Activity"
+              description="Audited lead, status, and follow-up changes."
+            >
+              <ActivityList activity={activity} />
+            </DetailSection>
+          </aside>
+        </section>
+      </div>
+    </AppShell>
+  );
+}
+
+function DetailSection({
+  action,
+  children,
+  description,
+  icon,
+  title
+}: {
+  action?: ReactNode;
+  children: ReactNode;
+  description: string;
+  icon: ReactNode;
+  title: string;
+}) {
+  const titleId = title.toLowerCase().replace(/\W+/g, "-");
+
+  return (
+    <section
+      className="ops-panel ops-lead-detail-section"
+      aria-labelledby={titleId}
+    >
+      <div className="ops-section-heading">
+        <div>
+          <p className="ops-eyebrow">
+            {icon}
+            Workspace
+          </p>
+          <h2 id={titleId}>{title}</h2>
+          <p>{description}</p>
+        </div>
+        {action ? <div className="ops-section-action">{action}</div> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+async function getLeadDetail(leadId: string) {
+  const db = getDb();
+  const [detail] = await db
+    .select({
+      id: leads.id,
+      title: leads.title,
+      status: leads.status,
+      source: leads.source,
+      projectType: leads.projectType,
+      problemSummary: leads.problemSummary,
+      requestedOutcome: leads.requestedOutcome,
+      budgetRange: leads.budgetRange,
+      timeline: leads.timeline,
+      nextStep: leads.nextStep,
+      createdAt: leads.createdAt,
+      contactName: contacts.name,
+      company: contacts.company,
+      email: contacts.email,
+      phone: contacts.phone,
+      sourceType: ingestionEvents.sourceType,
+      sourceChannel: ingestionEvents.sourceChannel,
+      rawText: ingestionEvents.rawText,
+      ingestedAt: ingestionEvents.createdAt
+    })
+    .from(leads)
+    .innerJoin(contacts, eq(leads.contactId, contacts.id))
+    .leftJoin(ingestionEvents, eq(leads.ingestionEventId, ingestionEvents.id))
+    .where(eq(leads.id, leadId))
+    .limit(1);
+
+  return detail ?? null;
+}
+
+async function getCustomFieldDefinitions(): Promise<
+  CustomFieldDefinitionItem[]
+> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: customFieldDefinitions.id,
+      label: customFieldDefinitions.label,
+      fieldType: customFieldDefinitions.fieldType
+    })
+    .from(customFieldDefinitions)
+    .where(isNull(customFieldDefinitions.archivedAt))
+    .orderBy(asc(customFieldDefinitions.createdAt));
+
+  return rows;
+}
+
+async function getLeadCustomFieldValues(
+  leadId: string
+): Promise<CustomFieldValueItem[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      definitionId: customFieldValues.definitionId,
+      value: customFieldValues.value
+    })
+    .from(customFieldValues)
+    .innerJoin(
+      customFieldDefinitions,
+      eq(customFieldValues.definitionId, customFieldDefinitions.id)
+    )
+    .where(
+      and(
+        eq(customFieldValues.leadId, leadId),
+        isNull(customFieldDefinitions.archivedAt)
+      )
+    );
+
+  return rows.map((row) => ({
+    definitionId: row.definitionId,
+    value: row.value ?? ""
+  }));
+}
+
+async function getLeadFollowUps(leadId: string): Promise<FollowUpListItem[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: followUps.id,
+      note: followUps.note,
+      status: followUps.status,
+      followUpDueAt: followUps.followUpDueAt,
+      completedAt: followUps.completedAt
+    })
+    .from(followUps)
+    .where(eq(followUps.leadId, leadId))
+    .orderBy(asc(followUps.followUpDueAt));
+
+  return rows.map((followUp) => ({
+    id: followUp.id,
+    note: followUp.note,
+    status: followUp.status,
+    followUpDueAt: followUp.followUpDueAt.toISOString(),
+    completedAt: followUp.completedAt?.toISOString() ?? null
+  }));
+}
+
+async function getLeadActivity(leadId: string) {
+  const db = getDb();
+
+  return db
+    .select({
+      id: leadEvents.id,
+      action: leadEvents.action,
+      summary: leadEvents.summary,
+      createdAt: leadEvents.createdAt,
+      actorName: users.name
+    })
+    .from(leadEvents)
+    .leftJoin(users, eq(leadEvents.actorUserId, users.id))
+    .where(eq(leadEvents.leadId, leadId))
+    .orderBy(desc(leadEvents.createdAt));
+}
+
+function ActivityList({
+  activity
+}: {
+  activity: Awaited<ReturnType<typeof getLeadActivity>>;
+}) {
+  if (activity.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        No activity has been recorded yet.
+      </p>
+    );
+  }
+
+  return (
+    <ol className="space-y-3">
+      {activity.map((event) => (
+        <li
+          key={event.id}
+          className="rounded-md border border-border bg-muted/30 p-3"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">{event.summary}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {formatActivityAction(event.action)} by{" "}
+                {event.actorName ?? "System"}
+              </p>
+            </div>
+            <time className="shrink-0 text-right text-xs text-muted-foreground">
+              {formatDateTime(event.createdAt)}
+            </time>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function StatusBadge({ status }: { status: LeadStatus }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex rounded-md px-2 py-1 text-xs font-medium",
+        getLeadStatusColorClassName(status) ?? "bg-gray-100 text-gray-700"
+      )}
+    >
+      {getLeadStatusLabel(status)}
+    </span>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string | null }) {
+  return (
+    <div className="ops-fact">
+      <p className="text-xs font-medium uppercase text-muted-foreground">
+        {label}
+      </p>
+      <p className="text-sm leading-6">{value ?? "Missing"}</p>
+    </div>
+  );
+}
+
+function formatActivityAction(action: string) {
+  return action
+    .split(".")
+    .map((part) => part.replace("_", " "))
+    .join(" ");
+}
+
+function formatNullableDateTime(value: Date | null) {
+  return value ? formatDateTime(value) : "Missing";
+}

@@ -28,7 +28,7 @@ Planning decisions:
 - [x] Reorganize lead detail into review, action, source, activity, and custom-field surfaces.
 - [x] Move workspace custom field definitions out of selected-lead detail if confirmed.
 - [x] Redesign calendar as a compact schedule board while preserving scope/date params.
-- [ ] Preserve ingestion, lead review, lead editing, statuses, follow-ups, custom fields, calendar, assistant, and audit behavior
+- [x] Preserve ingestion, lead review, lead editing, statuses, follow-ups, custom fields, calendar, assistant, and audit behavior
 - [ ] Keep domain logic and API contracts stable unless a specific redesign task requires a small change
 - [ ] Split repeated or complex dashboard UI into components
 - [ ] Ensure desktop and mobile layouts do not clip or overlap text

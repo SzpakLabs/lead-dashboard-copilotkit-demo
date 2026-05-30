@@ -1030,6 +1030,35 @@ body {
   padding: 0.7rem;
 }
 
+.ops-lead-detail-page {
+  align-items: start;
+  display: grid;
+  gap: var(--ops-panel-gap);
+  grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1.45fr) minmax(
+      20rem,
+      0.9fr
+    );
+}
+
+.ops-lead-detail-summary,
+.ops-lead-detail-side {
+  display: grid;
+  gap: var(--ops-panel-gap);
+  position: sticky;
+  top: 6rem;
+}
+
+.ops-lead-detail-main {
+  display: grid;
+  gap: var(--ops-panel-gap);
+  min-width: 0;
+}
+
+.ops-lead-detail-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 32rem;
+}
+
 .ops-review-badge {
   background: hsl(var(--muted));
   border-radius: var(--ops-control-radius);
@@ -1184,6 +1213,10 @@ body {
     grid-template-columns: minmax(14rem, 0.75fr) minmax(0, 1.5fr);
   }
 
+  .ops-lead-detail-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .ops-inspector {
     grid-column: 1 / -1;
     max-width: none;
@@ -1316,6 +1349,15 @@ body {
 
   .ops-rail {
     position: static;
+  }
+
+  .ops-lead-detail-summary,
+  .ops-lead-detail-side {
+    position: static;
+  }
+
+  .ops-lead-detail-section {
+    content-visibility: visible;
   }
 
   .ops-table {
