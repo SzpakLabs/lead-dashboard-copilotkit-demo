@@ -48,14 +48,14 @@ Discovery notes:
 
 ## Lead Detail Tabs
 
-- [ ] Reorganize `/leads/[leadId]` into tabs: Overview, Review, Follow-ups, Source, Activity, Custom fields, Full view.
-- [ ] Keep editing scoped to the relevant tab.
-- [ ] Add read-only `Full view` that hides empty fields where practical.
-- [ ] Preserve existing lead edit behavior.
-- [ ] Preserve existing review confirmation behavior.
-- [ ] Preserve existing status and follow-up behavior.
-- [ ] Preserve existing custom field value behavior.
-- [ ] Preserve existing source and activity visibility.
+- [x] Reorganize `/leads/[leadId]` into tabs: Overview, Review, Follow-ups, Source, Activity, Custom fields, Full view.
+- [x] Keep editing scoped to the relevant tab.
+- [x] Add read-only `Full view` that hides empty fields where practical.
+- [x] Preserve existing lead edit behavior.
+- [x] Preserve existing review confirmation behavior.
+- [x] Preserve existing status and follow-up behavior.
+- [x] Preserve existing custom field value behavior.
+- [x] Preserve existing source and activity visibility.
 
 ## Settings and Sources
 

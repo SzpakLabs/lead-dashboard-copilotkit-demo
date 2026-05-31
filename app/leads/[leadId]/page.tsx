@@ -1,34 +1,17 @@
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
-import {
-  ClipboardCheck,
-  Clock3,
-  DatabaseZap,
-  History,
-  Settings2,
-  Tags
-} from "lucide-react";
-import Link from "next/link";
+import { ClipboardCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { HistoryBackButton } from "@/components/dashboard/history-back-button";
 import {
-  ActivityList,
   AssistantPreviewNote,
-  DetailSection,
   Field,
   StatusBadge
 } from "@/components/dashboard/lead-ui";
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
-import {
-  CustomFieldValuesForm,
-  type CustomFieldValueItem
-} from "@/components/leads/custom-field-values-form";
-import {
-  FollowUpsPanel,
-  type FollowUpListItem
-} from "@/components/leads/follow-ups-panel";
-import { LeadDetailForm } from "@/components/leads/lead-detail-form";
-import { LeadStatusForm } from "@/components/leads/lead-status-form";
+import { type CustomFieldValueItem } from "@/components/leads/custom-field-values-form";
+import { type FollowUpListItem } from "@/components/leads/follow-ups-panel";
+import { LeadDetailTabs } from "@/components/leads/lead-detail-tabs";
 import { getDb } from "@/lib/db";
 import {
   contacts,
@@ -78,7 +61,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
           <div className="ops-panel ops-lead-detail-summary">
             <div className="ops-inspector-header">
               <div className="min-w-0">
-                <p className="ops-eyebrow">Focused review</p>
+                <p className="ops-eyebrow">Lead workspace</p>
                 <h2>{detail.title}</h2>
                 <p>
                   {detail.contactName}
@@ -98,107 +81,17 @@ export default async function LeadDetailPage({ params }: PageProps) {
             <AssistantPreviewNote />
           </div>
 
-          <div className="ops-lead-detail-main">
-            <DetailSection
-              icon={ClipboardCheck}
-              title="Review and edit"
-              description="Confirm extracted contact, scope, and qualification fields."
-            >
-              <LeadDetailForm
-                key={`detail-${detail.id}`}
-                lead={{
-                  id: detail.id,
-                  title: detail.title,
-                  source: detail.source,
-                  contactName: detail.contactName,
-                  company: detail.company ?? "",
-                  email: detail.email ?? "",
-                  phone: detail.phone ?? "",
-                  projectType: detail.projectType ?? "",
-                  problemSummary: detail.problemSummary ?? "",
-                  requestedOutcome: detail.requestedOutcome ?? "",
-                  budgetRange: detail.budgetRange ?? "",
-                  timeline: detail.timeline ?? "",
-                  nextStep: detail.nextStep ?? ""
-                }}
-              />
-            </DetailSection>
-
-            <DetailSection
-              icon={Clock3}
-              title="Status and follow-ups"
-              description="Keep lifecycle state and follow-up commitments current."
-            >
-              <div className="space-y-5">
-                <LeadStatusForm
-                  key={`status-${detail.id}`}
-                  leadId={detail.id}
-                  status={detail.status as LeadStatus}
-                />
-                <FollowUpsPanel
-                  key={`followups-${detail.id}`}
-                  leadId={detail.id}
-                  followUps={leadFollowUps}
-                />
-              </div>
-            </DetailSection>
-
-            <DetailSection
-              icon={Tags}
-              title="Custom fields"
-              description="Lead-specific values. Definitions live in settings."
-              action={
-                <Link href="/settings/fields">
-                  <Settings2 className="size-4" />
-                  Manage
-                </Link>
-              }
-            >
-              <CustomFieldValuesForm
-                key={`custom-fields-${detail.id}`}
-                leadId={detail.id}
-                definitions={customFieldDefinitions}
-                values={customFieldValues}
-              />
-            </DetailSection>
-          </div>
-
-          <aside className="ops-lead-detail-side" aria-label="Source and audit">
-            <DetailSection
-              icon={DatabaseZap}
-              title="Source"
-              description="Read-only source artifact behind this lead."
-            >
-              <div className="space-y-3">
-                <div className="ops-review-grid">
-                  <Field
-                    label="Channel"
-                    value={detail.sourceChannel ?? detail.source}
-                  />
-                  <Field
-                    label="Source type"
-                    value={detail.sourceType?.replace("_", " ") ?? "Missing"}
-                  />
-                  <Field
-                    label="Captured"
-                    value={formatNullableDateTime(detail.ingestedAt)}
-                  />
-                  <Field label="Lead source" value={detail.source} />
-                </div>
-                <div className="ops-source-copy">
-                  {detail.rawText ?? "No source artifact is linked."}
-                </div>
-              </div>
-            </DetailSection>
-
-            <DetailSection
-              icon={History}
-              title="Activity"
-              description="Audited lead, status, and follow-up changes."
-            >
-              <ActivityList activity={activity} />
-            </DetailSection>
-          </aside>
+          <LeadDetailTabs
+            activity={activity}
+            customFieldDefinitions={customFieldDefinitions}
+            customFieldValues={customFieldValues}
+            detail={{
+              ...detail,
+              status: detail.status as LeadStatus,
+              missingFields: normalizeMissingFields(detail.missingFields)
+            }}
+            followUps={leadFollowUps}
+          />
         </section>
       </div>
     </AppShell>
@@ -219,6 +112,8 @@ async function getLeadDetail(leadId: string) {
       budgetRange: leads.budgetRange,
       timeline: leads.timeline,
       nextStep: leads.nextStep,
+      missingFields: leads.missingFields,
+      confidence: leads.confidence,
       createdAt: leads.createdAt,
       contactName: contacts.name,
       company: contacts.company,
@@ -322,6 +217,10 @@ async function getLeadActivity(leadId: string) {
     .orderBy(desc(leadEvents.createdAt));
 }
 
-function formatNullableDateTime(value: Date | null) {
-  return value ? formatDateTime(value) : "Missing";
+function normalizeMissingFields(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter((item): item is string => typeof item === "string");
 }

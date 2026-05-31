@@ -1310,10 +1310,7 @@ html[data-theme="dark"] .ops-missing-fields span {
   align-items: start;
   display: grid;
   gap: var(--ops-panel-gap);
-  grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1.45fr) minmax(
-      20rem,
-      0.9fr
-    );
+  grid-template-columns: minmax(16rem, 0.62fr) minmax(0, 1.7fr);
 }
 
 .ops-lead-detail-summary,
@@ -1333,6 +1330,113 @@ html[data-theme="dark"] .ops-missing-fields span {
 .ops-lead-detail-section {
   content-visibility: auto;
   contain-intrinsic-size: auto 32rem;
+}
+
+.ops-lead-tabs {
+  display: grid;
+  gap: var(--ops-panel-gap);
+  min-width: 0;
+}
+
+.ops-lead-tab-list {
+  background: hsl(var(--ops-surface));
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: var(--ops-radius);
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.45rem;
+  scrollbar-gutter: stable;
+}
+
+.ops-lead-tab-list button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--ops-control-radius);
+  color: hsl(var(--ops-ink-soft));
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 760;
+  gap: 0.4rem;
+  min-height: 2.35rem;
+  padding: 0.48rem 0.66rem;
+}
+
+.ops-lead-tab-list button:hover,
+.ops-lead-tab-list button.is-active {
+  background: hsl(var(--muted) / 0.62);
+  border-color: hsl(var(--ops-line));
+  color: hsl(var(--foreground));
+}
+
+.ops-lead-tab-list button:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.ops-lead-tab-list svg {
+  flex: 0 0 auto;
+  height: 1rem;
+  width: 1rem;
+}
+
+.ops-lead-tab-panel:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 0.25rem;
+}
+
+.ops-full-view {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.ops-full-view section {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ops-full-view h3 {
+  font-size: 0.9rem;
+  font-weight: 780;
+}
+
+.ops-full-view-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ops-full-view-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ops-full-view-list li {
+  background: hsl(var(--muted) / 0.3);
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: var(--ops-control-radius);
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.75rem;
+}
+
+.ops-full-view-list strong,
+.ops-full-view-list span {
+  font-size: 0.82rem;
+}
+
+.ops-full-view-list span {
+  color: hsl(var(--muted-foreground));
+  text-transform: capitalize;
+}
+
+.ops-full-view-list p {
+  color: hsl(var(--ops-ink-soft));
+  font-size: 0.86rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .ops-review-badge {
@@ -1654,6 +1758,7 @@ body[data-intake-drawer-open="true"]
   .ops-strip,
   .ops-workbench,
   .ops-inspector-facts,
+  .ops-full-view-grid,
   .ops-review-grid,
   .ops-action-summary {
     grid-template-columns: 1fr;
