@@ -9,12 +9,12 @@ import {
   History,
   ListChecks,
   Settings2,
-  SlidersHorizontal,
   Tags,
   UserRound
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { DenseModeToggle } from "@/components/dashboard/dense-mode-toggle";
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import {
   CustomFieldValuesForm,
@@ -68,6 +68,7 @@ export type LeadLedgerRow = {
   updatedAt: Date;
   contactName: string;
   company: string | null;
+  customFieldValues?: string[];
 };
 
 export type LeadDetail = {
@@ -221,14 +222,7 @@ export function LeadLedgerPanel({
           </p>
         </div>
         <div className="ops-ledger-tools">
-          <span>
-            <SlidersHorizontal className="size-4" />
-            Dense
-          </span>
-          <Link href="/settings">
-            <Settings2 className="size-4" />
-            Settings
-          </Link>
+          <DenseModeToggle />
         </div>
       </div>
       <LeadLedger

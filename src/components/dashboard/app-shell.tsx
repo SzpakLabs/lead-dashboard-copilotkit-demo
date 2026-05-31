@@ -62,7 +62,7 @@ export function AppShell({
   return (
     <div
       className="ops-console min-h-screen"
-      data-density="compact"
+      data-density="comfortable"
       id="ops-app-shell"
     >
       <a className="ops-skip-link" href="#ops-main-content">

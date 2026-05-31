@@ -220,7 +220,7 @@ html[data-theme="dark"] .ops-console {
 .ops-search span,
 .ops-calendar-today span,
 .ops-calendar-stat span,
-.ops-ledger-tools :where(a, span),
+.ops-ledger-tools > :where(a, span, button),
 .ops-section-action a {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -244,7 +244,8 @@ html[data-theme="dark"] .ops-console {
 
 .ops-button,
 .ops-search,
-.ops-ledger-tools :where(a, span),
+.ops-density-toggle,
+.ops-ledger-tools > :where(a, span, button),
 .ops-section-action a {
   align-items: center;
   border: 1px solid hsl(var(--ops-line));
@@ -358,9 +359,20 @@ html[data-theme="dark"] .ops-console {
 }
 
 .ops-button,
-.ops-ledger-tools a,
+.ops-ledger-tools > a,
+.ops-density-toggle,
 .ops-section-action a {
   background: hsl(var(--ops-surface-strong));
+}
+
+.ops-density-toggle {
+  color: hsl(var(--ops-ink-soft));
+}
+
+.ops-density-toggle[aria-pressed="true"] {
+  background: rgb(20 111 101 / 0.1);
+  border-color: rgb(20 111 101 / 0.28);
+  color: hsl(var(--primary));
 }
 
 .ops-button-primary {
@@ -1154,7 +1166,7 @@ html[data-theme="dark"] .ops-console {
   justify-content: flex-end;
 }
 
-.ops-ledger-tools :where(a, span),
+.ops-ledger-tools > :where(a, span, button),
 .ops-section-action a {
   color: hsl(var(--ops-ink-soft));
   font-size: 0.78rem;
@@ -1757,8 +1769,26 @@ html[data-theme="dark"] .ops-review-warning {
   box-shadow: none;
 }
 
-:where([data-density="compact"]) .ops-table td {
-  padding-block: var(--ops-compact-block);
+[data-density="dense"] .ops-table th {
+  padding-block: 0.46rem;
+}
+
+[data-density="dense"] .ops-table td {
+  padding-block: 0.48rem;
+}
+
+[data-density="dense"] .ops-table td p {
+  font-size: 0.72rem;
+  margin-top: 0.12rem;
+}
+
+[data-density="dense"] .ops-lead-project {
+  display: none;
+}
+
+[data-density="dense"] .ops-muted-cell {
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
 }
 
 .ops-panel form,
@@ -2201,7 +2231,7 @@ body[data-intake-drawer-open="true"]
   .ops-button,
   .ops-search,
   .ops-queue-link,
-  .ops-ledger-tools :where(a, span),
+  .ops-ledger-tools > :where(a, span, button),
   .ops-section-action a {
     min-height: 2.75rem;
   }
