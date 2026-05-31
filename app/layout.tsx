@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { CopilotProvider } from "@/components/assistant/copilot-provider";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
@@ -27,9 +28,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="light dark" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `{
+        <Script id="leadops-theme-init" strategy="beforeInteractive">{`{
   try {
     const key = "leadops-color-scheme";
     const storedTheme = localStorage.getItem(key);
@@ -42,9 +41,7 @@ export default function RootLayout({
     document.documentElement.style.colorScheme = theme;
     document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", theme);
   } catch {}
-}`
-          }}
-        />
+}`}</Script>
         <link rel="stylesheet" href="/copilotkit-react-core-v2.css" />
       </head>
       <body>{content}</body>
