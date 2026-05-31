@@ -70,12 +70,12 @@ Discovery notes:
 
 ## Search and Dense Mode
 
-- [ ] Replace search scroll behavior with a global search or command overlay.
-- [ ] Search lead title, contact, company, source, status, next step, and practical custom field values.
-- [ ] Add keyboard close/selection behavior.
-- [ ] Open lead preview from search result selection.
-- [ ] Make dense mode change row height, padding, and secondary text density.
-- [ ] Persist dense mode preference.
+- [x] Replace search scroll behavior with a global search or command overlay.
+- [x] Search lead title, contact, company, source, status, next step, and practical custom field values.
+- [x] Add keyboard close/selection behavior.
+- [x] Open lead preview from search result selection.
+- [x] Make dense mode change row height, padding, and secondary text density.
+- [x] Persist dense mode preference.
 
 ## Dark Mode
 
