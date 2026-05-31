@@ -1,13 +1,7 @@
 import { z } from "zod";
 import { leadStatusSchema, type LeadStatus } from "@/lib/domain/leads/status";
 
-const leadSourceSchema = z.enum([
-  "linkedin",
-  "upwork",
-  "referral",
-  "website",
-  "other"
-]);
+const leadSourceSchema = z.string().trim().min(1).max(80);
 
 export const findLeadsInputSchema = z.object({
   query: z.string().trim().max(160).optional(),

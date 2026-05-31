@@ -5,8 +5,13 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { IngestionForm } from "@/components/leads/ingestion-form";
+import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 
-export function IntakeDrawer() {
+export function IntakeDrawer({
+  sourceOptions
+}: {
+  sourceOptions: SourceOption[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const titleId = useId();
   const drawerId = useId();
@@ -86,7 +91,10 @@ export function IntakeDrawer() {
                 </button>
               </div>
 
-              <IngestionForm className="border-0 bg-transparent p-0" />
+              <IngestionForm
+                className="border-0 bg-transparent p-0"
+                sourceOptions={sourceOptions}
+              />
 
               <div className="ops-drawer-footer">
                 <Link href="/intake" onClick={() => setIsOpen(false)}>

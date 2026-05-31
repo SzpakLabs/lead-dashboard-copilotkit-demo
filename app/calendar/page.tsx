@@ -41,6 +41,7 @@ import {
   getLeadStatusLabel,
   type LeadStatus
 } from "@/lib/domain/leads/status";
+import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 
@@ -68,12 +69,20 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   const selectedLead = selectedLeadId
     ? await getPreviewData(selectedLeadId)
     : null;
+  const sourceDefinitions = await getWorkspaceSourceDefinitions();
+  const sourceOptions = sourceDefinitions
+    .filter((source) => source.isActive && !source.archivedAt)
+    .map((source) => ({ value: source.slug, label: source.label }));
+  const sourceLabels = Object.fromEntries(
+    sourceDefinitions.map((source) => [source.slug, source.label])
+  );
 
   return (
     <AppShell
       activeSection="calendar"
       eyebrow="Lead schedule"
       eyebrowIcon={<CalendarDays className="size-4" />}
+      intakeSourceOptions={sourceOptions}
       showNewIntake
       title="Calendar"
     >
@@ -185,6 +194,8 @@ export default async function CalendarPage({ searchParams }: PageProps) {
             detail={selectedLead.detail}
             followUps={selectedLead.followUps}
             leadRow={selectedLead.leadRow}
+            sourceLabels={sourceLabels}
+            sourceOptions={sourceOptions}
           />
         </LeadPreviewDialog>
       ) : null}

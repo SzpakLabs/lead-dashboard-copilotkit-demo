@@ -18,10 +18,8 @@ import {
   LeadFilterRail,
   LeadPreviewContent,
   LeadLedgerPanel,
-  leadSourceOptions,
   OperationalHealthStrip,
-  type DashboardFilters,
-  type LeadSource
+  type DashboardFilters
 } from "@/components/dashboard/lead-workspace";
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import { type CustomFieldValueItem } from "@/components/leads/custom-field-values-form";
@@ -39,6 +37,7 @@ import {
   users
 } from "@/lib/db/schema";
 import { leadStatusSchema, type LeadStatus } from "@/lib/domain/leads/status";
+import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
 
 export const dynamic = "force-dynamic";
 
@@ -59,10 +58,20 @@ async function Dashboard({
 }) {
   const assistantEnabled = isAssistantRuntimeConfigured();
   const selectedLeadId = getSingleSearchParam(searchParams.leadId);
-  const customFieldDefinitionRows = await getCustomFieldDefinitions();
+  const [customFieldDefinitionRows, sourceDefinitions] = await Promise.all([
+    getCustomFieldDefinitions(),
+    getWorkspaceSourceDefinitions()
+  ]);
+  const activeSourceOptions = sourceDefinitions
+    .filter((source) => source.isActive && !source.archivedAt)
+    .map((source) => ({ value: source.slug, label: source.label }));
+  const sourceLabels = Object.fromEntries(
+    sourceDefinitions.map((source) => [source.slug, source.label])
+  );
   const filters = parseDashboardFilters(
     searchParams,
-    customFieldDefinitionRows
+    customFieldDefinitionRows,
+    activeSourceOptions.map((source) => source.value)
   );
   const leadRows = await getLeadRows(filters);
   const currentTime = await getCurrentTime();
@@ -87,11 +96,14 @@ async function Dashboard({
 
   return (
     <AppShell
-      actions={<LeadSearchOverlay leads={leadRows} />}
+      actions={
+        <LeadSearchOverlay leads={leadRows} sourceLabels={sourceLabels} />
+      }
       activeSection="console"
       assistantEnabled={assistantEnabled}
       eyebrow="Service Ops Console"
       eyebrowIcon={<DatabaseZap className="size-4" />}
+      intakeSourceOptions={activeSourceOptions}
       showNewIntake
       title="Lead operations"
     >
@@ -103,12 +115,14 @@ async function Dashboard({
           definitions={customFieldDefinitionRows}
           filters={filters}
           metrics={metrics}
+          sourceOptions={activeSourceOptions}
         />
         <LeadLedgerPanel
           activeLeadId={activeLeadId}
           currentTime={currentTime}
           filters={filters}
           leads={leadRows}
+          sourceLabels={sourceLabels}
         />
       </div>
       {detail ? (
@@ -120,6 +134,8 @@ async function Dashboard({
             detail={detail}
             followUps={detailFollowUps}
             leadRow={activeLeadRow}
+            sourceLabels={sourceLabels}
+            sourceOptions={activeSourceOptions}
           />
         </LeadPreviewDialog>
       ) : null}
@@ -199,14 +215,15 @@ async function getLeadRows(filters: DashboardFilters) {
 
 function parseDashboardFilters(
   searchParams: Record<string, string | string[] | undefined>,
-  definitions: CustomFieldDefinitionItem[]
+  definitions: CustomFieldDefinitionItem[],
+  activeSources: string[]
 ): DashboardFilters {
   const statusParam = getSingleSearchParam(searchParams.status);
   const sourceParam = getSingleSearchParam(searchParams.source);
   const status = leadStatusSchema.safeParse(statusParam).success
     ? (statusParam as LeadStatus)
     : "all";
-  const source = isLeadSource(sourceParam) ? sourceParam : "all";
+  const source = activeSources.includes(sourceParam) ? sourceParam : "all";
   const customFields = Object.fromEntries(
     definitions.map((definition) => [
       definition.id,
@@ -230,10 +247,6 @@ function getSingleSearchParam(value: string | string[] | undefined) {
   }
 
   return value ?? "";
-}
-
-function isLeadSource(value: string): value is LeadSource {
-  return leadSourceOptions.some((option) => option.value === value);
 }
 
 async function getCustomFieldDefinitions(): Promise<

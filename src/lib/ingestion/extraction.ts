@@ -1,12 +1,6 @@
 import { z } from "zod";
 
-export const extractionSourceChannelSchema = z.enum([
-  "linkedin",
-  "upwork",
-  "referral",
-  "website",
-  "other"
-]);
+export const extractionSourceChannelSchema = z.string().trim().min(1).max(80);
 
 export const extractedLeadSchema = z.object({
   contactName: z.string().nullable(),

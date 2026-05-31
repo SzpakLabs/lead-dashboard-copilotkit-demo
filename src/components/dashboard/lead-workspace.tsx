@@ -28,6 +28,7 @@ import { LeadDetailForm } from "@/components/leads/lead-detail-form";
 import { LeadStatusForm } from "@/components/leads/lead-status-form";
 import { formatDate, formatDateTime } from "@/lib/date-format";
 import { leadStatusOptions, type LeadStatus } from "@/lib/domain/leads/status";
+import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 import {
   ActivityList,
@@ -37,17 +38,10 @@ import {
   type ActivityListItem
 } from "./lead-ui";
 
-export type LeadSource =
-  | "linkedin"
-  | "upwork"
-  | "referral"
-  | "website"
-  | "other";
-
 export type DashboardFilters = {
   query: string;
   status: LeadStatus | "all";
-  source: LeadSource | "all";
+  source: string | "all";
   customFields: Record<string, string>;
 };
 
@@ -63,7 +57,7 @@ export type LeadLedgerRow = {
   id: string;
   title: string;
   status: LeadStatus;
-  source: LeadSource;
+  source: string;
   projectType: string | null;
   timeline: string | null;
   nextStep: string | null;
@@ -80,7 +74,7 @@ export type LeadDetail = {
   id: string;
   title: string;
   status: LeadStatus;
-  source: LeadSource;
+  source: string;
   projectType: string | null;
   problemSummary: string | null;
   requestedOutcome: string | null;
@@ -96,14 +90,6 @@ export type LeadDetail = {
   rawText: string;
   ingestedAt: Date;
 };
-
-export const leadSourceOptions: Array<{ value: LeadSource; label: string }> = [
-  { value: "linkedin", label: "LinkedIn" },
-  { value: "upwork", label: "Upwork" },
-  { value: "referral", label: "Referral" },
-  { value: "website", label: "Website" },
-  { value: "other", label: "Other" }
-];
 
 export function OperationalHealthStrip({
   metrics
@@ -147,12 +133,14 @@ export function LeadFilterRail({
   activeFilterCount,
   definitions,
   filters,
-  metrics
+  metrics,
+  sourceOptions
 }: {
   activeFilterCount: number;
   definitions: CustomFieldDefinitionItem[];
   filters: DashboardFilters;
   metrics: DashboardMetrics;
+  sourceOptions: SourceOption[];
 }) {
   return (
     <aside className="ops-rail" aria-label="Lead queues and filters">
@@ -202,6 +190,7 @@ export function LeadFilterRail({
           activeFilterCount={activeFilterCount}
           definitions={definitions}
           filters={filters}
+          sourceOptions={sourceOptions}
         />
       </section>
     </aside>
@@ -212,12 +201,14 @@ export function LeadLedgerPanel({
   activeLeadId,
   currentTime,
   filters,
-  leads
+  leads,
+  sourceLabels
 }: {
   activeLeadId: string | undefined;
   currentTime: number;
   filters: DashboardFilters;
   leads: LeadLedgerRow[];
+  sourceLabels: Record<string, string>;
 }) {
   return (
     <section className="ops-ledger" aria-labelledby="lead-ledger-title">
@@ -245,6 +236,7 @@ export function LeadLedgerPanel({
         currentTime={currentTime}
         filters={filters}
         leads={leads}
+        sourceLabels={sourceLabels}
       />
     </section>
   );
@@ -254,12 +246,14 @@ function LeadLedger({
   activeLeadId,
   currentTime,
   filters,
-  leads
+  leads,
+  sourceLabels
 }: {
   activeLeadId: string | undefined;
   currentTime: number;
   filters: DashboardFilters;
   leads: LeadLedgerRow[];
+  sourceLabels: Record<string, string>;
 }) {
   return (
     <div className="ops-table-wrap">
@@ -310,7 +304,7 @@ function LeadLedger({
                 data-label="Source"
                 className="capitalize text-muted-foreground"
               >
-                {lead.source}
+                {sourceLabels[lead.source] ?? lead.source}
               </td>
               <td data-label="Timeline" className="ops-muted-cell">
                 {lead.timeline ?? "Missing"}
@@ -349,7 +343,9 @@ export function LeadPreviewContent({
   customFieldValues,
   detail,
   followUps,
-  leadRow
+  leadRow,
+  sourceLabels,
+  sourceOptions
 }: {
   activity: ActivityListItem[];
   customFieldDefinitions: CustomFieldDefinitionItem[];
@@ -357,6 +353,8 @@ export function LeadPreviewContent({
   detail: LeadDetail;
   followUps: FollowUpListItem[];
   leadRow: LeadLedgerRow | undefined;
+  sourceLabels: Record<string, string>;
+  sourceOptions: SourceOption[];
 }) {
   return (
     <section className="ops-panel ops-inspector-panel ops-preview-content">
@@ -393,7 +391,10 @@ export function LeadPreviewContent({
       <div className="ops-inspector-facts" aria-label="Lead review state">
         <Field
           label="Source"
-          value={formatSource(detail.sourceType, detail.sourceChannel)}
+          value={formatSource(
+            detail.sourceType,
+            sourceLabels[detail.sourceChannel] ?? detail.sourceChannel
+          )}
         />
         <Field label="Created" value={formatDateTime(detail.ingestedAt)} />
         <Field label="Timeline" value={detail.timeline} />
@@ -439,6 +440,7 @@ export function LeadPreviewContent({
         <LeadReviewSurface detail={detail} leadRow={leadRow} />
         <LeadDetailForm
           key={`detail-${detail.id}`}
+          sourceOptions={sourceOptions}
           lead={{
             id: detail.id,
             title: detail.title,
@@ -482,7 +484,7 @@ export function LeadPreviewContent({
         title="Source"
         description="Trace the read-only artifact behind this lead."
       >
-        <SourceSurface detail={detail} />
+        <SourceSurface detail={detail} sourceLabels={sourceLabels} />
       </InspectorSection>
 
       <InspectorSection
@@ -564,11 +566,13 @@ function QueueLink({
 function LeadFiltersForm({
   activeFilterCount,
   definitions,
-  filters
+  filters,
+  sourceOptions
 }: {
   activeFilterCount: number;
   definitions: CustomFieldDefinitionItem[];
   filters: DashboardFilters;
+  sourceOptions: SourceOption[];
 }) {
   return (
     <form action="/" className="ops-filter-form" method="get">
@@ -611,7 +615,7 @@ function LeadFiltersForm({
           defaultValue={filters.source}
         >
           <option value="all">All sources</option>
-          {leadSourceOptions.map((option) => (
+          {sourceOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -760,17 +764,29 @@ function ActionSummary({
   );
 }
 
-function SourceSurface({ detail }: { detail: LeadDetail }) {
+function SourceSurface({
+  detail,
+  sourceLabels
+}: {
+  detail: LeadDetail;
+  sourceLabels: Record<string, string>;
+}) {
   return (
     <div className="space-y-3">
       <div className="ops-review-grid">
-        <Field label="Channel" value={detail.sourceChannel} />
+        <Field
+          label="Channel"
+          value={sourceLabels[detail.sourceChannel] ?? detail.sourceChannel}
+        />
         <Field
           label="Source type"
           value={detail.sourceType.replace("_", " ")}
         />
         <Field label="Captured" value={formatDateTime(detail.ingestedAt)} />
-        <Field label="Lead source" value={detail.source} />
+        <Field
+          label="Lead source"
+          value={sourceLabels[detail.source] ?? detail.source}
+        />
       </div>
       <div className="ops-source-copy">{detail.rawText}</div>
     </div>

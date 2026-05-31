@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { IntakeDrawer } from "@/components/leads/intake-drawer";
+import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -15,6 +16,7 @@ type AppShellProps = {
   children: ReactNode;
   eyebrow: string;
   eyebrowIcon: ReactNode;
+  intakeSourceOptions?: SourceOption[];
   showNewIntake?: boolean;
   title: string;
 };
@@ -52,6 +54,7 @@ export function AppShell({
   children,
   eyebrow,
   eyebrowIcon,
+  intakeSourceOptions = [],
   showNewIntake = false,
   title
 }: AppShellProps) {
@@ -103,7 +106,9 @@ export function AppShell({
         <div className="ops-actions" aria-label="Workspace actions">
           {actions}
           <ThemeToggle />
-          {showNewIntake ? <IntakeDrawer /> : null}
+          {showNewIntake ? (
+            <IntakeDrawer sourceOptions={intakeSourceOptions} />
+          ) : null}
         </div>
       </header>
 

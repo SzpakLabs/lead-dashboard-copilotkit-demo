@@ -3,12 +3,19 @@
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 
 const sampleText =
   "Carlos Test from Test Studio asked about a client dashboard for tracking inbound leads. Budget around $5k. Wants a discovery call next Tuesday and follow-up tomorrow.";
 
-export function IngestionForm({ className }: { className?: string }) {
+export function IngestionForm({
+  className,
+  sourceOptions
+}: {
+  className?: string;
+  sourceOptions: SourceOption[];
+}) {
   const router = useRouter();
   const sourceChannelId = useId();
   const sourceTypeId = useId();
@@ -16,7 +23,9 @@ export function IngestionForm({ className }: { className?: string }) {
   const hintId = useId();
   const messageId = useId();
   const [text, setText] = useState(sampleText);
-  const [sourceChannel, setSourceChannel] = useState("linkedin");
+  const [sourceChannel, setSourceChannel] = useState(
+    sourceOptions[0]?.value ?? "other"
+  );
   const [sourceType, setSourceType] = useState("pasted_text");
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -63,11 +72,11 @@ export function IngestionForm({ className }: { className?: string }) {
             value={sourceChannel}
             onChange={(event) => setSourceChannel(event.target.value)}
           >
-            <option value="linkedin">LinkedIn</option>
-            <option value="upwork">Upwork</option>
-            <option value="referral">Referral</option>
-            <option value="website">Website</option>
-            <option value="other">Other</option>
+            {sourceOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
         <div className="space-y-1 text-sm font-medium">

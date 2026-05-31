@@ -25,6 +25,7 @@ import {
 } from "@/lib/db/schema";
 import { formatDateTime } from "@/lib/date-format";
 import { type LeadStatus } from "@/lib/domain/leads/status";
+import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
 
 export const dynamic = "force-dynamic";
 
@@ -40,13 +41,25 @@ export default async function LeadDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const [customFieldDefinitions, customFieldValues, leadFollowUps, activity] =
-    await Promise.all([
-      getCustomFieldDefinitions(),
-      getLeadCustomFieldValues(leadId),
-      getLeadFollowUps(leadId),
-      getLeadActivity(leadId)
-    ]);
+  const [
+    customFieldDefinitions,
+    customFieldValues,
+    leadFollowUps,
+    activity,
+    sourceDefinitions
+  ] = await Promise.all([
+    getCustomFieldDefinitions(),
+    getLeadCustomFieldValues(leadId),
+    getLeadFollowUps(leadId),
+    getLeadActivity(leadId),
+    getWorkspaceSourceDefinitions()
+  ]);
+  const sourceOptions = sourceDefinitions
+    .filter((source) => source.isActive && !source.archivedAt)
+    .map((source) => ({ value: source.slug, label: source.label }));
+  const sourceLabels = Object.fromEntries(
+    sourceDefinitions.map((source) => [source.slug, source.label])
+  );
 
   return (
     <AppShell
@@ -72,7 +85,10 @@ export default async function LeadDetailPage({ params }: PageProps) {
             </div>
 
             <div className="ops-inspector-facts">
-              <Field label="Source" value={detail.source} />
+              <Field
+                label="Source"
+                value={sourceLabels[detail.source] ?? detail.source}
+              />
               <Field label="Created" value={formatDateTime(detail.createdAt)} />
               <Field label="Timeline" value={detail.timeline} />
               <Field label="Next step" value={detail.nextStep} />
@@ -91,6 +107,8 @@ export default async function LeadDetailPage({ params }: PageProps) {
               missingFields: normalizeMissingFields(detail.missingFields)
             }}
             followUps={leadFollowUps}
+            sourceLabels={sourceLabels}
+            sourceOptions={sourceOptions}
           />
         </section>
       </div>

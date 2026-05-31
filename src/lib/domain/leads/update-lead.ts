@@ -12,9 +12,7 @@ import {
 export const updateLeadInputSchema = z.object({
   leadId: z.string().uuid(),
   title: z.string().trim().min(1).max(180),
-  source: z
-    .enum(["linkedin", "upwork", "referral", "website", "other"])
-    .default("other"),
+  source: z.string().trim().min(1).max(80).default("other"),
   contactName: z.string().trim().min(1).max(160),
   company: z.string().trim().max(160).optional(),
   email: z.string().trim().email().max(180).optional().or(z.literal("")),

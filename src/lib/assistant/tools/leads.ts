@@ -45,7 +45,7 @@ const updateLeadFieldsPreviewPayloadSchema = z.object({
   after: z.object({
     leadId: z.string().uuid(),
     title: z.string(),
-    source: z.enum(["linkedin", "upwork", "referral", "website", "other"]),
+    source: z.string(),
     contactName: z.string(),
     company: z.string().nullable(),
     email: z.string().nullable(),
@@ -737,7 +737,7 @@ function normalizeNullableInput(
 function toUpdateLeadInput(input: {
   leadId: string;
   title: string;
-  source: "linkedin" | "upwork" | "referral" | "website" | "other";
+  source: string;
   contactName: string;
   company: string | null;
   email: string | null;

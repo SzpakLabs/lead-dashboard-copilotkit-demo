@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 
 export type LeadDetailFormValue = {
   id: string;
@@ -23,9 +24,10 @@ export type LeadDetailFormValue = {
 
 type LeadDetailFormProps = {
   lead: LeadDetailFormValue;
+  sourceOptions: SourceOption[];
 };
 
-export function LeadDetailForm({ lead }: LeadDetailFormProps) {
+export function LeadDetailForm({ lead, sourceOptions }: LeadDetailFormProps) {
   const router = useRouter();
   const sourceId = useId();
   const messageId = useId();
@@ -82,11 +84,11 @@ export function LeadDetailForm({ lead }: LeadDetailFormProps) {
             value={form.source}
             onChange={(event) => updateField("source", event.target.value)}
           >
-            <option value="linkedin">LinkedIn</option>
-            <option value="upwork">Upwork</option>
-            <option value="referral">Referral</option>
-            <option value="website">Website</option>
-            <option value="other">Other</option>
+            {getSelectOptions(sourceOptions, lead.source).map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
         <TextField
@@ -175,6 +177,20 @@ export function LeadDetailForm({ lead }: LeadDetailFormProps) {
       </div>
     </form>
   );
+}
+
+function getSelectOptions(options: SourceOption[], currentSource: string) {
+  if (options.some((option) => option.value === currentSource)) {
+    return options;
+  }
+
+  return [
+    ...options,
+    {
+      value: currentSource,
+      label: `${currentSource} (inactive)`
+    }
+  ];
 }
 
 function TextField({

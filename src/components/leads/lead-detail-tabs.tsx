@@ -37,6 +37,7 @@ import { LeadDetailForm } from "@/components/leads/lead-detail-form";
 import { LeadStatusForm } from "@/components/leads/lead-status-form";
 import { formatDateTime } from "@/lib/date-format";
 import type { LeadStatus } from "@/lib/domain/leads/status";
+import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 
 type LeadDetailTabsProps = {
@@ -45,6 +46,8 @@ type LeadDetailTabsProps = {
   customFieldValues: CustomFieldValueItem[];
   detail: LeadDetailTabsDetail;
   followUps: FollowUpListItem[];
+  sourceLabels: Record<string, string>;
+  sourceOptions: SourceOption[];
 };
 
 type LeadDetailTabsDetail = {
@@ -106,7 +109,9 @@ export function LeadDetailTabs({
   customFieldDefinitions,
   customFieldValues,
   detail,
-  followUps
+  followUps,
+  sourceLabels,
+  sourceOptions
 }: LeadDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<LeadDetailTabId>("overview");
   const customFieldValueMap = useMemo(
@@ -196,6 +201,7 @@ export function LeadDetailTabs({
         >
           <LeadDetailForm
             key={`detail-${detail.id}`}
+            sourceOptions={sourceOptions}
             lead={{
               id: detail.id,
               title: detail.title,
@@ -253,7 +259,7 @@ export function LeadDetailTabs({
           title="Source"
           description="Read-only source artifact and source metadata behind this lead."
         >
-          <SourceSnapshot detail={detail} />
+          <SourceSnapshot detail={detail} sourceLabels={sourceLabels} />
         </DetailSection>
       </TabPanel>
 
@@ -300,6 +306,7 @@ export function LeadDetailTabs({
             customFieldValueMap={customFieldValueMap}
             detail={detail}
             followUps={followUps}
+            sourceLabels={sourceLabels}
           />
         </DetailSection>
       </TabPanel>
@@ -374,11 +381,24 @@ function LeadReviewSummary({ detail }: { detail: LeadDetailTabsDetail }) {
   );
 }
 
-function SourceSnapshot({ detail }: { detail: LeadDetailTabsDetail }) {
+function SourceSnapshot({
+  detail,
+  sourceLabels
+}: {
+  detail: LeadDetailTabsDetail;
+  sourceLabels: Record<string, string>;
+}) {
   return (
     <div className="space-y-3">
       <div className="ops-review-grid">
-        <Field label="Channel" value={detail.sourceChannel ?? detail.source} />
+        <Field
+          label="Channel"
+          value={
+            sourceLabels[detail.sourceChannel ?? detail.source] ??
+            detail.sourceChannel ??
+            detail.source
+          }
+        />
         <Field
           label="Source type"
           value={detail.sourceType?.replace("_", " ") ?? null}
@@ -387,7 +407,10 @@ function SourceSnapshot({ detail }: { detail: LeadDetailTabsDetail }) {
           label="Captured"
           value={formatNullableDateTime(detail.ingestedAt)}
         />
-        <Field label="Lead source" value={detail.source} />
+        <Field
+          label="Lead source"
+          value={sourceLabels[detail.source] ?? detail.source}
+        />
       </div>
       <div className="ops-source-copy">
         {detail.rawText ?? "No source artifact is linked."}
@@ -401,18 +424,20 @@ function FullView({
   customFieldDefinitions,
   customFieldValueMap,
   detail,
-  followUps
+  followUps,
+  sourceLabels
 }: {
   activity: ActivityListItem[];
   customFieldDefinitions: CustomFieldDefinitionItem[];
   customFieldValueMap: Map<string, string>;
   detail: LeadDetailTabsDetail;
   followUps: FollowUpListItem[];
+  sourceLabels: Record<string, string>;
 }) {
   const leadFields = [
     ["Title", detail.title],
     ["Status", detail.status],
-    ["Source", detail.source],
+    ["Source", sourceLabels[detail.source] ?? detail.source],
     ["Created", formatDateTime(detail.createdAt)],
     ["Contact", detail.contactName],
     ["Company", detail.company],
@@ -426,7 +451,12 @@ function FullView({
     ["Requested outcome", detail.requestedOutcome]
   ] as const;
   const sourceFields = [
-    ["Channel", detail.sourceChannel ?? detail.source],
+    [
+      "Channel",
+      sourceLabels[detail.sourceChannel ?? detail.source] ??
+        detail.sourceChannel ??
+        detail.source
+    ],
     ["Source type", detail.sourceType?.replace("_", " ")],
     ["Captured", detail.ingestedAt ? formatDateTime(detail.ingestedAt) : null]
   ] as const;

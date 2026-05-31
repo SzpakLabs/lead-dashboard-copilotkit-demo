@@ -2,8 +2,13 @@ import { ArrowLeft, DatabaseZap } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { IngestionForm } from "@/components/leads/ingestion-form";
+import { getActiveSourceOptions } from "@/lib/domain/sources/manage-sources";
 
-export default function IntakePage() {
+export const dynamic = "force-dynamic";
+
+export default async function IntakePage() {
+  const sourceOptions = await getActiveSourceOptions();
+
   return (
     <AppShell
       actions={
@@ -27,7 +32,7 @@ export default function IntakePage() {
             </p>
           </div>
         </div>
-        <IngestionForm />
+        <IngestionForm sourceOptions={sourceOptions} />
       </section>
     </AppShell>
   );

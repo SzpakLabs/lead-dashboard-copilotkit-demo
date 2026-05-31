@@ -4,13 +4,17 @@ import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { StatusBadge } from "./lead-ui";
-import { leadSourceOptions, type LeadLedgerRow } from "./lead-workspace";
+import { type LeadLedgerRow } from "./lead-workspace";
 
 type LeadSearchOverlayProps = {
   leads: LeadLedgerRow[];
+  sourceLabels: Record<string, string>;
 };
 
-export function LeadSearchOverlay({ leads }: LeadSearchOverlayProps) {
+export function LeadSearchOverlay({
+  leads,
+  sourceLabels
+}: LeadSearchOverlayProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const pathname = usePathname();
@@ -29,7 +33,7 @@ export function LeadSearchOverlay({ leads }: LeadSearchOverlayProps) {
           lead.contactName,
           lead.company,
           lead.source,
-          getSourceLabel(lead.source),
+          sourceLabels[lead.source],
           lead.status,
           lead.nextStep,
           lead.timeline,
@@ -39,7 +43,7 @@ export function LeadSearchOverlay({ leads }: LeadSearchOverlayProps) {
           .some((value) => value.toLowerCase().includes(normalizedQuery))
       )
       .slice(0, 8);
-  }, [leads, normalizedQuery]);
+  }, [leads, normalizedQuery, sourceLabels]);
 
   function openLead(leadId: string) {
     const nextParams = new URLSearchParams(searchParams);
@@ -107,7 +111,7 @@ export function LeadSearchOverlay({ leads }: LeadSearchOverlayProps) {
                     <small>
                       {lead.contactName}
                       {lead.company ? `, ${lead.company}` : ""} ·{" "}
-                      {getSourceLabel(lead.source)}
+                      {sourceLabels[lead.source] ?? lead.source}
                     </small>
                   </span>
                   <StatusBadge status={lead.status} />
@@ -121,11 +125,5 @@ export function LeadSearchOverlay({ leads }: LeadSearchOverlayProps) {
         </div>
       ) : null}
     </>
-  );
-}
-
-function getSourceLabel(source: LeadLedgerRow["source"]) {
-  return (
-    leadSourceOptions.find((option) => option.value === source)?.label ?? source
   );
 }
