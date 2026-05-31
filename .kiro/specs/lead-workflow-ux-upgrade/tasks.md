@@ -59,14 +59,14 @@ Discovery notes:
 
 ## Settings and Sources
 
-- [ ] Create or adjust Settings IA with `Custom fields` and `Sources` sections.
-- [ ] Preserve existing custom field definition behavior.
-- [ ] Add source presets with enable/disable behavior.
-- [ ] Add custom source create/rename/archive/order behavior.
-- [ ] Update lead source selects to use active workspace sources.
-- [ ] Update source filters to use active workspace sources.
-- [ ] Ensure existing leads with inactive/archived sources still display correctly.
-- [ ] Update seed data to use configured sources.
+- [x] Create or adjust Settings IA with `Custom fields` and `Sources` sections.
+- [x] Preserve existing custom field definition behavior.
+- [x] Add source presets with enable/disable behavior.
+- [x] Add custom source create/rename/archive/order behavior.
+- [x] Update lead source selects to use active workspace sources.
+- [x] Update source filters to use active workspace sources.
+- [x] Ensure existing leads with inactive/archived sources still display correctly.
+- [x] Update seed data to use configured sources.
 
 ## Search and Dense Mode
 
