@@ -11,10 +11,20 @@ Status: active. `dashboard-redesign` is complete and this spec is the next imple
 
 ## Discovery
 
-- [ ] Inspect current routes, shared shell, lead ledger, calendar, lead detail, settings, assistant, seed scripts, and schema.
-- [ ] Confirm whether source configuration needs a DB schema change or can start as workspace settings.
-- [ ] Check installed CopilotKit package behavior against official docs before assistant UI/report work.
-- [ ] Identify the current seed anchor strategy and reset/seed command path.
+- [x] Inspect current routes, shared shell, lead ledger, calendar, lead detail, settings, assistant, seed scripts, and schema.
+- [x] Confirm whether source configuration needs a DB schema change or can start as workspace settings.
+- [x] Check installed CopilotKit package behavior against official docs before assistant UI/report work.
+- [x] Identify the current seed anchor strategy and reset/seed command path.
+
+Discovery notes:
+
+- Routes exist for `/`, `/calendar`, `/intake`, `/settings/fields`, `/leads/[leadId]`, API lead/follow-up/custom-field routes, `/api/ingest`, and `/api/copilotkit`.
+- The current shell is `AppShell`; primary nav still uses `Fields`, calendar/settings/intake/lead pages still use page-local back actions, and assistant UI is only mounted on console.
+- The console still uses URL-selected leads and a permanent `LeadInspectorPanel`; calendar items navigate directly to lead detail.
+- Lead detail is still a multi-section page, not tabbed.
+- Source values are hard-coded through the Postgres `lead_source` enum, UI option arrays, Zod schemas, ingestion, assistant tools, and seed data. Real configurable/custom sources need a schema change, preferably source definitions plus loosening source fields away from the enum.
+- CopilotKit packages are installed at `1.57.4`. Installed v2 exports support the current `CopilotKitProvider`, `CopilotPopup`, `useRenderTool`, `useHumanInTheLoop`, `BuiltInAgent`, `defineTool`, and single-route runtime handler usage. Official docs confirm v2 provider/runtime, server tools, tool rendering, human-in-the-loop, agent context, and generative UI patterns; no custom chat framework is needed.
+- Seed data currently has no `DEMO_SEED_ANCHOR`; it uses fixed May 2026 dates and two test-safe leads. Reset paths are `npm run db:seed` and `npm run db:reset-demo`, both running `tsx src/lib/db/seed.ts --reset`.
 
 ## App Shell and Navigation
 
