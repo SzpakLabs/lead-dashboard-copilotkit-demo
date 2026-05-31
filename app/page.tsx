@@ -9,12 +9,14 @@ import {
   sql,
   type SQL
 } from "drizzle-orm";
-import { DatabaseZap, Search } from "lucide-react";
+import { DatabaseZap } from "lucide-react";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { LeadPreviewDialog } from "@/components/dashboard/lead-preview-dialog";
+import { LeadSearchOverlay } from "@/components/dashboard/lead-search-overlay";
 import {
   getCustomFieldFilterParamName,
   LeadFilterRail,
-  LeadInspectorPanel,
+  LeadPreviewContent,
   LeadLedgerPanel,
   leadSourceOptions,
   OperationalHealthStrip,
@@ -69,7 +71,7 @@ async function Dashboard({
   const activeLeadId =
     leadRows.some((lead) => lead.id === selectedLeadId) && selectedLeadId
       ? selectedLeadId
-      : leadRows[0]?.id;
+      : undefined;
   const detail = activeLeadId ? await getLeadDetail(activeLeadId) : null;
   const detailFollowUps = activeLeadId
     ? await getLeadFollowUps(activeLeadId)
@@ -85,14 +87,7 @@ async function Dashboard({
 
   return (
     <AppShell
-      actions={
-        <>
-          <a className="ops-search" href="#lead-filters">
-            <Search className="size-4" />
-            <span>Search leads</span>
-          </a>
-        </>
-      }
+      actions={<LeadSearchOverlay leads={leadRows} />}
       activeSection="console"
       assistantEnabled={assistantEnabled}
       eyebrow="Service Ops Console"
@@ -115,15 +110,19 @@ async function Dashboard({
           filters={filters}
           leads={leadRows}
         />
-        <LeadInspectorPanel
-          activity={detailActivity}
-          customFieldDefinitions={customFieldDefinitionRows}
-          customFieldValues={detailCustomFieldValues}
-          detail={detail}
-          followUps={detailFollowUps}
-          leadRow={activeLeadRow}
-        />
       </div>
+      {detail ? (
+        <LeadPreviewDialog title={detail.title}>
+          <LeadPreviewContent
+            activity={detailActivity}
+            customFieldDefinitions={customFieldDefinitionRows}
+            customFieldValues={detailCustomFieldValues}
+            detail={detail}
+            followUps={detailFollowUps}
+            leadRow={activeLeadRow}
+          />
+        </LeadPreviewDialog>
+      ) : null}
     </AppShell>
   );
 }

@@ -38,13 +38,13 @@ Discovery notes:
 
 ## Console and Lead Preview
 
-- [ ] Remove the permanent selected-lead inspector from the main console.
-- [ ] Add reusable lead preview modal/sheet.
-- [ ] Open preview from console lead rows.
-- [ ] Open preview from calendar lead/follow-up events.
-- [ ] Open preview from search results.
-- [ ] Add preview actions for close, open full page, edit, add follow-up, and status where appropriate.
-- [ ] Verify desktop and mobile preview layouts.
+- [x] Remove the permanent selected-lead inspector from the main console.
+- [x] Add reusable lead preview modal/sheet.
+- [x] Open preview from console lead rows.
+- [x] Open preview from calendar lead/follow-up events.
+- [x] Open preview from search results.
+- [x] Add preview actions for close, open full page, edit, add follow-up, and status where appropriate.
+- [x] Verify desktop and mobile preview layouts.
 
 ## Lead Detail Tabs
 

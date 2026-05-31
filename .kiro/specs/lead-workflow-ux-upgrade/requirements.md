@@ -188,4 +188,3 @@ Acceptance criteria:
 - Dark mode works after reload and does not cause unreadable surfaces.
 - Assistant works or is cleanly disabled; if configured, report and forecast prompts render visual outputs.
 - Browser verification covers desktop and mobile for dialog/sheet clipping, calendar stacking, and assistant layout.
-

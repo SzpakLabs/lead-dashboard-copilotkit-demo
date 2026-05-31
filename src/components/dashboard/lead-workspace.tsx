@@ -234,9 +234,9 @@ export function LeadLedgerPanel({
             <SlidersHorizontal className="size-4" />
             Dense
           </span>
-          <Link href="/settings/fields">
+          <Link href="/settings">
             <Settings2 className="size-4" />
-            Fields
+            Settings
           </Link>
         </div>
       </div>
@@ -247,43 +247,6 @@ export function LeadLedgerPanel({
         leads={leads}
       />
     </section>
-  );
-}
-
-export function LeadInspectorPanel({
-  activity,
-  customFieldDefinitions,
-  customFieldValues,
-  detail,
-  followUps,
-  leadRow
-}: {
-  activity: ActivityListItem[];
-  customFieldDefinitions: CustomFieldDefinitionItem[];
-  customFieldValues: CustomFieldValueItem[];
-  detail: LeadDetail | null;
-  followUps: FollowUpListItem[];
-  leadRow: LeadLedgerRow | undefined;
-}) {
-  return (
-    <aside className="ops-inspector" aria-label="Selected lead inspector">
-      {detail ? (
-        <LeadInspector
-          activity={activity}
-          customFieldDefinitions={customFieldDefinitions}
-          customFieldValues={customFieldValues}
-          detail={detail}
-          followUps={followUps}
-          leadRow={leadRow}
-        />
-      ) : (
-        <section className="ops-panel">
-          <p className="text-sm text-muted-foreground">
-            Select a lead to review details.
-          </p>
-        </section>
-      )}
-    </aside>
   );
 }
 
@@ -321,7 +284,7 @@ function LeadLedger({
               key={lead.id}
               className={cn(lead.id === activeLeadId ? "is-selected" : "")}
             >
-              <td>
+              <td data-label="Lead">
                 <Link
                   aria-current={lead.id === activeLeadId ? "page" : undefined}
                   className="ops-lead-link"
@@ -340,21 +303,28 @@ function LeadLedger({
                   <p className="ops-lead-project">{lead.projectType}</p>
                 ) : null}
               </td>
-              <td>
+              <td data-label="Status">
                 <StatusBadge status={lead.status} />
               </td>
-              <td className="capitalize text-muted-foreground">
+              <td
+                data-label="Source"
+                className="capitalize text-muted-foreground"
+              >
                 {lead.source}
               </td>
-              <td className="ops-muted-cell">{lead.timeline ?? "Missing"}</td>
-              <td className="ops-muted-cell">{lead.nextStep ?? "Missing"}</td>
-              <td>
+              <td data-label="Timeline" className="ops-muted-cell">
+                {lead.timeline ?? "Missing"}
+              </td>
+              <td data-label="Next step" className="ops-muted-cell">
+                {lead.nextStep ?? "Missing"}
+              </td>
+              <td data-label="Follow-up">
                 <FollowUpDueBadge
                   followUpDueAt={lead.followUpDueAt}
                   currentTime={currentTime}
                 />
               </td>
-              <td>
+              <td data-label="Review">
                 <ReviewBadge
                   confidence={lead.confidence}
                   missingFields={lead.missingFields}
@@ -373,7 +343,7 @@ function LeadLedger({
   );
 }
 
-function LeadInspector({
+export function LeadPreviewContent({
   activity,
   customFieldDefinitions,
   customFieldValues,
@@ -389,10 +359,10 @@ function LeadInspector({
   leadRow: LeadLedgerRow | undefined;
 }) {
   return (
-    <section className="ops-panel ops-inspector-panel">
+    <section className="ops-panel ops-inspector-panel ops-preview-content">
       <div className="ops-inspector-header">
         <div className="min-w-0">
-          <p className="ops-eyebrow">Selected lead</p>
+          <p className="ops-eyebrow">Lead preview</p>
           <h2>{detail.title}</h2>
           <p>
             {detail.contactName}
@@ -400,6 +370,24 @@ function LeadInspector({
           </p>
         </div>
         <StatusBadge status={detail.status} />
+      </div>
+
+      <div className="ops-preview-actions" aria-label="Lead preview actions">
+        <Link
+          className="ops-button ops-button-primary"
+          href={`/leads/${detail.id}`}
+        >
+          Open full page
+        </Link>
+        <Link className="ops-button" href={`/leads/${detail.id}#overview`}>
+          Edit
+        </Link>
+        <Link className="ops-button" href={`/leads/${detail.id}#follow-ups`}>
+          Add follow-up
+        </Link>
+        <Link className="ops-button" href={`/leads/${detail.id}#status`}>
+          Status
+        </Link>
       </div>
 
       <div className="ops-inspector-facts" aria-label="Lead review state">
@@ -510,7 +498,7 @@ function LeadInspector({
         title="Custom fields"
         description="Lead-specific values. Definitions live in settings."
         action={
-          <Link href="/settings/fields">
+          <Link href="/settings">
             <Settings2 className="size-4" />
             Manage
           </Link>
