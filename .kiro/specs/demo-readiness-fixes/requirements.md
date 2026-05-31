@@ -11,9 +11,11 @@ This spec only covers final demo-readiness fixes found after the MVP implementat
 - Clean reset/seed workflow for curated demo data.
 - Assistant runtime readiness and environment documentation.
 - Small browser polish for missing favicon.
+- Demo interaction logging for visits, clicks/interactions, and assistant conversations.
+- Optional Telegram forwarding for demo events into a private inbox chat.
 - Final local and deployed smoke verification.
 
-This spec does not add new product features.
+This spec does not add product-facing analytics features.
 
 ## Requirements
 
@@ -62,10 +64,29 @@ Acceptance criteria:
 - `/calendar` returns 200 and renders seeded calendar data.
 - Assistant is either verified working or intentionally disabled with no broken UI.
 
+### 5. Demo Interaction Logging
+
+THE SYSTEM SHALL record lightweight demo usage events so portfolio-demo behavior can be reviewed after local or public sessions.
+
+Acceptance criteria:
+
+- Page visits are recorded with timestamp, route, referrer where available, user agent where available, and an IP grouping key.
+- Visits can be grouped by IP grouping key without requiring a signed-in user.
+- Clicks and meaningful interactions are recorded with timestamp, route, event type, target/action name, and relevant entity identifiers such as lead id when available.
+- Assistant conversations are recorded with timestamp, route/page context, conversation/session id, user messages, assistant responses where available, tool/action names, and confirmation outcomes.
+- When Telegram forwarding is configured, demo events are sent to the configured Telegram inbox chat as concise summaries.
+- Telegram forwarding configuration is read from environment variables, including bot credentials and the group/user chat id.
+- Logging must not record secrets, provider API keys, cookies, auth tokens, or raw request headers.
+- Telegram bot credentials must never be exposed to the client.
+- Public demo logging must avoid exposing logs to normal visitors.
+- Reset/seed documentation explains whether demo logs are preserved or cleared.
+- Logging or Telegram delivery failures must not break the dashboard, calendar, lead workflows, or assistant.
+
 ## Out of Scope
 
 - Redesigning the dashboard.
 - Adding Telegram, website widget, telephony, or analytics.
+- Building a full analytics dashboard or warehouse.
 - Replacing deterministic extraction with live LLM extraction.
 - Adding real authentication.
 - Expanding to non-software-services verticals.
