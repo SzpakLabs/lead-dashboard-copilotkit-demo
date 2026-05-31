@@ -6,7 +6,6 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
-  LayoutDashboard,
   RotateCcw
 } from "lucide-react";
 import Link from "next/link";
@@ -46,15 +45,10 @@ export default async function CalendarPage({ searchParams }: PageProps) {
 
   return (
     <AppShell
-      actions={
-        <Link className="ops-button" href="/">
-          <LayoutDashboard className="size-4" />
-          <span>Dashboard</span>
-        </Link>
-      }
       activeSection="calendar"
       eyebrow="Lead schedule"
       eyebrowIcon={<CalendarDays className="size-4" />}
+      showNewIntake
       title="Calendar"
     >
       <div className="ops-page-stack ops-calendar-page">

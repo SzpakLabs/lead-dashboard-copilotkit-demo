@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light dark;
   --background: 45 29% 97%;
   --foreground: 213 28% 13%;
   --muted: 44 24% 91%;
@@ -25,6 +26,48 @@
   --ops-control-height: 2.25rem;
   --ops-compact-block: 0.75rem;
   --ops-compact-inline: 0.875rem;
+  accent-color: hsl(var(--primary));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: 210 21% 8%;
+    --foreground: 42 24% 92%;
+    --muted: 211 18% 15%;
+    --muted-foreground: 214 10% 67%;
+    --border: 211 14% 25%;
+    --primary: 174 54% 58%;
+    --primary-foreground: 213 28% 10%;
+    --ops-surface: 210 20% 10%;
+    --ops-surface-strong: 212 19% 12%;
+    --ops-ink-soft: 214 13% 76%;
+    --ops-line: 211 14% 25%;
+    --ops-accent: 174 54% 58%;
+    --ops-warn: 39 88% 62%;
+    --ops-danger: 356 74% 67%;
+  }
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --background: 210 21% 8%;
+  --foreground: 42 24% 92%;
+  --muted: 211 18% 15%;
+  --muted-foreground: 214 10% 67%;
+  --border: 211 14% 25%;
+  --primary: 174 54% 58%;
+  --primary-foreground: 213 28% 10%;
+  --ops-surface: 210 20% 10%;
+  --ops-surface-strong: 212 19% 12%;
+  --ops-ink-soft: 214 13% 76%;
+  --ops-line: 211 14% 25%;
+  --ops-accent: 174 54% 58%;
+  --ops-warn: 39 88% 62%;
+  --ops-danger: 356 74% 67%;
 }
 
 body {
@@ -78,6 +121,22 @@ body {
     hsl(var(--background));
   background-size: 28px 28px;
   padding: var(--ops-page-gutter);
+}
+
+html[data-theme="dark"] .ops-console {
+  background:
+    linear-gradient(90deg, rgb(94 234 212 / 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, rgb(94 234 212 / 0.05) 1px, transparent 1px),
+    hsl(var(--background));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .ops-console {
+    background:
+      linear-gradient(90deg, rgb(94 234 212 / 0.05) 1px, transparent 1px),
+      linear-gradient(180deg, rgb(94 234 212 / 0.05) 1px, transparent 1px),
+      hsl(var(--background));
+  }
 }
 
 .ops-command-bar {
@@ -1067,6 +1126,20 @@ body {
   text-transform: capitalize;
 }
 
+html[data-theme="dark"] .ops-missing-fields span {
+  background: rgb(245 158 11 / 0.16);
+  border-color: rgb(245 158 11 / 0.34);
+  color: rgb(253 230 138);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .ops-missing-fields span {
+    background: rgb(245 158 11 / 0.16);
+    border-color: rgb(245 158 11 / 0.34);
+    color: rgb(253 230 138);
+  }
+}
+
 .ops-source-copy {
   background: hsl(var(--muted) / 0.5);
   border: 1px solid hsl(var(--ops-line));
@@ -1142,6 +1215,18 @@ body {
 .ops-review-warning {
   background: rgb(245 158 11 / 0.13);
   color: rgb(146 64 14);
+}
+
+html[data-theme="dark"] .ops-review-warning {
+  background: rgb(245 158 11 / 0.16);
+  color: rgb(253 230 138);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .ops-review-warning {
+    background: rgb(245 158 11 / 0.16);
+    color: rgb(253 230 138);
+  }
 }
 
 .ops-panel :where(input, select, textarea),

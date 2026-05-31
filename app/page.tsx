@@ -24,7 +24,6 @@ import {
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import { type CustomFieldValueItem } from "@/components/leads/custom-field-values-form";
 import { type FollowUpListItem } from "@/components/leads/follow-ups-panel";
-import { IntakeDrawer } from "@/components/leads/intake-drawer";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
 import {
@@ -92,13 +91,13 @@ async function Dashboard({
             <Search className="size-4" />
             <span>Search leads</span>
           </a>
-          <IntakeDrawer />
         </>
       }
       activeSection="console"
       assistantEnabled={assistantEnabled}
       eyebrow="Service Ops Console"
       eyebrowIcon={<DatabaseZap className="size-4" />}
+      showNewIntake
       title="Lead operations"
     >
       <OperationalHealthStrip metrics={metrics} />

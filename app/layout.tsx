@@ -24,8 +24,27 @@ export default function RootLayout({
   );
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="color-scheme" content="light dark" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `{
+  try {
+    const key = "leadops-color-scheme";
+    const storedTheme = localStorage.getItem(key);
+    const theme = storedTheme === "light" || storedTheme === "dark"
+      ? storedTheme
+      : window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", theme);
+  } catch {}
+}`
+          }}
+        />
         <link rel="stylesheet" href="/copilotkit-react-core-v2.css" />
       </head>
       <body>{content}</body>

@@ -1,6 +1,5 @@
 import { asc, isNull } from "drizzle-orm";
-import { ArrowLeft, Settings2 } from "lucide-react";
-import Link from "next/link";
+import { Settings2 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/app-shell";
 import {
   CustomFieldDefinitionsPanel,
@@ -16,13 +15,7 @@ export default async function FieldSettingsPage() {
 
   return (
     <AppShell
-      actions={
-        <Link className="ops-button" href="/">
-          <ArrowLeft className="size-4" />
-          <span>Back to console</span>
-        </Link>
-      }
-      activeSection="fields"
+      activeSection="settings"
       eyebrow="Workspace settings"
       eyebrowIcon={<Settings2 className="size-4" />}
       title="Custom fields"

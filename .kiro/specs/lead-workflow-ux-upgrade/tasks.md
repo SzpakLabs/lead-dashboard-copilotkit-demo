@@ -28,13 +28,13 @@ Discovery notes:
 
 ## App Shell and Navigation
 
-- [ ] Consolidate header width, spacing, primary nav, and page actions across Console, Calendar, Settings, and lead detail.
-- [ ] Replace `Fields` nav label with `Settings`.
-- [ ] Remove redundant Calendar `Dashboard` action.
-- [ ] Replace settings `Back to console` behavior with normal primary nav.
-- [ ] Add lead detail `Back` behavior with history-first and console fallback.
-- [ ] Add global dark mode toggle placement.
-- [ ] Ensure `New intake` remains available from Console and Calendar.
+- [x] Consolidate header width, spacing, primary nav, and page actions across Console, Calendar, Settings, and lead detail.
+- [x] Replace `Fields` nav label with `Settings`.
+- [x] Remove redundant Calendar `Dashboard` action.
+- [x] Replace settings `Back to console` behavior with normal primary nav.
+- [x] Add lead detail `Back` behavior with history-first and console fallback.
+- [x] Add global dark mode toggle placement.
+- [x] Ensure `New intake` remains available from Console and Calendar.
 
 ## Console and Lead Preview
 

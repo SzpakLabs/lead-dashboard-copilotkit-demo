@@ -1,6 +1,5 @@
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import {
-  ArrowLeft,
   ClipboardCheck,
   Clock3,
   DatabaseZap,
@@ -11,6 +10,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { HistoryBackButton } from "@/components/dashboard/history-back-button";
 import {
   ActivityList,
   AssistantPreviewNote,
@@ -67,12 +67,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
 
   return (
     <AppShell
-      actions={
-        <Link className="ops-button" href={`/?leadId=${detail.id}`}>
-          <ArrowLeft className="size-4" />
-          <span>Back to console</span>
-        </Link>
-      }
+      actions={<HistoryBackButton />}
       activeSection="console"
       eyebrow="Lead workspace"
       eyebrowIcon={<ClipboardCheck className="size-4" />}

@@ -2,9 +2,11 @@ import { Bot, CalendarDays, LayoutDashboard, Settings2 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import { IntakeDrawer } from "@/components/leads/intake-drawer";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./theme-toggle";
 
-type AppShellSection = "console" | "calendar" | "fields" | "intake";
+type AppShellSection = "console" | "calendar" | "settings" | "intake";
 
 type AppShellProps = {
   actions?: ReactNode;
@@ -13,6 +15,7 @@ type AppShellProps = {
   children: ReactNode;
   eyebrow: string;
   eyebrowIcon: ReactNode;
+  showNewIntake?: boolean;
   title: string;
 };
 
@@ -35,10 +38,10 @@ const navItems: Array<{
     section: "calendar"
   },
   {
-    href: "/settings/fields",
+    href: "/settings",
     icon: <Settings2 className="size-4" />,
-    label: "Fields",
-    section: "fields"
+    label: "Settings",
+    section: "settings"
   }
 ];
 
@@ -49,6 +52,7 @@ export function AppShell({
   children,
   eyebrow,
   eyebrowIcon,
+  showNewIntake = false,
   title
 }: AppShellProps) {
   return (
@@ -96,11 +100,11 @@ export function AppShell({
           ))}
         </nav>
 
-        {actions ? (
-          <div className="ops-actions" aria-label="Workspace actions">
-            {actions}
-          </div>
-        ) : null}
+        <div className="ops-actions" aria-label="Workspace actions">
+          {actions}
+          <ThemeToggle />
+          {showNewIntake ? <IntakeDrawer /> : null}
+        </div>
       </header>
 
       <main id="ops-main-content" tabIndex={-1}>
