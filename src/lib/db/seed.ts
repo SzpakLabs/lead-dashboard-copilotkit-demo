@@ -10,6 +10,7 @@ import {
   ingestionEvents,
   leadEvents,
   leads,
+  sourceDefinitions,
   users,
   workspaces
 } from "./schema";
@@ -39,6 +40,29 @@ async function seed({ reset }: { reset: boolean }) {
       slug: demoWorkspaceSlug
     })
     .returning();
+
+  await db.insert(sourceDefinitions).values(
+    [
+      { slug: "linkedin", label: "LinkedIn", active: true },
+      { slug: "upwork", label: "Upwork", active: true },
+      { slug: "referral", label: "Referral", active: true },
+      { slug: "website", label: "Website", active: true },
+      { slug: "phone", label: "Phone", active: false },
+      { slug: "whatsapp", label: "WhatsApp", active: false },
+      { slug: "instagram", label: "Instagram", active: false },
+      { slug: "facebook", label: "Facebook", active: false },
+      { slug: "google", label: "Google", active: false },
+      { slug: "walk-in", label: "Walk-in", active: false },
+      { slug: "other", label: "Other", active: true }
+    ].map((source, index) => ({
+      workspaceId: workspace.id,
+      slug: source.slug,
+      label: source.label,
+      presetKey: source.slug,
+      isActive: source.active,
+      sortOrder: index * 10
+    }))
+  );
 
   const [user] = await db
     .insert(users)

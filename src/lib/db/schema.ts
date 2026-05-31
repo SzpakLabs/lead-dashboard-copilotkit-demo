@@ -1,6 +1,7 @@
 import {
   boolean,
   index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -45,7 +46,8 @@ export const eventTargetTypeEnum = pgEnum("event_target_type", [
   "follow_up",
   "ingestion_event",
   "custom_field_definition",
-  "custom_field_value"
+  "custom_field_value",
+  "source_definition"
 ]);
 
 export const customFieldTypeEnum = pgEnum("custom_field_type", [
@@ -108,7 +110,7 @@ export const contacts = pgTable(
     company: text("company"),
     email: text("email"),
     phone: text("phone"),
-    source: leadSourceEnum("source").notNull().default("other"),
+    source: text("source").notNull().default("other"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -132,7 +134,7 @@ export const ingestionEvents = pgTable(
       onDelete: "set null"
     }),
     sourceType: ingestionSourceTypeEnum("source_type").notNull(),
-    sourceChannel: leadSourceEnum("source_channel").notNull().default("other"),
+    sourceChannel: text("source_channel").notNull().default("other"),
     rawText: text("raw_text").notNull(),
     normalizedText: text("normalized_text").notNull(),
     metadata: jsonb("metadata")
@@ -166,7 +168,7 @@ export const leads = pgTable(
     ),
     title: text("title").notNull(),
     status: leadStatusEnum("status").notNull().default("new"),
-    source: leadSourceEnum("source").notNull().default("other"),
+    source: text("source").notNull().default("other"),
     projectType: text("project_type"),
     problemSummary: text("problem_summary"),
     requestedOutcome: text("requested_outcome"),
@@ -192,6 +194,37 @@ export const leads = pgTable(
     workspaceIdx: index("leads_workspace_id_idx").on(table.workspaceId),
     contactIdx: index("leads_contact_id_idx").on(table.contactId),
     statusIdx: index("leads_status_idx").on(table.status)
+  })
+);
+
+export const sourceDefinitions = pgTable(
+  "source_definitions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    label: text("label").notNull(),
+    presetKey: text("preset_key"),
+    isActive: boolean("is_active").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+  },
+  (table) => ({
+    workspaceIdx: index("source_definitions_workspace_id_idx").on(
+      table.workspaceId
+    ),
+    workspaceSlugIdx: uniqueIndex("source_definitions_workspace_slug_idx").on(
+      table.workspaceId,
+      table.slug
+    )
   })
 );
 

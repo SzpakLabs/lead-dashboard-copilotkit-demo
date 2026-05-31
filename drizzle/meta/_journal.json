@@ -22,6 +22,13 @@
       "when": 1779470051370,
       "tag": "0002_assistant_action_logs",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780235976354,
+      "tag": "0003_source_definitions",
+      "breakpoints": true
     }
   ]
 }
