@@ -5,6 +5,7 @@ import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { IntakeDrawer } from "@/components/leads/intake-drawer";
 import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
+import { GlobalLeadSearch } from "./global-lead-search";
 import { ThemeToggle } from "./theme-toggle";
 
 type AppShellSection = "console" | "calendar" | "settings" | "intake";
@@ -104,6 +105,7 @@ export function AppShell({
         </nav>
 
         <div className="ops-actions" aria-label="Workspace actions">
+          <GlobalLeadSearch />
           {actions}
           <ThemeToggle />
           {showNewIntake ? (

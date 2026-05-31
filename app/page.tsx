@@ -12,7 +12,6 @@ import {
 import { DatabaseZap } from "lucide-react";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { LeadPreviewDialog } from "@/components/dashboard/lead-preview-dialog";
-import { LeadSearchOverlay } from "@/components/dashboard/lead-search-overlay";
 import {
   getCustomFieldFilterParamName,
   LeadFilterRail,
@@ -77,10 +76,7 @@ async function Dashboard({
   const currentTime = await getCurrentTime();
   const metrics = await getDashboardMetrics(currentTime);
 
-  const activeLeadId =
-    leadRows.some((lead) => lead.id === selectedLeadId) && selectedLeadId
-      ? selectedLeadId
-      : undefined;
+  const activeLeadId = isUuid(selectedLeadId) ? selectedLeadId : undefined;
   const detail = activeLeadId ? await getLeadDetail(activeLeadId) : null;
   const detailFollowUps = activeLeadId
     ? await getLeadFollowUps(activeLeadId)
@@ -96,9 +92,6 @@ async function Dashboard({
 
   return (
     <AppShell
-      actions={
-        <LeadSearchOverlay leads={leadRows} sourceLabels={sourceLabels} />
-      }
       activeSection="console"
       assistantEnabled={assistantEnabled}
       eyebrow="Service Ops Console"
@@ -247,6 +240,12 @@ function getSingleSearchParam(value: string | string[] | undefined) {
   }
 
   return value ?? "";
+}
+
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  );
 }
 
 async function getCustomFieldDefinitions(): Promise<

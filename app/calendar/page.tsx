@@ -629,7 +629,9 @@ async function getLeadRow(leadId: string): Promise<LeadLedgerRow | undefined> {
     .where(eq(leads.id, leadId))
     .limit(1);
 
-  return row ? { ...row, status: row.status as LeadStatus } : undefined;
+  return row
+    ? { ...row, customFieldValues: [], status: row.status as LeadStatus }
+    : undefined;
 }
 
 async function getCustomFieldDefinitions(): Promise<

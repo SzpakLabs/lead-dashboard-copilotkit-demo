@@ -334,6 +334,11 @@ html[data-theme="dark"] .ops-console {
   background: rgb(20 111 101 / 0.08);
 }
 
+.ops-search-result[aria-selected="true"] {
+  background: rgb(20 111 101 / 0.1);
+  border-color: rgb(20 111 101 / 0.32);
+}
+
 .ops-search-result span {
   display: grid;
   gap: 0.18rem;
