@@ -371,8 +371,7 @@ function CalendarItemLink({
         <span
           className={cn(
             "ops-calendar-status",
-            getLeadStatusColorClassName(item.status) ??
-              "bg-gray-100 text-gray-700"
+            getLeadStatusColorClassName(item.status) ?? "ops-status-badge"
           )}
         >
           {getLeadStatusLabel(item.status)}

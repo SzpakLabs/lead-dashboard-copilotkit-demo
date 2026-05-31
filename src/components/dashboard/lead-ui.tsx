@@ -21,7 +21,7 @@ export function StatusBadge({ status }: { status: LeadStatus }) {
     <span
       className={cn(
         "inline-flex rounded-md px-2 py-1 text-xs font-medium",
-        getLeadStatusColorClassName(status) ?? "bg-gray-100 text-gray-700"
+        getLeadStatusColorClassName(status) ?? "ops-status-badge"
       )}
     >
       {getLeadStatusLabel(status)}

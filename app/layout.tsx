@@ -32,14 +32,14 @@ export default function RootLayout({
   try {
     const key = "leadops-color-scheme";
     const storedTheme = localStorage.getItem(key);
-    const theme = storedTheme === "light" || storedTheme === "dark"
-      ? storedTheme
-      : window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", theme);
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+    document.documentElement.classList.toggle("dark", theme ? theme === "dark" : systemDark);
+    if (theme) {
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", theme);
+    }
   } catch {}
 }`}</Script>
         <link rel="stylesheet" href="/copilotkit-react-core-v2.css" />

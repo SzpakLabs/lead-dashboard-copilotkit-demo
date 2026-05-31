@@ -79,12 +79,12 @@ Discovery notes:
 
 ## Dark Mode
 
-- [ ] Add theme state and persistence.
-- [ ] Respect system theme before explicit preference exists.
-- [ ] Add dark theme tokens for app shell, tables, filters, dialogs, forms, calendar, settings, and lead detail.
-- [ ] Adjust status, urgency, and focus styles for dark mode.
-- [ ] Align CopilotKit surfaces with the active theme.
-- [ ] Verify no unreadable text or low-contrast controls in both themes.
+- [x] Add theme state and persistence.
+- [x] Respect system theme before explicit preference exists.
+- [x] Add dark theme tokens for app shell, tables, filters, dialogs, forms, calendar, settings, and lead detail.
+- [x] Adjust status, urgency, and focus styles for dark mode.
+- [x] Align CopilotKit surfaces with the active theme.
+- [x] Verify no unreadable text or low-contrast controls in both themes.
 
 ## Assistant
 

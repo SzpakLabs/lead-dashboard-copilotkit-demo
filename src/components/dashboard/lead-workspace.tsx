@@ -853,7 +853,7 @@ function FollowUpDueBadge({
     <span
       className={cn(
         "inline-flex rounded-md px-2 py-1 text-xs font-medium",
-        isOverdue ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+        isOverdue ? "ops-urgency-overdue" : "ops-urgency-due"
       )}
     >
       {isOverdue ? "Overdue" : "Due"} {formatDate(followUpDueAt)}

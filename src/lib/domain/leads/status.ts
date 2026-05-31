@@ -20,37 +20,37 @@ export const leadStatusOptions: Array<{
   {
     value: "new",
     label: "New",
-    colorClassName: "bg-gray-100 text-gray-700"
+    colorClassName: "ops-status-badge ops-status-new"
   },
   {
     value: "needs_review",
     label: "Needs review",
-    colorClassName: "bg-amber-100 text-amber-800"
+    colorClassName: "ops-status-badge ops-status-needs-review"
   },
   {
     value: "contacted",
     label: "Contacted",
-    colorClassName: "bg-blue-100 text-blue-800"
+    colorClassName: "ops-status-badge ops-status-contacted"
   },
   {
     value: "scheduled",
     label: "Scheduled",
-    colorClassName: "bg-violet-100 text-violet-800"
+    colorClassName: "ops-status-badge ops-status-scheduled"
   },
   {
     value: "in_progress",
     label: "In progress",
-    colorClassName: "bg-cyan-100 text-cyan-800"
+    colorClassName: "ops-status-badge ops-status-in-progress"
   },
   {
     value: "won",
     label: "Won",
-    colorClassName: "bg-green-100 text-green-800"
+    colorClassName: "ops-status-badge ops-status-won"
   },
   {
     value: "lost",
     label: "Lost",
-    colorClassName: "bg-red-100 text-red-800"
+    colorClassName: "ops-status-badge ops-status-lost"
   }
 ];
 

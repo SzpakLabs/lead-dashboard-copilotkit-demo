@@ -6,6 +6,8 @@ import { useSyncExternalStore } from "react";
 type ThemePreference = "light" | "dark";
 
 const storageKey = "leadops-color-scheme";
+const themeFadeMs = 120;
+let themeFadeTimeout: number | undefined;
 
 export function ThemeToggle() {
   const theme = useSyncExternalStore(
@@ -16,8 +18,11 @@ export function ThemeToggle() {
 
   function toggleTheme() {
     const nextTheme = theme === "dark" ? "light" : "dark";
-    localStorage.setItem(storageKey, nextTheme);
-    applyTheme(nextTheme);
+
+    fadeThemeChange(() => {
+      localStorage.setItem(storageKey, nextTheme);
+      syncTheme();
+    });
   }
 
   const isDark = theme === "dark";
@@ -35,17 +40,56 @@ export function ThemeToggle() {
   );
 }
 
-function applyTheme(theme: ThemePreference) {
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
+function syncTheme() {
+  const storedTheme = localStorage.getItem(storageKey);
+  const explicitTheme =
+    storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+  const systemTheme = getSystemTheme();
+  const activeTheme = explicitTheme ?? systemTheme;
+
+  document.documentElement.classList.toggle("dark", activeTheme === "dark");
+
+  if (explicitTheme) {
+    document.documentElement.dataset.theme = explicitTheme;
+    document.documentElement.style.colorScheme = explicitTheme;
+  } else {
+    delete document.documentElement.dataset.theme;
+    document.documentElement.style.colorScheme = "";
+  }
+
   document
     .querySelector('meta[name="color-scheme"]')
-    ?.setAttribute("content", theme);
+    ?.setAttribute("content", explicitTheme ?? "light dark");
   window.dispatchEvent(new Event("leadops-theme-change"));
 }
 
+function fadeThemeChange(applyThemeChange: () => void) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    applyThemeChange();
+    return;
+  }
+
+  window.clearTimeout(themeFadeTimeout);
+  document.documentElement.dataset.themeFade = "out";
+
+  themeFadeTimeout = window.setTimeout(() => {
+    applyThemeChange();
+    document.documentElement.dataset.themeFade = "in";
+
+    themeFadeTimeout = window.setTimeout(() => {
+      delete document.documentElement.dataset.themeFade;
+    }, themeFadeMs);
+  }, themeFadeMs);
+}
+
 function getThemeSnapshot(): ThemePreference {
-  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  const storedTheme = localStorage.getItem(storageKey);
+
+  if (storedTheme === "light" || storedTheme === "dark") {
+    return storedTheme;
+  }
+
+  return getSystemTheme();
 }
 
 function getServerThemeSnapshot(): ThemePreference {
@@ -53,11 +97,25 @@ function getServerThemeSnapshot(): ThemePreference {
 }
 
 function subscribeToTheme(callback: () => void) {
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const handleThemeChange = () => {
+    syncTheme();
+    callback();
+  };
+
   window.addEventListener("leadops-theme-change", callback);
-  window.addEventListener("storage", callback);
+  window.addEventListener("storage", handleThemeChange);
+  media.addEventListener("change", handleThemeChange);
 
   return () => {
     window.removeEventListener("leadops-theme-change", callback);
-    window.removeEventListener("storage", callback);
+    window.removeEventListener("storage", handleThemeChange);
+    media.removeEventListener("change", handleThemeChange);
   };
+}
+
+function getSystemTheme(): ThemePreference {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }

@@ -163,7 +163,7 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
               className={cn(
                 "space-y-3 rounded-md border border-border p-3",
                 getDueState(followUp, currentTime) === "overdue"
-                  ? "border-red-200"
+                  ? "ops-followup-overdue"
                   : ""
               )}
             >
@@ -176,7 +176,7 @@ export function FollowUpsPanel({ leadId, followUps }: FollowUpsPanelProps) {
                     className={cn(
                       "mt-1 text-xs font-medium",
                       getDueState(followUp, currentTime) === "overdue"
-                        ? "text-red-700"
+                        ? "ops-text-overdue"
                         : "text-muted-foreground"
                     )}
                   >

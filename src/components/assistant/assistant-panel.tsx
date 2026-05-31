@@ -138,6 +138,7 @@ export function AssistantPanel() {
         <div className="mt-3 flex gap-2">
           <Button
             size="sm"
+            className="ops-copilot-action-primary"
             disabled={status !== "executing"}
             onClick={() =>
               respond?.({ approved: true, previewId: args.previewId })
@@ -149,6 +150,7 @@ export function AssistantPanel() {
           <Button
             size="sm"
             variant="outline"
+            className="ops-copilot-action-secondary"
             disabled={status !== "executing"}
             onClick={() =>
               respond?.({ approved: false, previewId: args.previewId })
@@ -349,10 +351,7 @@ function MutationCard({
 
 function LeadResultItem({ lead }: { lead: AssistantLeadCard }) {
   return (
-    <a
-      className="block rounded-md border border-border bg-background p-3 hover:bg-muted/50"
-      href={lead.url}
-    >
+    <a className="ops-copilot-result-item block rounded-md p-3" href={lead.url}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{lead.title}</p>
@@ -364,8 +363,7 @@ function LeadResultItem({ lead }: { lead: AssistantLeadCard }) {
         <span
           className={cn(
             "shrink-0 rounded-md px-2 py-1 text-xs font-medium",
-            getLeadStatusColorClassName(lead.status) ??
-              "bg-gray-100 text-gray-700"
+            getLeadStatusColorClassName(lead.status) ?? "ops-status-badge"
           )}
         >
           {lead.statusLabel}
@@ -397,7 +395,7 @@ function ChangeList({
       {changes.map((change) => (
         <div
           key={change.field}
-          className="rounded-md border border-border bg-background p-2 text-xs"
+          className="ops-copilot-result-item rounded-md p-2 text-xs"
         >
           <p className="font-medium">{formatFieldLabel(change.field)}</p>
           <p className="mt-1 text-muted-foreground">
@@ -417,10 +415,7 @@ function formatFieldLabel(field: string) {
 
 function CalendarResultItem({ item }: { item: AssistantCalendarItem }) {
   return (
-    <a
-      className="block rounded-md border border-border bg-background p-3 hover:bg-muted/50"
-      href={item.url}
-    >
+    <a className="ops-copilot-result-item block rounded-md p-3" href={item.url}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{item.title}</p>
@@ -432,8 +427,7 @@ function CalendarResultItem({ item }: { item: AssistantCalendarItem }) {
         <span
           className={cn(
             "shrink-0 rounded-md px-2 py-1 text-xs font-medium",
-            getLeadStatusColorClassName(item.status) ??
-              "bg-gray-100 text-gray-700"
+            getLeadStatusColorClassName(item.status) ?? "ops-status-badge"
           )}
         >
           {item.statusLabel}
@@ -456,7 +450,7 @@ function ToolShell({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-md border border-border bg-white p-3">
+    <div className="ops-copilot-tool-card rounded-md p-3">
       <div className="mb-3 flex items-center gap-2 text-sm font-medium">
         {icon}
         {title}

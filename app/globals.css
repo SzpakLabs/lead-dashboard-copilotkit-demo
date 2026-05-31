@@ -11,13 +11,29 @@
   --border: 42 18% 79%;
   --primary: 174 64% 21%;
   --primary-foreground: 42 40% 96%;
+  --ring: 174 64% 21%;
   --ops-surface: 48 30% 96%;
   --ops-surface-strong: 0 0% 100%;
   --ops-ink-soft: 213 14% 30%;
   --ops-line: 42 18% 79%;
   --ops-accent: 174 64% 21%;
+  --ops-success: 150 58% 32%;
   --ops-warn: 38 92% 45%;
   --ops-danger: 357 64% 45%;
+  --ops-status-new-bg: 213 20% 92%;
+  --ops-status-new-fg: 213 22% 28%;
+  --ops-status-review-bg: 38 92% 88%;
+  --ops-status-review-fg: 32 95% 28%;
+  --ops-status-contacted-bg: 204 94% 88%;
+  --ops-status-contacted-fg: 205 76% 30%;
+  --ops-status-scheduled-bg: 262 83% 90%;
+  --ops-status-scheduled-fg: 263 62% 34%;
+  --ops-status-progress-bg: 187 80% 86%;
+  --ops-status-progress-fg: 188 72% 28%;
+  --ops-status-won-bg: 150 58% 88%;
+  --ops-status-won-fg: 150 58% 26%;
+  --ops-status-lost-bg: 357 84% 91%;
+  --ops-status-lost-fg: 357 68% 34%;
   --ops-shell-max: 96rem;
   --ops-page-gutter: 1rem;
   --ops-panel-gap: 1rem;
@@ -38,13 +54,29 @@
     --border: 211 14% 25%;
     --primary: 174 54% 58%;
     --primary-foreground: 213 28% 10%;
+    --ring: 174 54% 58%;
     --ops-surface: 210 20% 10%;
     --ops-surface-strong: 212 19% 12%;
     --ops-ink-soft: 214 13% 76%;
     --ops-line: 211 14% 25%;
     --ops-accent: 174 54% 58%;
+    --ops-success: 151 62% 58%;
     --ops-warn: 39 88% 62%;
     --ops-danger: 356 74% 67%;
+    --ops-status-new-bg: 214 18% 22%;
+    --ops-status-new-fg: 214 16% 82%;
+    --ops-status-review-bg: 38 74% 18%;
+    --ops-status-review-fg: 43 92% 76%;
+    --ops-status-contacted-bg: 207 58% 20%;
+    --ops-status-contacted-fg: 204 94% 78%;
+    --ops-status-scheduled-bg: 263 44% 22%;
+    --ops-status-scheduled-fg: 264 95% 82%;
+    --ops-status-progress-bg: 188 54% 19%;
+    --ops-status-progress-fg: 186 84% 76%;
+    --ops-status-won-bg: 150 52% 18%;
+    --ops-status-won-fg: 151 76% 72%;
+    --ops-status-lost-bg: 357 48% 20%;
+    --ops-status-lost-fg: 356 88% 78%;
   }
 }
 
@@ -61,19 +93,55 @@ html[data-theme="dark"] {
   --border: 211 14% 25%;
   --primary: 174 54% 58%;
   --primary-foreground: 213 28% 10%;
+  --ring: 174 54% 58%;
   --ops-surface: 210 20% 10%;
   --ops-surface-strong: 212 19% 12%;
   --ops-ink-soft: 214 13% 76%;
   --ops-line: 211 14% 25%;
   --ops-accent: 174 54% 58%;
+  --ops-success: 151 62% 58%;
   --ops-warn: 39 88% 62%;
   --ops-danger: 356 74% 67%;
+  --ops-status-new-bg: 214 18% 22%;
+  --ops-status-new-fg: 214 16% 82%;
+  --ops-status-review-bg: 38 74% 18%;
+  --ops-status-review-fg: 43 92% 76%;
+  --ops-status-contacted-bg: 207 58% 20%;
+  --ops-status-contacted-fg: 204 94% 78%;
+  --ops-status-scheduled-bg: 263 44% 22%;
+  --ops-status-scheduled-fg: 264 95% 82%;
+  --ops-status-progress-bg: 188 54% 19%;
+  --ops-status-progress-fg: 186 84% 76%;
+  --ops-status-won-bg: 150 52% 18%;
+  --ops-status-won-fg: 151 76% 72%;
+  --ops-status-lost-bg: 357 48% 20%;
+  --ops-status-lost-fg: 356 88% 78%;
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-feature-settings: "tnum";
+}
+
+html[data-theme-fade] .ops-console {
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+  will-change: opacity, transform;
+}
+
+html[data-theme-fade="out"] .ops-console {
+  opacity: 0.58;
+  transform: scale(0.998);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme-fade] .ops-console {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .ops-console,
@@ -1035,6 +1103,68 @@ html[data-theme="dark"] .ops-console {
   white-space: nowrap;
 }
 
+.ops-status-badge {
+  background: hsl(var(--ops-status-new-bg));
+  border: 1px solid hsl(var(--ops-status-new-fg) / 0.18);
+  color: hsl(var(--ops-status-new-fg));
+}
+
+.ops-status-needs-review {
+  background: hsl(var(--ops-status-review-bg));
+  border-color: hsl(var(--ops-status-review-fg) / 0.22);
+  color: hsl(var(--ops-status-review-fg));
+}
+
+.ops-status-contacted {
+  background: hsl(var(--ops-status-contacted-bg));
+  border-color: hsl(var(--ops-status-contacted-fg) / 0.2);
+  color: hsl(var(--ops-status-contacted-fg));
+}
+
+.ops-status-scheduled {
+  background: hsl(var(--ops-status-scheduled-bg));
+  border-color: hsl(var(--ops-status-scheduled-fg) / 0.2);
+  color: hsl(var(--ops-status-scheduled-fg));
+}
+
+.ops-status-in-progress {
+  background: hsl(var(--ops-status-progress-bg));
+  border-color: hsl(var(--ops-status-progress-fg) / 0.2);
+  color: hsl(var(--ops-status-progress-fg));
+}
+
+.ops-status-won {
+  background: hsl(var(--ops-status-won-bg));
+  border-color: hsl(var(--ops-status-won-fg) / 0.2);
+  color: hsl(var(--ops-status-won-fg));
+}
+
+.ops-status-lost {
+  background: hsl(var(--ops-status-lost-bg));
+  border-color: hsl(var(--ops-status-lost-fg) / 0.2);
+  color: hsl(var(--ops-status-lost-fg));
+}
+
+.ops-urgency-due {
+  background: hsl(var(--ops-success) / 0.14);
+  border: 1px solid hsl(var(--ops-success) / 0.28);
+  color: hsl(var(--ops-success));
+}
+
+.ops-urgency-overdue {
+  background: hsl(var(--ops-danger) / 0.13);
+  border: 1px solid hsl(var(--ops-danger) / 0.3);
+  color: hsl(var(--ops-danger));
+}
+
+.ops-followup-overdue {
+  border-color: hsl(var(--ops-danger) / 0.44);
+}
+
+.ops-text-overdue {
+  color: hsl(var(--ops-danger));
+}
+
 .ops-metric {
   align-items: center;
   background: hsl(var(--ops-surface-strong));
@@ -1599,6 +1729,42 @@ html[data-theme="dark"] .ops-missing-fields span {
 
 .ops-assistant-note span {
   overflow-wrap: anywhere;
+}
+
+[data-copilotkit] {
+  color-scheme: light dark;
+}
+
+.dark [data-copilotkit],
+[data-copilotkit].dark {
+  color-scheme: dark;
+}
+
+[data-copilotkit] .ops-copilot-tool-card,
+[data-copilotkit] .ops-copilot-result-item {
+  background: hsl(var(--ops-surface-strong));
+  border: 1px solid hsl(var(--ops-line));
+  color: hsl(var(--foreground));
+}
+
+[data-copilotkit] .ops-copilot-result-item:hover {
+  background: hsl(var(--muted) / 0.5);
+}
+
+[data-copilotkit] .ops-copilot-action-primary {
+  background: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+[data-copilotkit] .ops-copilot-action-secondary {
+  background: hsl(var(--ops-surface-strong));
+  border: 1px solid hsl(var(--ops-line));
+  color: hsl(var(--foreground));
+}
+
+[data-copilotkit] .ops-copilot-action-secondary:hover {
+  background: hsl(var(--muted) / 0.55);
 }
 
 .ops-lead-detail-page {
