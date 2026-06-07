@@ -88,16 +88,16 @@ Discovery notes:
 
 ## Assistant
 
-- [ ] Check official CopilotKit docs for the installed API surface before implementation.
-- [ ] Make assistant entry available on all primary pages.
-- [ ] Provide route/page context to the assistant.
-- [ ] Keep assistant tools typed and routed through domain functions.
-- [ ] Keep mutation previews and confirmations through CopilotKit-supported human-in-the-loop patterns.
-- [ ] Improve assistant UI using CopilotKit-supported customization rather than a custom chat system.
-- [ ] Add report tool/query for requested periods.
-- [ ] Add forecast tool/query for near-period earning estimates.
-- [ ] Render reports and forecasts as CopilotKit-compatible visual outputs.
-- [ ] Verify missing credentials produce clean disabled behavior.
+- [x] Check official CopilotKit docs for the installed API surface before implementation.
+- [x] Make assistant entry available on all primary pages.
+- [x] Provide route/page context to the assistant.
+- [x] Keep assistant tools typed and routed through domain functions.
+- [x] Keep mutation previews and confirmations through CopilotKit-supported human-in-the-loop patterns.
+- [x] Improve assistant UI using CopilotKit-supported customization rather than a custom chat system.
+- [x] Add report tool/query for requested periods.
+- [x] Add forecast tool/query for near-period earning estimates.
+- [x] Render reports and forecasts as CopilotKit-compatible visual outputs.
+- [x] Verify missing credentials produce clean disabled behavior.
 
 ## Demo Data
 
