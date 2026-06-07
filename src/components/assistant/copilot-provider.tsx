@@ -1,17 +1,11 @@
 "use client";
 
-import { CopilotKitProvider } from "@copilotkit/react-core/v2";
+import { CopilotKit } from "@copilotkit/react-core";
 
 export function CopilotProvider({ children }: { children: React.ReactNode }) {
   return (
-    <CopilotKitProvider
-      runtimeUrl="/api/copilotkit"
-      useSingleEndpoint
-      onError={({ code, error }) => {
-        console.error("[copilotkit]", code, error.message);
-      }}
-    >
+    <CopilotKit runtimeUrl="/api/copilotkit" useSingleEndpoint>
       {children}
-    </CopilotKitProvider>
+    </CopilotKit>
   );
 }

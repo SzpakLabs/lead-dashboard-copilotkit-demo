@@ -93,6 +93,15 @@ async function Dashboard({
   return (
     <AppShell
       activeSection="console"
+      assistantContext={{
+        page: "console",
+        filters,
+        activeFilterCount,
+        selectedLeadId: activeLeadId ?? null,
+        visibleLeadIds: leadRows.map((lead) => lead.id),
+        visibleLeadCount: leadRows.length,
+        metrics
+      }}
       assistantEnabled={assistantEnabled}
       eyebrow="Service Ops Console"
       eyebrowIcon={<DatabaseZap className="size-4" />}

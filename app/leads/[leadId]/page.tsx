@@ -12,6 +12,7 @@ import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-
 import { type CustomFieldValueItem } from "@/components/leads/custom-field-values-form";
 import { type FollowUpListItem } from "@/components/leads/follow-ups-panel";
 import { LeadDetailTabs } from "@/components/leads/lead-detail-tabs";
+import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
 import {
   contacts,
@@ -35,6 +36,7 @@ type PageProps = {
 
 export default async function LeadDetailPage({ params }: PageProps) {
   const { leadId } = await params;
+  const assistantEnabled = isAssistantRuntimeConfigured();
   const detail = await getLeadDetail(leadId);
 
   if (!detail) {
@@ -65,6 +67,28 @@ export default async function LeadDetailPage({ params }: PageProps) {
     <AppShell
       actions={<HistoryBackButton />}
       activeSection="console"
+      assistantContext={{
+        page: "lead-detail",
+        selectedLeadId: leadId,
+        defaultTab: "overview",
+        lead: {
+          id: detail.id,
+          title: detail.title,
+          status: detail.status,
+          source: detail.source,
+          sourceLabel: sourceLabels[detail.source] ?? detail.source,
+          contactName: detail.contactName,
+          company: detail.company,
+          nextStep: detail.nextStep,
+          timeline: detail.timeline,
+          confidence: detail.confidence,
+          missingFields: normalizeMissingFields(detail.missingFields)
+        },
+        followUpCount: leadFollowUps.length,
+        activityCount: activity.length,
+        customFieldCount: customFieldDefinitions.length
+      }}
+      assistantEnabled={assistantEnabled}
       eyebrow="Lead workspace"
       eyebrowIcon={<ClipboardCheck className="size-4" />}
       title={detail.title}

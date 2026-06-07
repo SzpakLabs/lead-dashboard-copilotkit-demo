@@ -1,4 +1,9 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { parse } from "dotenv";
+
 const defaultAssistantModel = "openai/gpt-5.4-mini";
+let localEnvironmentValues: Record<string, string | undefined> | null = null;
 
 type AssistantRuntimeReadiness =
   | {
@@ -17,12 +22,13 @@ type AssistantRuntimeReadiness =
     };
 
 export function getAssistantRuntimeReadiness(): AssistantRuntimeReadiness {
-  const model = process.env.COPILOTKIT_MODEL?.trim() || defaultAssistantModel;
+  const model =
+    getAssistantEnvironmentValue("COPILOTKIT_MODEL") || defaultAssistantModel;
   const provider = getModelProvider(model);
   const providerKeyName = getProviderKeyName(provider);
   const apiKey =
-    process.env[providerKeyName]?.trim() ||
-    process.env.COPILOTKIT_PROVIDER_API_KEY?.trim();
+    getAssistantEnvironmentValue("COPILOTKIT_PROVIDER_API_KEY") ||
+    getAssistantEnvironmentValue(providerKeyName);
 
   if (!isAssistantExplicitlyEnabled()) {
     return {
@@ -58,9 +64,56 @@ export function isAssistantRuntimeConfigured() {
 }
 
 function isAssistantExplicitlyEnabled() {
-  const value = process.env.LEAD_ASSISTANT_ENABLED?.trim().toLowerCase();
+  const value = getAssistantEnvironmentValue(
+    "LEAD_ASSISTANT_ENABLED"
+  )?.toLowerCase();
 
   return value === "true" || value === "1";
+}
+
+function getAssistantEnvironmentValue(key: string) {
+  return getLocalEnvironmentValue(key)?.trim() || process.env[key]?.trim();
+}
+
+function getLocalEnvironmentValue(key: string) {
+  if (process.env.NODE_ENV === "production") {
+    return undefined;
+  }
+
+  if (!localEnvironmentValues) {
+    localEnvironmentValues = loadLocalEnvironmentValues();
+  }
+
+  return localEnvironmentValues[key];
+}
+
+function loadLocalEnvironmentValues() {
+  const mode = process.env.NODE_ENV === "test" ? "test" : "development";
+  const files = [
+    `.env.${mode}.local`,
+    mode !== "test" ? ".env.local" : null,
+    `.env.${mode}`,
+    ".env"
+  ].filter((file): file is string => Boolean(file));
+  const values: Record<string, string | undefined> = {};
+
+  for (const file of files) {
+    const path = join(process.cwd(), file);
+
+    if (!existsSync(path)) {
+      continue;
+    }
+
+    const parsed = parse(readFileSync(path));
+
+    for (const [name, value] of Object.entries(parsed)) {
+      if (values[name] === undefined) {
+        values[name] = value;
+      }
+    }
+  }
+
+  return values;
 }
 
 function getModelProvider(model: string) {

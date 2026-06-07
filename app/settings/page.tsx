@@ -8,6 +8,7 @@ import {
   type CustomFieldDefinitionItem
 } from "@/components/leads/custom-field-definitions-panel";
 import { SourceDefinitionsPanel } from "@/components/leads/source-definitions-panel";
+import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
 import { customFieldDefinitions } from "@/lib/db/schema";
 import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
@@ -23,6 +24,7 @@ type SettingsSection = "custom-fields" | "sources";
 
 export default async function SettingsPage({ searchParams }: PageProps) {
   const params = await searchParams;
+  const assistantEnabled = isAssistantRuntimeConfigured();
   const activeSection = parseSettingsSection(params.section);
   const [definitions, sources] = await Promise.all([
     getCustomFieldDefinitions(),
@@ -32,6 +34,19 @@ export default async function SettingsPage({ searchParams }: PageProps) {
   return (
     <AppShell
       activeSection="settings"
+      assistantContext={{
+        page: "settings",
+        activeSettingsSection: activeSection,
+        customFieldCount: definitions.length,
+        sourceCount: sources.length,
+        activeSourceSlugs: sources
+          .filter((source) => source.isActive && !source.archivedAt)
+          .map((source) => source.slug),
+        archivedSourceSlugs: sources
+          .filter((source) => Boolean(source.archivedAt))
+          .map((source) => source.slug)
+      }}
+      assistantEnabled={assistantEnabled}
       eyebrow="Workspace settings"
       eyebrowIcon={<Settings2 className="size-4" />}
       title="Settings"

@@ -20,6 +20,7 @@ import {
 import type { CustomFieldDefinitionItem } from "@/components/leads/custom-field-definitions-panel";
 import type { CustomFieldValueItem } from "@/components/leads/custom-field-values-form";
 import type { FollowUpListItem } from "@/components/leads/follow-ups-panel";
+import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { formatDate, formatDateTime } from "@/lib/date-format";
 import { getDb } from "@/lib/db";
 import {
@@ -55,6 +56,7 @@ type PageProps = {
 
 export default async function CalendarPage({ searchParams }: PageProps) {
   const params = await searchParams;
+  const assistantEnabled = isAssistantRuntimeConfigured();
   const scope = parseScope(params.scope);
   const anchorDate = parseAnchorDate(params.date);
   const selectedLeadId = params.leadId ?? "";
@@ -80,6 +82,22 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   return (
     <AppShell
       activeSection="calendar"
+      assistantContext={{
+        page: "calendar",
+        scope,
+        range: {
+          label: range.label,
+          startsAt: range.start.toISOString(),
+          endsAt: range.end.toISOString()
+        },
+        anchorDate: anchorDate.toISOString(),
+        selectedLeadId: selectedLeadId || null,
+        visibleLeadIds: Array.from(
+          new Set(scopedItems.map((item) => item.leadId))
+        ),
+        visibleItemCount: scopedItems.length
+      }}
+      assistantEnabled={assistantEnabled}
       eyebrow="Lead schedule"
       eyebrowIcon={<CalendarDays className="size-4" />}
       intakeSourceOptions={sourceOptions}

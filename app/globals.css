@@ -1767,6 +1767,131 @@ html[data-theme="dark"] .ops-missing-fields span {
   background: hsl(var(--muted) / 0.55);
 }
 
+[data-copilotkit] [data-testid="copilot-add-menu-button"] {
+  display: none !important;
+}
+
+[data-copilotkit]
+  [data-testid="copilot-chat-input"]
+  > div[data-layout="compact"] {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  padding: 0.65rem 0.75rem !important;
+}
+
+[data-copilotkit]
+  [data-testid="copilot-chat-input"]
+  > div[data-layout="compact"]
+  > div:nth-child(1) {
+  display: none !important;
+}
+
+[data-copilotkit]
+  [data-testid="copilot-chat-input"]
+  > div[data-layout="compact"]
+  > div:nth-child(2) {
+  grid-column-start: 1 !important;
+}
+
+[data-copilotkit]
+  [data-testid="copilot-chat-input"]
+  > div[data-layout="compact"]
+  > div:nth-child(3) {
+  grid-column-start: 2 !important;
+}
+
+[data-copilotkit] .copilotKitInputContainer {
+  background: hsl(var(--background)) !important;
+  padding: 0 1rem 0.875rem !important;
+}
+
+[data-copilotkit] .poweredBy {
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+[data-copilotkit] .copilotKitInput,
+[data-copilotkit] [data-testid="copilot-chat-input"] {
+  background: hsl(var(--ops-surface-strong)) !important;
+  border: 1px solid hsl(var(--ops-line)) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 18px 42px rgb(0 0 0 / 0.2) !important;
+  color: hsl(var(--foreground)) !important;
+  min-height: 4.5rem !important;
+  padding: 0.75rem 0.875rem !important;
+  width: min(100%, 43rem) !important;
+}
+
+[data-copilotkit] .copilotKitInput:focus-within,
+[data-copilotkit] [data-testid="copilot-chat-input"]:focus-within {
+  border-color: hsl(var(--primary) / 0.75) !important;
+  box-shadow:
+    0 0 0 3px hsl(var(--primary) / 0.18),
+    0 18px 42px rgb(0 0 0 / 0.2) !important;
+}
+
+[data-copilotkit] .copilotKitInput > textarea,
+[data-copilotkit] [data-testid="copilot-chat-textarea"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  caret-color: hsl(var(--foreground)) !important;
+  color: hsl(var(--foreground)) !important;
+  font-size: 1rem !important;
+  line-height: 1.45 !important;
+  min-height: 2.85rem !important;
+  outline: none !important;
+  padding: 0.1rem 0.25rem !important;
+}
+
+[data-copilotkit] .copilotKitInput > textarea:focus,
+[data-copilotkit] .copilotKitInput > textarea:focus-visible,
+[data-copilotkit] [data-testid="copilot-chat-textarea"]:focus,
+[data-copilotkit] [data-testid="copilot-chat-textarea"]:focus-visible {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+[data-copilotkit] .copilotKitInput > textarea::placeholder,
+[data-copilotkit] [data-testid="copilot-chat-textarea"]::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 1 !important;
+}
+
+[data-copilotkit] .copilotKitInput > textarea::selection,
+[data-copilotkit] [data-testid="copilot-chat-textarea"]::selection {
+  background: hsl(var(--primary) / 0.35);
+  color: hsl(var(--foreground));
+}
+
+[data-copilotkit] .copilotKitInputControls {
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+[data-copilotkit] .copilotKitInputControlButton,
+[data-copilotkit] [data-testid="copilot-send-button"] {
+  align-items: center !important;
+  border-radius: 0.75rem !important;
+  background-color: hsl(var(--ops-accent)) !important;
+  color: hsl(var(--background)) !important;
+  display: inline-flex !important;
+  height: 2.25rem !important;
+  justify-content: center !important;
+  width: 2.25rem !important;
+}
+
+[data-copilotkit] .copilotKitInputControlButton[disabled] {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--muted-foreground) / 0.6) !important;
+}
+
+[data-copilotkit] .copilotKitInputControlButton:not([disabled]):hover {
+  background-color: hsl(var(--ops-accent) / 0.88) !important;
+  color: hsl(var(--background)) !important;
+  transform: none !important;
+}
+
 .ops-lead-detail-page {
   align-items: start;
   display: grid;

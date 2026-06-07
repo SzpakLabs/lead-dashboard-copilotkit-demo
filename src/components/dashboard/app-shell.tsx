@@ -2,6 +2,10 @@ import { Bot, CalendarDays, LayoutDashboard, Settings2 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import {
+  AssistantRouteContext,
+  type AssistantPageContext
+} from "@/components/assistant/assistant-route-context";
 import { IntakeDrawer } from "@/components/leads/intake-drawer";
 import type { SourceOption } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
@@ -13,6 +17,7 @@ type AppShellSection = "console" | "calendar" | "settings" | "intake";
 type AppShellProps = {
   actions?: ReactNode;
   activeSection: AppShellSection;
+  assistantContext?: AssistantPageContext;
   assistantEnabled?: boolean;
   children: ReactNode;
   eyebrow: string;
@@ -51,6 +56,7 @@ const navItems: Array<{
 export function AppShell({
   actions,
   activeSection,
+  assistantContext,
   assistantEnabled = false,
   children,
   eyebrow,
@@ -68,7 +74,15 @@ export function AppShell({
       <a className="ops-skip-link" href="#ops-main-content">
         Skip to lead workspace
       </a>
-      {assistantEnabled ? <AssistantPanel /> : null}
+      {assistantEnabled ? (
+        <>
+          <AssistantRouteContext
+            activeSection={activeSection}
+            pageContext={assistantContext}
+          />
+          <AssistantPanel />
+        </>
+      ) : null}
 
       <header className="ops-command-bar">
         <div className="ops-command-identity">
