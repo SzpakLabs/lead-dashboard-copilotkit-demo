@@ -11,10 +11,15 @@ import {
   workspaces
 } from "@/lib/db/schema";
 import {
+  assistantMutationApplySchema,
   changeLeadStatusToolInputSchema,
+  changeLeadStatusPreviewInputSchema,
   checkAvailabilityInputSchema,
+  createFollowUpPreviewInputSchema,
   createFollowUpToolInputSchema,
   findLeadsInputSchema,
+  getLeadReportInputSchema,
+  getRevenueForecastInputSchema,
   listCalendarItemsInputSchema,
   type AssistantMutationChange,
   type AssistantMutationResult,
@@ -26,7 +31,8 @@ import {
   openLeadInputSchema,
   type OpenLeadResult,
   rejectAssistantMutationInputSchema,
-  updateLeadFieldsInputSchema
+  updateLeadFieldsInputSchema,
+  updateLeadFieldsPreviewInputSchema
 } from "@/lib/assistant/lead-tool-schemas";
 import { checkCalendarAvailability } from "@/lib/domain/calendar/check-availability";
 import {
@@ -37,6 +43,8 @@ import { createFollowUp } from "@/lib/domain/followups/manage-followups";
 import { changeLeadStatus } from "@/lib/domain/leads/change-lead-status";
 import { getLeadStatusLabel, type LeadStatus } from "@/lib/domain/leads/status";
 import { updateLead } from "@/lib/domain/leads/update-lead";
+import { getLeadReport } from "@/lib/domain/reports/get-lead-report";
+import { getRevenueForecast } from "@/lib/domain/reports/get-revenue-forecast";
 
 const demoWorkspaceSlug = "software-services-demo";
 
@@ -117,6 +125,22 @@ export const checkAvailabilityTool = defineTool({
   execute: checkAvailability
 });
 
+export const getLeadReportTool = defineTool({
+  name: "get_lead_report",
+  description:
+    "Generate a read-only visual lead operations report for an explicit ISO date-time period. Use this for report, summary, status mix, source mix, bottleneck, overdue follow-up, scheduled work, completed work, won, or lost outcome requests.",
+  parameters: getLeadReportInputSchema,
+  execute: getLeadReportFromAssistant
+});
+
+export const getRevenueForecastTool = defineTool({
+  name: "get_revenue_forecast",
+  description:
+    "Generate a read-only near-period earning forecast for an explicit ISO date-time period. Use this for revenue, earning, pipeline value, confirmed value, weighted estimate, or optimistic estimate requests.",
+  parameters: getRevenueForecastInputSchema,
+  execute: getRevenueForecastFromAssistant
+});
+
 export const updateLeadFieldsTool = defineTool({
   name: "update_lead_fields",
   description:
@@ -154,6 +178,8 @@ export const assistantTools = [
   openLeadTool,
   listCalendarItemsTool,
   checkAvailabilityTool,
+  getLeadReportTool,
+  getRevenueForecastTool,
   updateLeadFieldsTool,
   changeLeadStatusTool,
   createFollowUpTool,
@@ -320,21 +346,57 @@ export async function checkAvailability(
   };
 }
 
+export async function getLeadReportFromAssistant(input: unknown) {
+  const parsed = getLeadReportInputSchema.parse(input);
+
+  if (
+    Boolean(parsed.comparisonPeriodStart) !==
+    Boolean(parsed.comparisonPeriodEnd)
+  ) {
+    throw new Error("Comparison reports require both comparison period dates");
+  }
+
+  return getLeadReport({
+    workspaceId: await getDemoWorkspaceId(),
+    periodStart: new Date(parsed.periodStart),
+    periodEnd: new Date(parsed.periodEnd),
+    comparisonPeriodStart: parsed.comparisonPeriodStart
+      ? new Date(parsed.comparisonPeriodStart)
+      : undefined,
+    comparisonPeriodEnd: parsed.comparisonPeriodEnd
+      ? new Date(parsed.comparisonPeriodEnd)
+      : undefined,
+    limit: parsed.limit
+  });
+}
+
+export async function getRevenueForecastFromAssistant(input: unknown) {
+  const parsed = getRevenueForecastInputSchema.parse(input);
+
+  return getRevenueForecast({
+    workspaceId: await getDemoWorkspaceId(),
+    periodStart: new Date(parsed.periodStart),
+    periodEnd: new Date(parsed.periodEnd),
+    limit: parsed.limit
+  });
+}
+
 export async function updateLeadFields(
   input: unknown
 ): Promise<AssistantMutationResult> {
   const parsed = updateLeadFieldsInputSchema.parse(input);
 
   if (parsed.mode === "apply") {
+    const applyInput = assistantMutationApplySchema.parse(parsed);
     const preview = await getAssistantActionPreview(
-      parsed.previewId,
+      applyInput.previewId,
       "update_lead_fields"
     );
     const payload = updateLeadFieldsPreviewPayloadSchema.parse(preview.preview);
 
     try {
       await updateLead(toUpdateLeadInput(payload.after));
-      await markAssistantActionApplied(parsed.previewId, {
+      await markAssistantActionApplied(applyInput.previewId, {
         leadId: payload.leadId,
         appliedFields: payload.changes.map((change) => change.field)
       });
@@ -342,7 +404,7 @@ export async function updateLeadFields(
       return {
         status: "applied",
         result: {
-          previewId: parsed.previewId,
+          previewId: applyInput.previewId,
           toolName: "update_lead_fields",
           leadId: payload.leadId,
           applied: true,
@@ -350,38 +412,48 @@ export async function updateLeadFields(
         }
       };
     } catch (error) {
-      await markAssistantActionFailed(parsed.previewId, error);
+      await markAssistantActionFailed(applyInput.previewId, error);
       throw error;
     }
   }
 
-  const current = await getLeadEditableSnapshot(parsed.leadId);
+  const previewInput = updateLeadFieldsPreviewInputSchema.parse(parsed);
+  const current = await getLeadEditableSnapshot(previewInput.leadId);
   const after = {
     leadId: current.leadId,
-    title: parsed.fields.title ?? current.title,
-    source: parsed.fields.source ?? current.source,
-    contactName: parsed.fields.contactName ?? current.contactName,
-    company: normalizeNullableInput(parsed.fields.company, current.company),
-    email: normalizeNullableInput(parsed.fields.email, current.email),
-    phone: normalizeNullableInput(parsed.fields.phone, current.phone),
+    title: previewInput.fields.title ?? current.title,
+    source: previewInput.fields.source ?? current.source,
+    contactName: previewInput.fields.contactName ?? current.contactName,
+    company: normalizeNullableInput(
+      previewInput.fields.company,
+      current.company
+    ),
+    email: normalizeNullableInput(previewInput.fields.email, current.email),
+    phone: normalizeNullableInput(previewInput.fields.phone, current.phone),
     projectType: normalizeNullableInput(
-      parsed.fields.projectType,
+      previewInput.fields.projectType,
       current.projectType
     ),
     problemSummary: normalizeNullableInput(
-      parsed.fields.problemSummary,
+      previewInput.fields.problemSummary,
       current.problemSummary
     ),
     requestedOutcome: normalizeNullableInput(
-      parsed.fields.requestedOutcome,
+      previewInput.fields.requestedOutcome,
       current.requestedOutcome
     ),
     budgetRange: normalizeNullableInput(
-      parsed.fields.budgetRange,
+      previewInput.fields.budgetRange,
       current.budgetRange
     ),
-    timeline: normalizeNullableInput(parsed.fields.timeline, current.timeline),
-    nextStep: normalizeNullableInput(parsed.fields.nextStep, current.nextStep)
+    timeline: normalizeNullableInput(
+      previewInput.fields.timeline,
+      current.timeline
+    ),
+    nextStep: normalizeNullableInput(
+      previewInput.fields.nextStep,
+      current.nextStep
+    )
   };
   const changes = buildChanges(current, after);
 
@@ -421,8 +493,9 @@ export async function changeLeadStatusFromAssistant(
   const parsed = changeLeadStatusToolInputSchema.parse(input);
 
   if (parsed.mode === "apply") {
+    const applyInput = assistantMutationApplySchema.parse(parsed);
     const preview = await getAssistantActionPreview(
-      parsed.previewId,
+      applyInput.previewId,
       "change_lead_status"
     );
     const payload = changeLeadStatusPreviewPayloadSchema.parse(preview.preview);
@@ -432,7 +505,7 @@ export async function changeLeadStatusFromAssistant(
         leadId: payload.leadId,
         status: payload.status
       });
-      await markAssistantActionApplied(parsed.previewId, {
+      await markAssistantActionApplied(applyInput.previewId, {
         leadId: payload.leadId,
         status: payload.status
       });
@@ -440,7 +513,7 @@ export async function changeLeadStatusFromAssistant(
       return {
         status: "applied",
         result: {
-          previewId: parsed.previewId,
+          previewId: applyInput.previewId,
           toolName: "change_lead_status",
           leadId: payload.leadId,
           applied: true,
@@ -448,14 +521,16 @@ export async function changeLeadStatusFromAssistant(
         }
       };
     } catch (error) {
-      await markAssistantActionFailed(parsed.previewId, error);
+      await markAssistantActionFailed(applyInput.previewId, error);
       throw error;
     }
   }
 
-  const current = await getLeadEditableSnapshot(parsed.leadId);
+  const previewInput = changeLeadStatusPreviewInputSchema.parse(parsed);
+  const current = await getLeadEditableSnapshot(previewInput.leadId);
   const beforeLabel = getLeadStatusLabel(current.status) ?? current.status;
-  const afterLabel = getLeadStatusLabel(parsed.status) ?? parsed.status;
+  const afterLabel =
+    getLeadStatusLabel(previewInput.status) ?? previewInput.status;
   const changes = [
     {
       field: "status",
@@ -470,7 +545,7 @@ export async function changeLeadStatusFromAssistant(
     summary,
     preview: {
       leadId: current.leadId,
-      status: parsed.status,
+      status: previewInput.status,
       changes
     }
   });
@@ -494,8 +569,9 @@ export async function createFollowUpFromAssistant(
   const parsed = createFollowUpToolInputSchema.parse(input);
 
   if (parsed.mode === "apply") {
+    const applyInput = assistantMutationApplySchema.parse(parsed);
     const preview = await getAssistantActionPreview(
-      parsed.previewId,
+      applyInput.previewId,
       "create_followup"
     );
     const payload = createFollowUpPreviewPayloadSchema.parse(preview.preview);
@@ -506,7 +582,7 @@ export async function createFollowUpFromAssistant(
         note: payload.note,
         followUpDueAt: payload.followUpDueAt
       });
-      await markAssistantActionApplied(parsed.previewId, {
+      await markAssistantActionApplied(applyInput.previewId, {
         leadId: payload.leadId,
         followUpId: followUp.id
       });
@@ -514,7 +590,7 @@ export async function createFollowUpFromAssistant(
       return {
         status: "applied",
         result: {
-          previewId: parsed.previewId,
+          previewId: applyInput.previewId,
           toolName: "create_followup",
           leadId: payload.leadId,
           applied: true,
@@ -522,18 +598,19 @@ export async function createFollowUpFromAssistant(
         }
       };
     } catch (error) {
-      await markAssistantActionFailed(parsed.previewId, error);
+      await markAssistantActionFailed(applyInput.previewId, error);
       throw error;
     }
   }
 
-  const current = await getLeadEditableSnapshot(parsed.leadId);
-  const followUpDueAt = new Date(parsed.followUpDueAt).toISOString();
+  const previewInput = createFollowUpPreviewInputSchema.parse(parsed);
+  const current = await getLeadEditableSnapshot(previewInput.leadId);
+  const followUpDueAt = new Date(previewInput.followUpDueAt).toISOString();
   const changes = [
     {
       field: "followUp",
       before: null,
-      after: `${parsed.note} (${followUpDueAt})`
+      after: `${previewInput.note} (${followUpDueAt})`
     }
   ];
   const summary = `Create follow-up for ${current.title}.`;
@@ -543,7 +620,7 @@ export async function createFollowUpFromAssistant(
     summary,
     preview: {
       leadId: current.leadId,
-      note: parsed.note,
+      note: previewInput.note,
       followUpDueAt,
       changes
     }

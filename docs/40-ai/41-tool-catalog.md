@@ -73,6 +73,48 @@ Output:
 
 The assistant must ask for clarification before calling this tool when date, time, duration, timezone, or working-hours context is missing.
 
+### `get_lead_report`
+
+Generates a read-only lead operations report for an explicit period.
+
+Input:
+
+- `periodStart` ISO date-time with timezone
+- `periodEnd` ISO date-time with timezone
+- `comparisonPeriodStart` optional ISO date-time with timezone
+- `comparisonPeriodEnd` optional ISO date-time with timezone
+- `limit` optional result limit, 1 to 10, default 6
+
+Output:
+
+- period metadata and optional comparison metadata
+- totals for lead volume, scheduled work, completed work, overdue follow-ups, open follow-ups, won, lost, and needs review
+- status and source buckets
+- review workload counts
+- notable scheduled, completed, overdue, and bottleneck signals
+- `answerPrefix: "Based on this dashboard"`
+
+### `get_revenue_forecast`
+
+Generates a read-only near-period earning estimate from dashboard pipeline data.
+
+Input:
+
+- `periodStart` ISO date-time with timezone
+- `periodEnd` ISO date-time with timezone
+- `limit` optional result limit, 1 to 10, default 8
+
+Output:
+
+- confirmed value from won leads completed in the period when budget is parseable
+- weighted pipeline estimate
+- optimistic pipeline estimate
+- lead-level assumptions with budget, status weight, confidence weight, timing notes, and estimated values
+- missing-data notes for unknown budgets or low-confidence leads
+- `answerPrefix: "Based on this dashboard"`
+
+Forecast output is an operational estimate, not revenue accounting.
+
 ### Mutation Preview Contract
 
 Mutating tools use the same two-step contract:

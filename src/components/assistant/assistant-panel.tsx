@@ -3,15 +3,19 @@
 import {
   CopilotPopup,
   useHumanInTheLoop,
+  useDefaultRenderTool,
   useRenderTool
 } from "@copilotkit/react-core/v2";
 import {
+  AlertTriangle,
+  BarChart3,
   CalendarDays,
   Check,
   Clock,
   ExternalLink,
   Pencil,
   Search,
+  TrendingUp,
   X
 } from "lucide-react";
 import { z } from "zod";
@@ -21,22 +25,36 @@ import {
   confirmAssistantMutationInputSchema,
   createFollowUpToolInputSchema,
   findLeadsInputSchema,
+  getLeadReportInputSchema,
+  getRevenueForecastInputSchema,
   listCalendarItemsInputSchema,
   type AssistantCalendarItem,
   type AssistantLeadCard,
   type AssistantMutationResult,
   type CheckAvailabilityResult,
   type FindLeadsResult,
+  type LeadReport,
   type ListCalendarItemsResult,
   openLeadInputSchema,
   type OpenLeadResult,
+  type RevenueForecast,
   updateLeadFieldsInputSchema
 } from "@/lib/assistant/lead-tool-schemas";
 import { getLeadStatusColorClassName } from "@/lib/domain/leads/status";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+type ToolStatus = "inProgress" | "executing" | "complete";
+
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  currency: "USD",
+  maximumFractionDigits: 0,
+  style: "currency"
+});
+
 export function AssistantPanel() {
+  useDefaultRenderTool();
+
   useRenderTool(
     {
       name: "find_leads",
@@ -76,6 +94,28 @@ export function AssistantPanel() {
       parameters: checkAvailabilityInputSchema,
       render: ({ status, result }) => (
         <AvailabilityCard status={status} result={parseToolResult(result)} />
+      )
+    },
+    []
+  );
+
+  useRenderTool(
+    {
+      name: "get_lead_report",
+      parameters: getLeadReportInputSchema,
+      render: ({ status, result }) => (
+        <LeadReportCard status={status} result={parseToolResult(result)} />
+      )
+    },
+    []
+  );
+
+  useRenderTool(
+    {
+      name: "get_revenue_forecast",
+      parameters: getRevenueForecastInputSchema,
+      render: ({ status, result }) => (
+        <RevenueForecastCard status={status} result={parseToolResult(result)} />
       )
     },
     []
@@ -134,7 +174,13 @@ export function AssistantPanel() {
     render: ({ status, args, respond }) => (
       <ToolShell icon={<Pencil className="size-4" />} title="Confirm change">
         <p className="text-sm font-medium">{args.summary}</p>
-        <ChangeList changes={args.changes ?? []} />
+        <ChangeList
+          changes={(args.changes ?? []).map((change) => ({
+            field: change.field,
+            before: change.before ?? null,
+            after: change.after ?? null
+          }))}
+        />
         <div className="mt-3 flex gap-2">
           <Button
             size="sm"
@@ -167,15 +213,15 @@ export function AssistantPanel() {
   return (
     <CopilotPopup
       agentId="default"
+      attachments={{ enabled: false }}
       defaultOpen={false}
       labels={{
         modalHeaderTitle: "Lead assistant",
         chatToggleOpenLabel: "Open lead assistant",
         chatToggleCloseLabel: "Close lead assistant",
-        chatInputPlaceholder:
-          "Search leads, check availability, or draft edits...",
+        chatInputPlaceholder: "Ask about leads, reports, or follow-ups...",
         welcomeMessageText:
-          "Ask me to find leads, list scheduled work, check a fully specified time slot, or preview lead changes.",
+          "Ask for lead search, reports, forecasts, calendar checks, or previewed edits.",
         chatDisclaimerText: "Assistant edits require your confirmation."
       }}
     />
@@ -186,7 +232,7 @@ function FindLeadsCard({
   status,
   result
 }: {
-  status: "inProgress" | "executing" | "complete";
+  status: ToolStatus;
   result: FindLeadsResult | null;
 }) {
   if (status !== "complete" || !result) {
@@ -215,7 +261,7 @@ function OpenLeadCard({
   status,
   result
 }: {
-  status: "inProgress" | "executing" | "complete";
+  status: ToolStatus;
   result: OpenLeadResult | null;
 }) {
   if (status !== "complete" || !result) {
@@ -244,7 +290,7 @@ function CalendarItemsCard({
   status,
   result
 }: {
-  status: "inProgress" | "executing" | "complete";
+  status: ToolStatus;
   result: ListCalendarItemsResult | null;
 }) {
   if (status !== "complete" || !result) {
@@ -280,7 +326,7 @@ function AvailabilityCard({
   status,
   result
 }: {
-  status: "inProgress" | "executing" | "complete";
+  status: ToolStatus;
   result: CheckAvailabilityResult | null;
 }) {
   if (status !== "complete" || !result) {
@@ -317,12 +363,104 @@ function AvailabilityCard({
   );
 }
 
+function LeadReportCard({
+  status,
+  result
+}: {
+  status: ToolStatus;
+  result: LeadReport | null;
+}) {
+  if (status !== "complete" || !result) {
+    return (
+      <ToolShell
+        icon={<BarChart3 className="size-4" />}
+        title="Building report"
+      />
+    );
+  }
+
+  return (
+    <ToolShell
+      icon={<BarChart3 className="size-4" />}
+      title={`Report: ${formatPeriod(result.period.startsAt, result.period.endsAt)}`}
+    >
+      <p className="mb-3 text-xs text-muted-foreground">
+        {result.answerPrefix}. {result.limitation}
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <MetricCell label="Lead volume" value={result.totals.leadVolume} />
+        <MetricCell label="Scheduled" value={result.totals.scheduledWork} />
+        <MetricCell label="Completed" value={result.totals.completedWork} />
+        <MetricCell label="Overdue" value={result.totals.overdueFollowUps} />
+      </div>
+      <BucketBars title="Status mix" buckets={result.statusBuckets} />
+      <BucketBars title="Source mix" buckets={result.sourceBuckets} />
+      <ReportLeadList
+        title="Notable leads"
+        leads={result.notableLeads}
+        emptyText="No notable leads in this period."
+      />
+      <BottleneckList bottlenecks={result.bottlenecks} />
+    </ToolShell>
+  );
+}
+
+function RevenueForecastCard({
+  status,
+  result
+}: {
+  status: ToolStatus;
+  result: RevenueForecast | null;
+}) {
+  if (status !== "complete" || !result) {
+    return (
+      <ToolShell
+        icon={<TrendingUp className="size-4" />}
+        title="Building forecast"
+      />
+    );
+  }
+
+  return (
+    <ToolShell
+      icon={<TrendingUp className="size-4" />}
+      title={`Forecast: ${formatPeriod(result.period.startsAt, result.period.endsAt)}`}
+    >
+      <p className="mb-3 text-xs text-muted-foreground">
+        {result.answerPrefix}. {result.limitation}
+      </p>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <MetricCell
+          label="Confirmed"
+          value={formatCurrency(result.confirmedValue)}
+        />
+        <MetricCell
+          label="Weighted pipeline"
+          value={formatCurrency(result.weightedPipelineValue)}
+        />
+        <MetricCell
+          label="Optimistic"
+          value={formatCurrency(result.optimisticPipelineValue)}
+        />
+      </div>
+      <ForecastLeadList assumptions={result.leadAssumptions} />
+      {result.missingDataNotes.length > 0 ? (
+        <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+          {result.missingDataNotes.map((note) => (
+            <p key={note}>{note}</p>
+          ))}
+        </div>
+      ) : null}
+    </ToolShell>
+  );
+}
+
 function MutationCard({
   status,
   result,
   title
 }: {
-  status: "inProgress" | "executing" | "complete";
+  status: ToolStatus;
   result: AssistantMutationResult | null;
   title: string;
 }) {
@@ -440,6 +578,172 @@ function CalendarResultItem({ item }: { item: AssistantCalendarItem }) {
   );
 }
 
+function MetricCell({
+  label,
+  value
+}: {
+  label: string;
+  value: number | string;
+}) {
+  return (
+    <div className="ops-copilot-result-item rounded-md p-2">
+      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 text-base font-semibold">{value}</p>
+    </div>
+  );
+}
+
+function BucketBars({
+  buckets,
+  title
+}: {
+  buckets: LeadReport["statusBuckets"];
+  title: string;
+}) {
+  const maxCount = Math.max(1, ...buckets.map((bucket) => bucket.count));
+
+  if (buckets.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4">
+      <p className="mb-2 text-xs font-medium">{title}</p>
+      <div className="space-y-2">
+        {buckets.slice(0, 5).map((bucket) => (
+          <div key={bucket.key} className="space-y-1">
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <span className="truncate">{bucket.label}</span>
+              <span className="text-muted-foreground">
+                {bucket.count} · {bucket.percentage}%
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+              <div
+                className="h-full rounded-full bg-emerald-500"
+                style={{
+                  width: `${Math.max(8, (bucket.count / maxCount) * 100)}%`
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReportLeadList({
+  emptyText,
+  leads,
+  title
+}: {
+  emptyText: string;
+  leads: LeadReport["notableLeads"];
+  title: string;
+}) {
+  return (
+    <div className="mt-4">
+      <p className="mb-2 text-xs font-medium">{title}</p>
+      <div className="space-y-2">
+        {leads.length > 0 ? (
+          leads.slice(0, 4).map((lead) => (
+            <a
+              key={lead.id}
+              className="ops-copilot-result-item block rounded-md p-2"
+              href={lead.url}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{lead.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {lead.contactName}
+                    {lead.company ? `, ${lead.company}` : ""}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {lead.statusLabel}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {lead.reason}
+              </p>
+            </a>
+          ))
+        ) : (
+          <p className="text-xs text-muted-foreground">{emptyText}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ForecastLeadList({
+  assumptions
+}: {
+  assumptions: RevenueForecast["leadAssumptions"];
+}) {
+  if (assumptions.length === 0) {
+    return (
+      <p className="mt-3 text-sm text-muted-foreground">
+        No forecastable leads in this period.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      {assumptions.slice(0, 5).map((lead) => (
+        <a
+          key={lead.id}
+          className="ops-copilot-result-item block rounded-md p-2"
+          href={lead.url}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">{lead.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {lead.statusLabel} · {lead.contactName}
+              </p>
+            </div>
+            <div className="shrink-0 text-right text-xs">
+              <p className="font-semibold">
+                {formatCurrency(lead.estimatedValue)}
+              </p>
+              <p className="text-muted-foreground">
+                {Math.round(lead.statusWeight * lead.confidenceWeight * 100)}%
+              </p>
+            </div>
+          </div>
+          {lead.notes.length > 0 ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {lead.notes.join(" · ")}
+            </p>
+          ) : null}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function BottleneckList({ bottlenecks }: { bottlenecks: string[] }) {
+  return (
+    <div className="mt-4 space-y-2">
+      {bottlenecks.map((bottleneck) => (
+        <div
+          key={bottleneck}
+          className="flex gap-2 text-xs text-muted-foreground"
+        >
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+          <span>{bottleneck}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ToolShell({
   icon,
   title,
@@ -458,6 +762,16 @@ function ToolShell({
       {children}
     </div>
   );
+}
+
+function formatPeriod(startsAt: string, endsAt: string) {
+  return `${new Date(startsAt).toLocaleDateString()} - ${new Date(
+    endsAt
+  ).toLocaleDateString()}`;
+}
+
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value);
 }
 
 function parseToolResult<T>(result: unknown): T | null {

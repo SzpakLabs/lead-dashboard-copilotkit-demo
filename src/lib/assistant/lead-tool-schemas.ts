@@ -2,6 +2,18 @@ import { z } from "zod";
 import { leadStatusSchema, type LeadStatus } from "@/lib/domain/leads/status";
 
 const leadSourceSchema = z.string().trim().min(1).max(80);
+const clearableEmailSchema = z
+  .string()
+  .trim()
+  .max(180)
+  .refine(
+    (value) => value === "" || z.string().email().safeParse(value).success,
+    {
+      message: "Use a valid email address or an empty string to clear it"
+    }
+  );
+
+const clearableStringSchema = (max: number) => z.string().trim().max(max);
 
 export const findLeadsInputSchema = z.object({
   query: z.string().trim().max(160).optional(),
@@ -39,7 +51,21 @@ export const checkAvailabilityInputSchema = z.object({
   workingHoursEnd: workingHourSchema.describe("Local working day end")
 });
 
-const assistantMutationApplySchema = z.object({
+export const getLeadReportInputSchema = z.object({
+  periodStart: isoDateTimeSchema,
+  periodEnd: isoDateTimeSchema,
+  comparisonPeriodStart: isoDateTimeSchema.optional(),
+  comparisonPeriodEnd: isoDateTimeSchema.optional(),
+  limit: z.number().int().min(1).max(10).default(6)
+});
+
+export const getRevenueForecastInputSchema = z.object({
+  periodStart: isoDateTimeSchema,
+  periodEnd: isoDateTimeSchema,
+  limit: z.number().int().min(1).max(10).default(8)
+});
+
+export const assistantMutationApplySchema = z.object({
   mode: z.literal("apply"),
   previewId: z.string().uuid()
 });
@@ -49,47 +75,68 @@ const leadFieldPatchSchema = z
     title: z.string().trim().min(1).max(180).optional(),
     source: leadSourceSchema.optional(),
     contactName: z.string().trim().min(1).max(160).optional(),
-    company: z.string().trim().max(160).nullable().optional(),
-    email: z.string().trim().email().max(180).nullable().optional(),
-    phone: z.string().trim().max(80).nullable().optional(),
-    projectType: z.string().trim().max(120).nullable().optional(),
-    problemSummary: z.string().trim().max(1_000).nullable().optional(),
-    requestedOutcome: z.string().trim().max(1_000).nullable().optional(),
-    budgetRange: z.string().trim().max(120).nullable().optional(),
-    timeline: z.string().trim().max(180).nullable().optional(),
-    nextStep: z.string().trim().max(240).nullable().optional()
+    company: clearableStringSchema(160).optional(),
+    email: clearableEmailSchema.optional(),
+    phone: clearableStringSchema(80).optional(),
+    projectType: clearableStringSchema(120).optional(),
+    problemSummary: clearableStringSchema(1_000).optional(),
+    requestedOutcome: clearableStringSchema(1_000).optional(),
+    budgetRange: clearableStringSchema(120).optional(),
+    timeline: clearableStringSchema(180).optional(),
+    nextStep: clearableStringSchema(240).optional()
   })
   .refine((fields) => Object.keys(fields).length > 0, {
     message: "Provide at least one lead field to update"
   });
 
-export const updateLeadFieldsInputSchema = z.discriminatedUnion("mode", [
-  z.object({
-    mode: z.literal("preview").default("preview"),
-    leadId: z.string().uuid(),
-    fields: leadFieldPatchSchema
-  }),
-  assistantMutationApplySchema
-]);
+export const updateLeadFieldsPreviewInputSchema = z.object({
+  mode: z.literal("preview").default("preview"),
+  leadId: z.string().uuid(),
+  fields: leadFieldPatchSchema
+});
 
-export const changeLeadStatusToolInputSchema = z.discriminatedUnion("mode", [
-  z.object({
-    mode: z.literal("preview").default("preview"),
-    leadId: z.string().uuid(),
-    status: leadStatusSchema
-  }),
-  assistantMutationApplySchema
-]);
+export const updateLeadFieldsInputSchema = z.object({
+  mode: z.enum(["preview", "apply"]).default("preview"),
+  leadId: z.string().uuid().optional().describe("Required in preview mode"),
+  fields: leadFieldPatchSchema.optional().describe("Required in preview mode"),
+  previewId: z.string().uuid().optional().describe("Required in apply mode")
+});
 
-export const createFollowUpToolInputSchema = z.discriminatedUnion("mode", [
-  z.object({
-    mode: z.literal("preview").default("preview"),
-    leadId: z.string().uuid(),
-    note: z.string().trim().min(1).max(1_000),
-    followUpDueAt: isoDateTimeSchema
-  }),
-  assistantMutationApplySchema
-]);
+export const changeLeadStatusPreviewInputSchema = z.object({
+  mode: z.literal("preview").default("preview"),
+  leadId: z.string().uuid(),
+  status: leadStatusSchema
+});
+
+export const changeLeadStatusToolInputSchema = z.object({
+  mode: z.enum(["preview", "apply"]).default("preview"),
+  leadId: z.string().uuid().optional().describe("Required in preview mode"),
+  status: leadStatusSchema.optional().describe("Required in preview mode"),
+  previewId: z.string().uuid().optional().describe("Required in apply mode")
+});
+
+export const createFollowUpPreviewInputSchema = z.object({
+  mode: z.literal("preview").default("preview"),
+  leadId: z.string().uuid(),
+  note: z.string().trim().min(1).max(1_000),
+  followUpDueAt: isoDateTimeSchema
+});
+
+export const createFollowUpToolInputSchema = z.object({
+  mode: z.enum(["preview", "apply"]).default("preview"),
+  leadId: z.string().uuid().optional().describe("Required in preview mode"),
+  note: z
+    .string()
+    .trim()
+    .min(1)
+    .max(1_000)
+    .optional()
+    .describe("Required in preview mode"),
+  followUpDueAt: isoDateTimeSchema
+    .optional()
+    .describe("Required in preview mode"),
+  previewId: z.string().uuid().optional().describe("Required in apply mode")
+});
 
 export const rejectAssistantMutationInputSchema = z.object({
   previewId: z.string().uuid()
@@ -212,8 +259,10 @@ export const confirmAssistantMutationInputSchema = z.object({
   changes: z.array(
     z.object({
       field: z.string(),
-      before: z.string().nullable(),
-      after: z.string().nullable()
+      before: z.string().optional(),
+      after: z.string().optional()
     })
   )
 });
+
+export type { LeadReport, RevenueForecast } from "@/lib/domain/reports/types";
