@@ -112,12 +112,12 @@ Discovery notes:
 
 - [x] Run `npm run check`.
 - [x] Verify console lead preview flow.
-- [ ] Verify calendar event preview flow.
-- [ ] Verify full lead page tab workflows.
-- [ ] Verify settings custom fields and sources.
-- [ ] Verify global search.
-- [ ] Verify dense mode.
-- [ ] Verify dark mode persistence and readability.
-- [ ] Verify assistant availability on Console, Calendar, Settings, and lead detail.
-- [ ] Verify assistant report and forecast output with configured credentials, or document clean disabled behavior.
-- [ ] Verify desktop and mobile layouts for clipping, overlap, calendar stacking, and dialog/sheet usability.
+- [x] Verify calendar event preview flow.
+- [x] Verify full lead page tab workflows.
+- [x] Verify settings custom fields and sources.
+- [x] Verify global search.
+- [x] Verify dense mode.
+- [x] Verify dark mode persistence and readability.
+- [x] Verify assistant availability on Console, Calendar, Settings, and lead detail.
+- [x] Verify assistant report and forecast output with configured credentials, or document clean disabled behavior.
+- [x] Verify desktop and mobile layouts for clipping, overlap, calendar stacking, and dialog/sheet usability.

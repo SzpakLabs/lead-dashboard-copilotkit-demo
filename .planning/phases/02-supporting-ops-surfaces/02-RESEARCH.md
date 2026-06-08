@@ -57,4 +57,3 @@ Manual or browser gates:
 - Dense mode visibly changes ledger density.
 - Dark mode persists and surfaces remain readable.
 - Assistant is cleanly disabled without credentials or renders report/forecast cards with configured credentials.
-

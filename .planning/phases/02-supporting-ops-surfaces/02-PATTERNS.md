@@ -2,16 +2,16 @@
 
 ## Closest Analogs
 
-| Role | Existing File | Pattern To Preserve |
-|------|---------------|---------------------|
-| Global shell | `src/components/dashboard/app-shell.tsx` | Server pages pass context into a shared shell; shell owns nav, search, theme, intake, and assistant presence. |
-| Shared preview | `src/components/dashboard/lead-preview-dialog.tsx` | Preview state is URL-driven through `leadId`; closing removes the query value with `router.replace(..., { scroll: false })`. |
-| Preview content | `src/components/dashboard/lead-workspace.tsx` | Dense lead summary/actions should be reused instead of creating a second detail UI. |
-| Full detail | `src/components/leads/lead-detail-tabs.tsx` | Tabs are client state with hash sync, keyboard navigation, and scoped panels. |
-| Assistant gate | `src/lib/assistant/config.ts` | Assistant enablement is explicit and credential-aware; pages should not assume provider keys exist. |
-| Assistant tools | `src/lib/assistant/tools/leads.ts` | Read tools call read models; mutation tools preview first and apply only with a preview ID. |
-| Reports | `src/lib/domain/reports/get-lead-report.ts` | Report output is structured and deterministic with dashboard-only limitation text. |
-| Forecasts | `src/lib/domain/reports/get-revenue-forecast.ts` | Forecast separates confirmed, weighted, optimistic, assumptions, and missing-data notes. |
+| Role            | Existing File                                      | Pattern To Preserve                                                                                                          |
+| --------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Global shell    | `src/components/dashboard/app-shell.tsx`           | Server pages pass context into a shared shell; shell owns nav, search, theme, intake, and assistant presence.                |
+| Shared preview  | `src/components/dashboard/lead-preview-dialog.tsx` | Preview state is URL-driven through `leadId`; closing removes the query value with `router.replace(..., { scroll: false })`. |
+| Preview content | `src/components/dashboard/lead-workspace.tsx`      | Dense lead summary/actions should be reused instead of creating a second detail UI.                                          |
+| Full detail     | `src/components/leads/lead-detail-tabs.tsx`        | Tabs are client state with hash sync, keyboard navigation, and scoped panels.                                                |
+| Assistant gate  | `src/lib/assistant/config.ts`                      | Assistant enablement is explicit and credential-aware; pages should not assume provider keys exist.                          |
+| Assistant tools | `src/lib/assistant/tools/leads.ts`                 | Read tools call read models; mutation tools preview first and apply only with a preview ID.                                  |
+| Reports         | `src/lib/domain/reports/get-lead-report.ts`        | Report output is structured and deterministic with dashboard-only limitation text.                                           |
+| Forecasts       | `src/lib/domain/reports/get-revenue-forecast.ts`   | Forecast separates confirmed, weighted, optimistic, assumptions, and missing-data notes.                                     |
 
 ## Data Flow
 
@@ -28,4 +28,3 @@
 - Do not add schema changes in this phase unless a verified blocker makes it unavoidable.
 - Do not add realistic person names in tests, docs, examples, browser input, or assistant prompts.
 - Preserve the dense operational visual language and existing CSS variables.
-

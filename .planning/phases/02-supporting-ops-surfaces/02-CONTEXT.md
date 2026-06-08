@@ -61,6 +61,7 @@ This phase does not add new integrations, production auth, a custom assistant fr
 </decisions>
 
 <canonical_refs>
+
 ## Canonical References
 
 **Downstream agents MUST read these before planning or implementing.**
@@ -95,6 +96,7 @@ This phase does not add new integrations, production auth, a custom assistant fr
 </canonical_refs>
 
 <code_context>
+
 ## Existing Code Insights
 
 ### Reusable Assets
