@@ -55,3 +55,17 @@ Allowed examples:
 - `Carlos Test`
 - `Test User`
 - `Maria Test`
+
+## GSD Project Context
+
+- Project context lives in `.planning/PROJECT.md`.
+- Requirements live in `.planning/REQUIREMENTS.md`.
+- Phase structure lives in `.planning/ROADMAP.md`.
+- Current state lives in `.planning/STATE.md`.
+- Codebase maps live in `.planning/codebase/`.
+
+For GSD work, read the Kiro steering/spec files first, then read `.planning/STATE.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, and `.planning/ROADMAP.md`.
+
+Current GSD focus: Phase 1 - Publishable Lead Review Flow.
+
+Next command: `$gsd-plan-phase 1`.
