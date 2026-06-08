@@ -85,5 +85,6 @@ None - no external service configuration required.
 The main route and preview surface are ready for final automated and browser verification in Plan 03.
 
 ---
-*Phase: 01-publishable-lead-review-flow*
-*Completed: 2026-06-08*
+
+_Phase: 01-publishable-lead-review-flow_
+_Completed: 2026-06-08_

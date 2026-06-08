@@ -6,11 +6,11 @@
 
 ## Phase Summary
 
-| Phase | Name | Requirements | Goal |
-|-------|------|--------------|------|
-| 1 | 1/3 | In Progress|  |
-| 2 | Supporting Ops Surfaces | LEAD-04, LEAD-05, SAFE-02, SAFE-03, SAFE-04 | Calendar, lead detail, reports, forecasts, and assistant support the story |
-| 3 | Portfolio Packaging And Deployment | ACCESS-02, ACCESS-03, PACK-01, PACK-02, PACK-04 | Demo is documented, checked, and ready to share |
+| Phase | Name                               | Requirements                                    | Goal                                                                       |
+| ----- | ---------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------- |
+| 1     | 1/3                                | In Progress                                     |                                                                            |
+| 2     | Supporting Ops Surfaces            | LEAD-04, LEAD-05, SAFE-02, SAFE-03, SAFE-04     | Calendar, lead detail, reports, forecasts, and assistant support the story |
+| 3     | Portfolio Packaging And Deployment | ACCESS-02, ACCESS-03, PACK-01, PACK-02, PACK-04 | Demo is documented, checked, and ready to share                            |
 
 ## Phases
 
@@ -84,4 +84,5 @@
 - Unmapped: 0
 
 ---
-*Roadmap created: 2026-06-08*
+
+_Roadmap created: 2026-06-08_

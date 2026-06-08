@@ -4,13 +4,13 @@
 
 ## Files And Roles
 
-| File | Role | Closest Existing Pattern |
-|------|------|--------------------------|
-| `src/lib/db/seed.ts` | Demo data creation and reset | Existing workspace/contact/lead/follow-up/event insert sequence |
-| `app/page.tsx` | Primary dashboard route and selected lead data loader | Existing server component query composition |
-| `src/components/dashboard/lead-workspace.tsx` | Console ledger, filters, metrics, preview content | Existing ops panel and table patterns |
-| `src/components/dashboard/lead-preview-dialog.tsx` | Closeable preview surface | Existing URL-backed native dialog |
-| `app/globals.css` | Responsive/dark-mode/preview styling | Existing `ops-*` utility classes and CSS variables |
+| File                                               | Role                                                  | Closest Existing Pattern                                        |
+| -------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------- |
+| `src/lib/db/seed.ts`                               | Demo data creation and reset                          | Existing workspace/contact/lead/follow-up/event insert sequence |
+| `app/page.tsx`                                     | Primary dashboard route and selected lead data loader | Existing server component query composition                     |
+| `src/components/dashboard/lead-workspace.tsx`      | Console ledger, filters, metrics, preview content     | Existing ops panel and table patterns                           |
+| `src/components/dashboard/lead-preview-dialog.tsx` | Closeable preview surface                             | Existing URL-backed native dialog                               |
+| `app/globals.css`                                  | Responsive/dark-mode/preview styling                  | Existing `ops-*` utility classes and CSS variables              |
 
 ## Concrete Patterns
 

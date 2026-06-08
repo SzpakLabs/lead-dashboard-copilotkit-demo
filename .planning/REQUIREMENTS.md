@@ -51,41 +51,43 @@
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| Real ingestion integrations | Defer until the demo is public and the core story is validated |
-| Production auth and roles | Not required for portfolio proof |
-| Billing | Unrelated to lead operations demo value |
-| Database architecture replacement | Existing Drizzle/PostgreSQL stack is sufficient |
-| Parallel custom assistant framework | Existing CopilotKit architecture is the approved direction |
-| Broad redesign | Active work is publication readiness, not a new product concept |
+| Feature                             | Reason                                                          |
+| ----------------------------------- | --------------------------------------------------------------- |
+| Real ingestion integrations         | Defer until the demo is public and the core story is validated  |
+| Production auth and roles           | Not required for portfolio proof                                |
+| Billing                             | Unrelated to lead operations demo value                         |
+| Database architecture replacement   | Existing Drizzle/PostgreSQL stack is sufficient                 |
+| Parallel custom assistant framework | Existing CopilotKit architecture is the approved direction      |
+| Broad redesign                      | Active work is publication readiness, not a new product concept |
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| ACCESS-01 | Phase 1 | Complete |
-| ACCESS-02 | Phase 3 | Pending |
-| ACCESS-03 | Phase 3 | Pending |
-| LEAD-01 | Phase 1 | Complete |
-| LEAD-02 | Phase 1 | Complete |
-| LEAD-03 | Phase 1 | Complete |
-| LEAD-04 | Phase 2 | Pending |
-| LEAD-05 | Phase 2 | Pending |
-| SAFE-01 | Phase 1 | Complete |
-| SAFE-02 | Phase 2 | Pending |
-| SAFE-03 | Phase 2 | Pending |
-| SAFE-04 | Phase 2 | Pending |
-| PACK-01 | Phase 3 | Pending |
-| PACK-02 | Phase 3 | Pending |
-| PACK-03 | Phase 1 | Complete |
-| PACK-04 | Phase 3 | Pending |
+| Requirement | Phase   | Status   |
+| ----------- | ------- | -------- |
+| ACCESS-01   | Phase 1 | Complete |
+| ACCESS-02   | Phase 3 | Pending  |
+| ACCESS-03   | Phase 3 | Pending  |
+| LEAD-01     | Phase 1 | Complete |
+| LEAD-02     | Phase 1 | Complete |
+| LEAD-03     | Phase 1 | Complete |
+| LEAD-04     | Phase 2 | Pending  |
+| LEAD-05     | Phase 2 | Pending  |
+| SAFE-01     | Phase 1 | Complete |
+| SAFE-02     | Phase 2 | Pending  |
+| SAFE-03     | Phase 2 | Pending  |
+| SAFE-04     | Phase 2 | Pending  |
+| PACK-01     | Phase 3 | Pending  |
+| PACK-02     | Phase 3 | Pending  |
+| PACK-03     | Phase 1 | Complete |
+| PACK-04     | Phase 3 | Pending  |
 
 **Coverage:**
+
 - v1 requirements: 16 total
 - Mapped to phases: 16
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-06-08*
-*Last updated: 2026-06-08 after initial definition*
+
+_Requirements defined: 2026-06-08_
+_Last updated: 2026-06-08 after initial definition_

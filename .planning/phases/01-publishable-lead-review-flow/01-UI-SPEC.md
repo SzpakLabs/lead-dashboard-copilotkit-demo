@@ -15,13 +15,13 @@ created: 2026-06-08
 
 ## Design System
 
-| Property | Value |
-|----------|-------|
-| Tool | local shadcn-style primitives |
-| Preset | local ops console |
-| Component library | none beyond local primitives |
-| Icon library | lucide-react |
-| Font | system font stack inherited from the app |
+| Property          | Value                                    |
+| ----------------- | ---------------------------------------- |
+| Tool              | local shadcn-style primitives            |
+| Preset            | local ops console                        |
+| Component library | none beyond local primitives             |
+| Icon library      | lucide-react                             |
+| Font              | system font stack inherited from the app |
 
 ---
 
@@ -29,15 +29,15 @@ created: 2026-06-08
 
 Declared values must stay aligned with existing CSS variables and Tailwind spacing.
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| xs | 4px | Icon gaps, segmented nav padding |
-| sm | 8px | Button gaps, compact controls |
-| md | 16px | Panel gaps, default page gutter |
-| lg | 24px | Section padding, preview content groups |
-| xl | 32px | Major workbench gaps on wide screens |
-| 2xl | 48px | Reserved for page-level separation only |
-| 3xl | 64px | Avoid in Phase 1 console surfaces |
+| Token | Value | Usage                                   |
+| ----- | ----- | --------------------------------------- |
+| xs    | 4px   | Icon gaps, segmented nav padding        |
+| sm    | 8px   | Button gaps, compact controls           |
+| md    | 16px  | Panel gaps, default page gutter         |
+| lg    | 24px  | Section padding, preview content groups |
+| xl    | 32px  | Major workbench gaps on wide screens    |
+| 2xl   | 48px  | Reserved for page-level separation only |
+| 3xl   | 64px  | Avoid in Phase 1 console surfaces       |
 
 Exceptions: existing CSS variables `--ops-compact-block: 0.75rem`, `--ops-compact-inline: 0.875rem`, and `--ops-control-height: 2.25rem` are approved because they are already used by the console.
 
@@ -45,12 +45,12 @@ Exceptions: existing CSS variables `--ops-compact-block: 0.75rem`, `--ops-compac
 
 ## Typography
 
-| Role | Size | Weight | Line Height |
-|------|------|--------|-------------|
-| Body | 14px-16px | 400-500 | 1.45 |
-| Label | 11px-13px | 650-750 | 1.2 |
-| Heading | 18px-22px | 700-750 | 1.15 |
-| Display | 22px max | 720 | 1.1 |
+| Role    | Size      | Weight  | Line Height |
+| ------- | --------- | ------- | ----------- |
+| Body    | 14px-16px | 400-500 | 1.45        |
+| Label   | 11px-13px | 650-750 | 1.2         |
+| Heading | 18px-22px | 700-750 | 1.15        |
+| Display | 22px max  | 720     | 1.1         |
 
 Do not introduce hero-scale type in Phase 1. The first viewport is a work console, not a landing page.
 
@@ -60,12 +60,12 @@ Do not introduce hero-scale type in Phase 1. The first viewport is a work consol
 
 Use the existing HSL CSS variables in `app/globals.css`.
 
-| Role | Value | Usage |
-|------|-------|-------|
-| Dominant (60%) | `hsl(var(--background))` | Page background |
-| Secondary (30%) | `hsl(var(--ops-surface))`, `hsl(var(--ops-surface-strong))` | Panels, command bar, dialogs |
-| Accent (10%) | `hsl(var(--ops-accent))` | Focus rings, selected nav, primary actions |
-| Destructive | `hsl(var(--ops-danger))` | Destructive or overdue-only states |
+| Role            | Value                                                       | Usage                                      |
+| --------------- | ----------------------------------------------------------- | ------------------------------------------ |
+| Dominant (60%)  | `hsl(var(--background))`                                    | Page background                            |
+| Secondary (30%) | `hsl(var(--ops-surface))`, `hsl(var(--ops-surface-strong))` | Panels, command bar, dialogs               |
+| Accent (10%)    | `hsl(var(--ops-accent))`                                    | Focus rings, selected nav, primary actions |
+| Destructive     | `hsl(var(--ops-danger))`                                    | Destructive or overdue-only states         |
 
 Accent reserved for: selected navigation, primary CTA, focus-visible outlines, active filters, and meaningful status accents. Do not recolor all interactive elements with the accent.
 
@@ -73,13 +73,13 @@ Accent reserved for: selected navigation, primary CTA, focus-visible outlines, a
 
 ## Copywriting Contract
 
-| Element | Copy |
-|---------|------|
-| Primary CTA | `New intake` |
-| Empty state heading | `No matching leads` |
-| Empty state body | `Adjust filters or add a Test lead through New intake.` |
-| Error state | `Demo data is unavailable. Check DATABASE_URL and run npm run db:reset-demo.` |
-| Destructive confirmation | `Archive source: existing leads keep their source label.` |
+| Element                  | Copy                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| Primary CTA              | `New intake`                                                                  |
+| Empty state heading      | `No matching leads`                                                           |
+| Empty state body         | `Adjust filters or add a Test lead through New intake.`                       |
+| Error state              | `Demo data is unavailable. Check DATABASE_URL and run npm run db:reset-demo.` |
+| Destructive confirmation | `Archive source: existing leads keep their source label.`                     |
 
 All example person names in UI-visible fixtures, docs, browser checks, or prompts must include `Test`.
 
@@ -98,10 +98,10 @@ All example person names in UI-visible fixtures, docs, browser checks, or prompt
 
 ## Registry Safety
 
-| Registry | Blocks Used | Safety Gate |
-|----------|-------------|-------------|
-| shadcn official | none | not required |
-| third-party | none | do not add third-party blocks in Phase 1 |
+| Registry        | Blocks Used | Safety Gate                              |
+| --------------- | ----------- | ---------------------------------------- |
+| shadcn official | none        | not required                             |
+| third-party     | none        | do not add third-party blocks in Phase 1 |
 
 ---
 

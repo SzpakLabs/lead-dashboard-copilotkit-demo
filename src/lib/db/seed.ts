@@ -52,7 +52,8 @@ const leadFixtures = [
     title: "Website rebuild and booking flow",
     status: "scheduled",
     projectType: "website",
-    problemSummary: "Current website does not convert service inquiries reliably.",
+    problemSummary:
+      "Current website does not convert service inquiries reliably.",
     requestedOutcome: "Rebuild the site and add a cleaner booking path.",
     budgetRange: "$3k-$6k",
     timeline: "Discovery call this week",
@@ -72,7 +73,8 @@ const leadFixtures = [
     title: "Client onboarding dashboard",
     status: "needs_review",
     projectType: "dashboard",
-    problemSummary: "Client onboarding status is spread across chats and sheets.",
+    problemSummary:
+      "Client onboarding status is spread across chats and sheets.",
     requestedOutcome: "Prototype dashboard for onboarding visibility.",
     budgetRange: "Around $4k",
     timeline: "Prototype this month",
@@ -92,7 +94,8 @@ const leadFixtures = [
     title: "Repair intake CRM cleanup",
     status: "contacted",
     projectType: "operations",
-    problemSummary: "Repair inquiries are split between calls, forms, and chats.",
+    problemSummary:
+      "Repair inquiries are split between calls, forms, and chats.",
     requestedOutcome: "Create a lightweight intake and follow-up workflow.",
     budgetRange: "$5k-$8k",
     timeline: "Decision by end of month",

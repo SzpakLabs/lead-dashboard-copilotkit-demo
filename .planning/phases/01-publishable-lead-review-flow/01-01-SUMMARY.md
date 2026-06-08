@@ -81,5 +81,6 @@ None - no external service configuration required beyond existing `DATABASE_URL`
 The dashboard now has enough seeded data for route, preview, status, calendar, and reporting verification. Ready for Plan 02.
 
 ---
-*Phase: 01-publishable-lead-review-flow*
-*Completed: 2026-06-08*
+
+_Phase: 01-publishable-lead-review-flow_
+_Completed: 2026-06-08_

@@ -63,14 +63,14 @@ The active implementation spec is `.kiro/specs/lead-workflow-ux-upgrade`. Its re
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Keep software-services lead operations as the demo domain | It is clear for agencies, freelancers, and small service businesses | Pending |
-| Preserve deterministic extraction for v1 publication | It avoids brittle AI dependencies in the public demo | Pending |
-| Keep assistant mutations behind typed tools and preview/apply behavior | Human control is central to the portfolio positioning | Pending |
-| Defer real ingestion channels | Public demo value comes from workflow clarity before integrations | Pending |
-| Treat the active Kiro spec as the implementation source of truth | It already tracks completed and remaining work in this repo | Pending |
-| Use GSD for publication-phase planning around the existing app | The repo is brownfield and should not be re-scaffolded | Pending |
+| Decision                                                               | Rationale                                                           | Outcome |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------- | ------- |
+| Keep software-services lead operations as the demo domain              | It is clear for agencies, freelancers, and small service businesses | Pending |
+| Preserve deterministic extraction for v1 publication                   | It avoids brittle AI dependencies in the public demo                | Pending |
+| Keep assistant mutations behind typed tools and preview/apply behavior | Human control is central to the portfolio positioning               | Pending |
+| Defer real ingestion channels                                          | Public demo value comes from workflow clarity before integrations   | Pending |
+| Treat the active Kiro spec as the implementation source of truth       | It already tracks completed and remaining work in this repo         | Pending |
+| Use GSD for publication-phase planning around the existing app         | The repo is brownfield and should not be re-scaffolded              | Pending |
 
 ## Evolution
 
@@ -92,4 +92,5 @@ After each milestone:
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-06-08 after initialization*
+
+_Last updated: 2026-06-08 after initialization_
