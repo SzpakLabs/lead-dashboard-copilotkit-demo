@@ -101,17 +101,17 @@ Discovery notes:
 
 ## Demo Data
 
-- [ ] Expand reset/seed data across two months before and two months after the seed anchor.
-- [ ] Keep all seeded person names test-safe with `Test`.
-- [ ] Add varied sources, statuses, budgets, review states, custom fields, source artifacts, and activity.
-- [ ] Add enough follow-ups and scheduled/completed work for report and forecast output.
-- [ ] Add days with multiple events to stress calendar display.
-- [ ] Ensure seed workflow remains idempotent for the demo workspace.
+- [x] Expand reset/seed data across two months before and two months after the seed anchor.
+- [x] Keep all seeded person names test-safe with `Test`.
+- [x] Add varied sources, statuses, budgets, review states, custom fields, source artifacts, and activity.
+- [x] Add enough follow-ups and scheduled/completed work for report and forecast output.
+- [x] Add days with multiple events to stress calendar display.
+- [x] Ensure seed workflow remains idempotent for the demo workspace.
 
 ## Verification
 
-- [ ] Run `npm run check`.
-- [ ] Verify console lead preview flow.
+- [x] Run `npm run check`.
+- [x] Verify console lead preview flow.
 - [ ] Verify calendar event preview flow.
 - [ ] Verify full lead page tab workflows.
 - [ ] Verify settings custom fields and sources.
