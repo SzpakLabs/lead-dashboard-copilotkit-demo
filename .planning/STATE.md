@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-06-08T13:54:34.109Z"
+progress:
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
+---
+
 # State
 
 ## Project Reference
@@ -27,4 +41,3 @@ Project initialized from `.planning/idea.md` after codebase mapping. The reposit
 ## Next Command
 
 Run `$gsd-plan-phase 1` to plan the publishable lead review flow.
-
