@@ -13,15 +13,15 @@
 
 ### Lead Workflow
 
-- [ ] **LEAD-01**: User can demonstrate lead intake or lead review with demo-safe data.
-- [ ] **LEAD-02**: User can see budget, urgency, service type, source, status, next step, and follow-up timing for representative leads.
+- [x] **LEAD-01**: User can demonstrate lead intake or lead review with demo-safe data.
+- [x] **LEAD-02**: User can see budget, urgency, service type, source, status, next step, and follow-up timing for representative leads.
 - [ ] **LEAD-03**: User can change or review lead status through an existing workflow and see the UI or persisted state update.
 - [ ] **LEAD-04**: User can inspect a lead through preview and full detail surfaces without losing context.
 - [ ] **LEAD-05**: User can use calendar, reports, or forecast views to explain follow-up workload and pipeline value.
 
 ### Safety And Assistant
 
-- [ ] **SAFE-01**: Seed data, docs examples, browser checks, forms, chats, and assistant simulations use person names containing `Test`.
+- [x] **SAFE-01**: Seed data, docs examples, browser checks, forms, chats, and assistant simulations use person names containing `Test`.
 - [ ] **SAFE-02**: Assistant behavior remains optional and cleanly disabled when required credentials are absent.
 - [ ] **SAFE-03**: Assistant actions remain typed, scoped to domain tools, and controlled through preview/apply or explicit confirmation behavior.
 - [ ] **SAFE-04**: Forecasts and reports distinguish confirmed values from estimates and show assumptions where applicable.
@@ -67,12 +67,12 @@
 | ACCESS-01 | Phase 1 | Pending |
 | ACCESS-02 | Phase 3 | Pending |
 | ACCESS-03 | Phase 3 | Pending |
-| LEAD-01 | Phase 1 | Pending |
-| LEAD-02 | Phase 1 | Pending |
+| LEAD-01 | Phase 1 | Complete |
+| LEAD-02 | Phase 1 | Complete |
 | LEAD-03 | Phase 1 | Pending |
 | LEAD-04 | Phase 2 | Pending |
 | LEAD-05 | Phase 2 | Pending |
-| SAFE-01 | Phase 1 | Pending |
+| SAFE-01 | Phase 1 | Complete |
 | SAFE-02 | Phase 2 | Pending |
 | SAFE-03 | Phase 2 | Pending |
 | SAFE-04 | Phase 2 | Pending |

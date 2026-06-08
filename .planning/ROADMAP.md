@@ -8,7 +8,7 @@
 
 | Phase | Name | Requirements | Goal |
 |-------|------|--------------|------|
-| 1 | Publishable Lead Review Flow | ACCESS-01, LEAD-01, LEAD-02, LEAD-03, SAFE-01, PACK-03 | Main demo opens cleanly and proves the lead qualification workflow |
+| 1 | 0/3 | Planned    |  |
 | 2 | Supporting Ops Surfaces | LEAD-04, LEAD-05, SAFE-02, SAFE-03, SAFE-04 | Calendar, lead detail, reports, forecasts, and assistant support the story |
 | 3 | Portfolio Packaging And Deployment | ACCESS-02, ACCESS-03, PACK-01, PACK-02, PACK-04 | Demo is documented, checked, and ready to share |
 
