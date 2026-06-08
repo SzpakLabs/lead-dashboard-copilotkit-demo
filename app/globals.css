@@ -1519,6 +1519,7 @@ html[data-theme="dark"] .ops-console {
   color: hsl(var(--foreground));
   inline-size: min(56rem, calc(100dvw - 2rem));
   max-block-size: min(48rem, calc(100dvh - 2rem));
+  overflow: visible;
   padding: 0;
 }
 
@@ -1527,6 +1528,7 @@ html[data-theme="dark"] .ops-console {
 }
 
 .ops-preview-shell {
+  max-block-size: calc(100dvh - 2rem);
   padding-block-start: 2.75rem;
   position: relative;
 }
@@ -1555,6 +1557,29 @@ html[data-theme="dark"] .ops-console {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.ops-preview-actions .ops-button {
+  justify-content: center;
+}
+
+.ops-ledger-empty {
+  background: hsl(var(--muted) / 0.34);
+  border-top: 1px solid hsl(var(--ops-line));
+  color: hsl(var(--muted-foreground));
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+}
+
+.ops-ledger-empty strong {
+  color: hsl(var(--foreground));
+  font-size: 0.92rem;
+}
+
+.ops-ledger-empty span {
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 .ops-inspector-header {

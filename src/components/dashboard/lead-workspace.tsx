@@ -323,8 +323,9 @@ function LeadLedger({
         </tbody>
       </table>
       {leads.length === 0 ? (
-        <div className="p-5 text-sm text-muted-foreground">
-          No leads match this queue. Create a draft from pasted text.
+        <div className="ops-ledger-empty">
+          <strong>No matching leads</strong>
+          <span>Adjust filters or add a Test lead through New intake.</span>
         </div>
       ) : null}
     </div>
@@ -378,7 +379,7 @@ export function LeadPreviewContent({
           Add follow-up
         </Link>
         <Link className="ops-button" href={`/leads/${detail.id}#status`}>
-          Status
+          Change status
         </Link>
       </div>
 
