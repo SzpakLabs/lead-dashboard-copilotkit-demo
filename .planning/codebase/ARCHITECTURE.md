@@ -20,6 +20,51 @@ The implementation follows the intended steering boundary in broad strokes:
 - `src/lib/ingestion/` owns text normalization and extraction.
 - `src/lib/assistant/` owns CopilotKit runtime configuration, tool schemas, and tool implementations.
 
+## System Overview
+
+```txt
+┌─────────────────────────────────────────────────────────────┐
+│                  Next.js App Router UI                       │
+├──────────────────────┬──────────────────┬───────────────────┤
+│ Root layout          │ App shell        │ Workspace views   │
+│ `app/layout.tsx`     │ `AppShell`       │ Console, Calendar │
+│                      │                  │ Lead, Settings    │
+└──────────┬───────────┴────────┬─────────┴─────────┬─────────┘
+           │                    │                   │
+           ▼                    ▼                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  App Router API Routes                       │
+├──────────────────┬──────────────────┬───────────────────────┤
+│ Ingestion         │ Lead mutations   │ Workspace config      │
+│ `app/api/ingest`  │ `app/api/leads`  │ custom fields/sources │
+└────────┬──────────┴────────┬─────────┴──────────┬────────────┘
+         │                   │                    │
+         ▼                   ▼                    ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Domain and Read Models                      │
+├──────────────────┬──────────────────┬───────────────────────┤
+│ Lead operations  │ Calendar/reports │ Settings operations   │
+│ `domain/leads`   │ `domain/calendar`│ custom fields/sources │
+│                  │ `domain/reports` │                       │
+└────────┬─────────┴────────┬─────────┴──────────┬────────────┘
+         │                  │                     │
+         ▼                  ▼                     ▼
+┌───────────────────────┐  ┌──────────────────────────────────┐
+│ Ingestion pipeline    │  │ CopilotKit assistant runtime      │
+│ normalize + extract   │  │ `app/api/copilotkit/route.ts`     │
+│ `src/lib/ingestion`   │  │ `src/lib/assistant/tools/leads.ts`│
+└──────────┬────────────┘  └───────────────┬──────────────────┘
+           │                               │
+           ▼                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  PostgreSQL via Drizzle ORM                  │
+│ `src/lib/db/schema.ts`                                       │
+│ workspaces, users, contacts, leads, ingestion_events,        │
+│ lead_events, follow_ups, source_definitions, custom fields,  │
+│ assistant_action_logs                                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ## Key File Paths
 
 - `app/layout.tsx` conditionally wraps the app with `CopilotProvider` when assistant runtime configuration is present.
