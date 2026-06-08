@@ -7,7 +7,7 @@
 
 ### Demo Access
 
-- [ ] **ACCESS-01**: User can open the main lead dashboard route without crashes in the documented demo environment.
+- [x] **ACCESS-01**: User can open the main lead dashboard route without crashes in the documented demo environment.
 - [ ] **ACCESS-02**: User can follow documented local setup steps for database, seed data, and optional assistant configuration.
 - [ ] **ACCESS-03**: Public demo path avoids exposing private credentials and documents any unavailable private capabilities.
 
@@ -15,7 +15,7 @@
 
 - [x] **LEAD-01**: User can demonstrate lead intake or lead review with demo-safe data.
 - [x] **LEAD-02**: User can see budget, urgency, service type, source, status, next step, and follow-up timing for representative leads.
-- [ ] **LEAD-03**: User can change or review lead status through an existing workflow and see the UI or persisted state update.
+- [x] **LEAD-03**: User can change or review lead status through an existing workflow and see the UI or persisted state update.
 - [ ] **LEAD-04**: User can inspect a lead through preview and full detail surfaces without losing context.
 - [ ] **LEAD-05**: User can use calendar, reports, or forecast views to explain follow-up workload and pipeline value.
 
@@ -30,7 +30,7 @@
 
 - [ ] **PACK-01**: README or portfolio notes explain the business problem, solution, stack, local setup, deployment notes, and limitations.
 - [ ] **PACK-02**: A 60-second demo script exists and follows the lead intake or lead review story.
-- [ ] **PACK-03**: The first screenshot or first viewport is professional enough for GitHub, LinkedIn, Upwork, and direct outreach.
+- [x] **PACK-03**: The first screenshot or first viewport is professional enough for GitHub, LinkedIn, Upwork, and direct outreach.
 - [ ] **PACK-04**: Verification evidence records the strongest practical checks run before sharing the demo.
 
 ## v2 Requirements
@@ -64,12 +64,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ACCESS-01 | Phase 1 | Pending |
+| ACCESS-01 | Phase 1 | Complete |
 | ACCESS-02 | Phase 3 | Pending |
 | ACCESS-03 | Phase 3 | Pending |
 | LEAD-01 | Phase 1 | Complete |
 | LEAD-02 | Phase 1 | Complete |
-| LEAD-03 | Phase 1 | Pending |
+| LEAD-03 | Phase 1 | Complete |
 | LEAD-04 | Phase 2 | Pending |
 | LEAD-05 | Phase 2 | Pending |
 | SAFE-01 | Phase 1 | Complete |
@@ -78,7 +78,7 @@
 | SAFE-04 | Phase 2 | Pending |
 | PACK-01 | Phase 3 | Pending |
 | PACK-02 | Phase 3 | Pending |
-| PACK-03 | Phase 1 | Pending |
+| PACK-03 | Phase 1 | Complete |
 | PACK-04 | Phase 3 | Pending |
 
 **Coverage:**
