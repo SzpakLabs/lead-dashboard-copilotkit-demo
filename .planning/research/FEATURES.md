@@ -37,4 +37,3 @@
 - Clean first-screen behavior.
 - README/demo script quality.
 - Optional assistant configuration that does not break the core app when absent.
-

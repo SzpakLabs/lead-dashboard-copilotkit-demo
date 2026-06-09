@@ -32,4 +32,3 @@ The stack is appropriate for a portfolio demo because it keeps UI, routes, domai
 - Do not add a parallel custom assistant framework.
 - Do not introduce production auth or billing into the publication milestone.
 - Do not let optional assistant credentials block the non-assistant demo path.
-

@@ -36,4 +36,3 @@ The app is a single-repository full-stack Next.js system.
 - Assistant tools should call domain modules only.
 - Ingestion should create drafts or proposals through the same pipeline.
 - Calendar should remain a derived read model until standalone editable events are needed.
-
