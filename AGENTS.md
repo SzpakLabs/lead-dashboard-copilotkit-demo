@@ -69,3 +69,7 @@ For GSD work, read the Kiro steering/spec files first, then read `.planning/STAT
 Current GSD focus: Phase 1 - Publishable Lead Review Flow.
 
 Next command: `$gsd-plan-phase 1`.
+
+## GSD Routing
+
+For GSD tasks, read `.planning/GSD_ROUTING.md` before running any GSD command. Manual GSD only by default: no full `--auto` pipelines unless explicitly requested, no GPT-5.5 medium by default, cheap-first routing, and stop after the requested GSD stage.

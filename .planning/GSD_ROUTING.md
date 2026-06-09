@@ -1,0 +1,1 @@
+/Users/macos/.codex/GSD_ROUTING.md
