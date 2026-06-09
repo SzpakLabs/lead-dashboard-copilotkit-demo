@@ -8,7 +8,7 @@
 ### Demo Access
 
 - [x] **ACCESS-01**: User can open the main lead dashboard route without crashes in the documented demo environment.
-- [ ] **ACCESS-02**: User can follow documented local setup steps for database, seed data, and optional assistant configuration.
+- [x] **ACCESS-02**: User can follow documented local setup steps for database, seed data, and optional assistant configuration.
 - [ ] **ACCESS-03**: Public demo path avoids exposing private credentials and documents any unavailable private capabilities.
 
 ### Lead Workflow
@@ -28,10 +28,10 @@
 
 ### Portfolio Packaging
 
-- [ ] **PACK-01**: README or portfolio notes explain the business problem, solution, stack, local setup, deployment notes, and limitations.
-- [ ] **PACK-02**: A 60-second demo script exists and follows the lead intake or lead review story.
+- [x] **PACK-01**: README or portfolio notes explain the business problem, solution, stack, local setup, deployment notes, and limitations.
+- [x] **PACK-02**: A 60-second demo script exists and follows the lead intake or lead review story.
 - [x] **PACK-03**: The first screenshot or first viewport is professional enough for GitHub, LinkedIn, Upwork, and direct outreach.
-- [ ] **PACK-04**: Verification evidence records the strongest practical checks run before sharing the demo.
+- [x] **PACK-04**: Verification evidence records the strongest practical checks run before sharing the demo.
 
 ## v2 Requirements
 
@@ -65,7 +65,7 @@
 | Requirement | Phase   | Status   |
 | ----------- | ------- | -------- |
 | ACCESS-01   | Phase 1 | Complete |
-| ACCESS-02   | Phase 3 | Pending  |
+| ACCESS-02   | Phase 3 | Complete |
 | ACCESS-03   | Phase 3 | Pending  |
 | LEAD-01     | Phase 1 | Complete |
 | LEAD-02     | Phase 1 | Complete |
@@ -76,10 +76,10 @@
 | SAFE-02     | Phase 2 | Pending  |
 | SAFE-03     | Phase 2 | Pending  |
 | SAFE-04     | Phase 2 | Pending  |
-| PACK-01     | Phase 3 | Pending  |
-| PACK-02     | Phase 3 | Pending  |
+| PACK-01     | Phase 3 | Complete |
+| PACK-02     | Phase 3 | Complete |
 | PACK-03     | Phase 1 | Complete |
-| PACK-04     | Phase 3 | Pending  |
+| PACK-04     | Phase 3 | Complete |
 
 **Coverage:**
 
@@ -90,4 +90,4 @@
 ---
 
 _Requirements defined: 2026-06-08_
-_Last updated: 2026-06-08 after initial definition_
+_Last updated: 2026-06-10 after Phase 3 execution_

@@ -53,6 +53,7 @@ This phase does not add new product capabilities, redesign the app, replace the 
 </decisions>
 
 <canonical_refs>
+
 ## Canonical References
 
 **Downstream agents MUST read these before planning or implementing.**
@@ -94,6 +95,7 @@ This phase does not add new product capabilities, redesign the app, replace the 
 </canonical_refs>
 
 <code_context>
+
 ## Existing Code Insights
 
 ### Reusable Assets

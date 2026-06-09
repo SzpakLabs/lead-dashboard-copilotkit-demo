@@ -63,4 +63,3 @@ Prevention:
 
 - Treat `.planning/codebase/` and active Kiro specs as current repo evidence.
 - Update steering only when a product or architecture decision changes.
-

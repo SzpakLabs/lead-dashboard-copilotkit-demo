@@ -24,4 +24,3 @@
 - `.kiro/steering/product.md`
 - `.kiro/steering/tech.md`
 - `.kiro/specs/lead-workflow-ux-upgrade/*`
-
