@@ -11,3 +11,4 @@ coverage
 .design-variants/*
 .design-variants/legacy
 .playwright-mcp
+.vercel
