@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { EmptyDatabasePage } from "@/components/dashboard/database-states";
 import { LeadPreviewDialog } from "@/components/dashboard/lead-preview-dialog";
 import {
   LeadPreviewContent,
@@ -45,6 +46,7 @@ import {
 import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { isEmptyDatabaseError } from "@/lib/db/bootstrap-state";
 
 export const dynamic = "force-dynamic";
 
@@ -55,30 +57,103 @@ type PageProps = {
 };
 
 export default async function CalendarPage({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const assistantEnabled = isAssistantRuntimeConfigured();
-  const scope = parseScope(params.scope);
-  const anchorDate = parseAnchorDate(params.date);
-  const selectedLeadId = params.leadId ?? "";
-  const allItems = await getCalendarItems();
-  const range = getCalendarRange(scope, anchorDate);
-  const scopedItems = allItems.filter((item) =>
-    isInRange(item.startsAt, range.start, range.end)
-  );
-  const boardDays =
-    scope === "month" ? getMonthGridDays(anchorDate) : getBoardDays(range);
-  const boardStats = getBoardStats(scopedItems);
-  const selectedLead = selectedLeadId
-    ? await getPreviewData(selectedLeadId)
-    : null;
-  const sourceDefinitions = await getWorkspaceSourceDefinitions();
-  const sourceOptions = sourceDefinitions
-    .filter((source) => source.isActive && !source.archivedAt)
-    .map((source) => ({ value: source.slug, label: source.label }));
-  const sourceLabels = Object.fromEntries(
-    sourceDefinitions.map((source) => [source.slug, source.label])
-  );
+  const result = await loadCalendarPage(searchParams);
 
+  if (!result.ok) {
+    return (
+      <EmptyDatabasePage
+        activeSection="calendar"
+        reason={result.reason}
+        title="Calendar"
+      />
+    );
+  }
+
+  return <CalendarPageView {...result.data} />;
+}
+
+async function loadCalendarPage(searchParams: PageProps["searchParams"]) {
+  try {
+    const params = await searchParams;
+    const assistantEnabled = isAssistantRuntimeConfigured();
+    const scope = parseScope(params.scope);
+    const anchorDate = parseAnchorDate(params.date);
+    const selectedLeadId = params.leadId ?? "";
+    const allItems = await getCalendarItems();
+    const range = getCalendarRange(scope, anchorDate);
+    const scopedItems = allItems.filter((item) =>
+      isInRange(item.startsAt, range.start, range.end)
+    );
+    const boardDays =
+      scope === "month" ? getMonthGridDays(anchorDate) : getBoardDays(range);
+    const boardStats = getBoardStats(scopedItems);
+    const selectedLead = selectedLeadId
+      ? await getPreviewData(selectedLeadId)
+      : null;
+    const sourceDefinitions = await getWorkspaceSourceDefinitions();
+    const sourceOptions = sourceDefinitions
+      .filter((source) => source.isActive && !source.archivedAt)
+      .map((source) => ({ value: source.slug, label: source.label }));
+    const sourceLabels = Object.fromEntries(
+      sourceDefinitions.map((source) => [source.slug, source.label])
+    );
+
+    return {
+      ok: true as const,
+      data: {
+        assistantEnabled,
+        anchorDate,
+        boardDays,
+        boardStats,
+        range,
+        scope,
+        scopedItems,
+        selectedLead,
+        selectedLeadId,
+        sourceLabels,
+        sourceOptions
+      }
+    };
+  } catch (error) {
+    if (isEmptyDatabaseError(error)) {
+      return {
+        ok: false as const,
+        reason:
+          error instanceof Error
+            ? error.message
+            : "The demo workspace and seed records are missing."
+      };
+    }
+
+    throw error;
+  }
+}
+
+function CalendarPageView({
+  assistantEnabled,
+  anchorDate,
+  boardDays,
+  boardStats,
+  range,
+  scope,
+  scopedItems,
+  selectedLead,
+  selectedLeadId,
+  sourceLabels,
+  sourceOptions
+}: {
+  assistantEnabled: boolean;
+  anchorDate: Date;
+  boardDays: Date[];
+  boardStats: ReturnType<typeof getBoardStats>;
+  range: ReturnType<typeof getCalendarRange>;
+  scope: CalendarScope;
+  scopedItems: CalendarItem[];
+  selectedLead: Awaited<ReturnType<typeof getPreviewData>> | null;
+  selectedLeadId: string;
+  sourceLabels: Record<string, string>;
+  sourceOptions: Array<{ value: string; label: string }>;
+}) {
   return (
     <AppShell
       activeSection="calendar"
@@ -92,9 +167,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
         },
         anchorDate: anchorDate.toISOString(),
         selectedLeadId: selectedLeadId || null,
-        visibleLeadIds: Array.from(
-          new Set(scopedItems.map((item) => item.leadId))
-        ),
+        visibleLeadIds: Array.from(new Set(scopedItems.map((item) => item.leadId))),
         visibleItemCount: scopedItems.length
       }}
       assistantEnabled={assistantEnabled}
@@ -105,10 +178,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
       title="Calendar"
     >
       <div className="ops-page-stack ops-calendar-page">
-        <section
-          className="ops-calendar-board"
-          aria-labelledby="calendar-title"
-        >
+        <section className="ops-calendar-board" aria-labelledby="calendar-title">
           <div className="ops-calendar-header">
             <div className="min-w-0">
               <p className="ops-eyebrow">
@@ -132,10 +202,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
               >
                 <ArrowLeft className="size-4" />
               </Link>
-              <Link
-                className="ops-calendar-today"
-                href={getCalendarHref(scope, new Date())}
-              >
+              <Link className="ops-calendar-today" href={getCalendarHref(scope, new Date())}>
                 <RotateCcw className="size-4" />
                 <span>Today</span>
               </Link>
@@ -154,52 +221,28 @@ export default async function CalendarPage({ searchParams }: PageProps) {
 
           <div className="ops-calendar-toolbar">
             <nav className="ops-scope-tabs" aria-label="Calendar scope">
-              {(["month", "week", "day"] satisfies CalendarScope[]).map(
-                (option) => (
-                  <Link
-                    key={option}
-                    aria-current={scope === option ? "page" : undefined}
-                    className={cn(scope === option ? "is-active" : "")}
-                    href={getCalendarHref(option, anchorDate)}
-                  >
-                    {option}
-                  </Link>
-                )
-              )}
+              {(["month", "week", "day"] satisfies CalendarScope[]).map((option) => (
+                <Link
+                  key={option}
+                  aria-current={scope === option ? "page" : undefined}
+                  className={cn(scope === option ? "is-active" : "")}
+                  href={getCalendarHref(option, anchorDate)}
+                >
+                  {option}
+                </Link>
+              ))}
             </nav>
             <div className="ops-calendar-stats" aria-label="Calendar totals">
-              <CalendarStat
-                icon={<CalendarCheck2 className="size-4" />}
-                label="Scheduled"
-                value={boardStats.scheduled}
-              />
-              <CalendarStat
-                icon={<Clock3 className="size-4" />}
-                label="Follow-ups"
-                value={boardStats.followUps}
-              />
-              <CalendarStat
-                icon={<CheckCircle2 className="size-4" />}
-                label="Completed"
-                value={boardStats.completed}
-              />
+              <CalendarStat icon={<CalendarCheck2 className="size-4" />} label="Scheduled" value={boardStats.scheduled} />
+              <CalendarStat icon={<Clock3 className="size-4" />} label="Follow-ups" value={boardStats.followUps} />
+              <CalendarStat icon={<CheckCircle2 className="size-4" />} label="Completed" value={boardStats.completed} />
             </div>
           </div>
 
           {scope === "month" ? (
-            <MonthBoard
-              anchorDate={anchorDate}
-              days={boardDays}
-              items={scopedItems}
-              scope={scope}
-            />
+            <MonthBoard anchorDate={anchorDate} days={boardDays} items={scopedItems} scope={scope} />
           ) : (
-            <AgendaBoard
-              anchorDate={anchorDate}
-              days={boardDays}
-              items={scopedItems}
-              scope={scope}
-            />
+            <AgendaBoard anchorDate={anchorDate} days={boardDays} items={scopedItems} scope={scope} />
           )}
         </section>
       </div>

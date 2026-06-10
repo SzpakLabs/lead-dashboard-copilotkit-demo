@@ -3,6 +3,7 @@ import { ClipboardCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { HistoryBackButton } from "@/components/dashboard/history-back-button";
+import { EmptyDatabasePage } from "@/components/dashboard/database-states";
 import {
   AssistantPreviewNote,
   Field,
@@ -25,6 +26,7 @@ import {
   users
 } from "@/lib/db/schema";
 import { formatDateTime } from "@/lib/date-format";
+import { isEmptyDatabaseError } from "@/lib/db/bootstrap-state";
 import { type LeadStatus } from "@/lib/domain/leads/status";
 import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
 
@@ -35,34 +37,105 @@ type PageProps = {
 };
 
 export default async function LeadDetailPage({ params }: PageProps) {
-  const { leadId } = await params;
-  const assistantEnabled = isAssistantRuntimeConfigured();
-  const detail = await getLeadDetail(leadId);
+  const result = await loadLeadDetailPage(params);
 
-  if (!detail) {
-    notFound();
+  if (!result.ok) {
+    return (
+      <EmptyDatabasePage
+        activeSection="console"
+        reason={result.reason}
+        title="Lead workspace"
+      />
+    );
   }
 
-  const [
-    customFieldDefinitions,
-    customFieldValues,
-    leadFollowUps,
-    activity,
-    sourceDefinitions
-  ] = await Promise.all([
-    getCustomFieldDefinitions(),
-    getLeadCustomFieldValues(leadId),
-    getLeadFollowUps(leadId),
-    getLeadActivity(leadId),
-    getWorkspaceSourceDefinitions()
-  ]);
-  const sourceOptions = sourceDefinitions
-    .filter((source) => source.isActive && !source.archivedAt)
-    .map((source) => ({ value: source.slug, label: source.label }));
-  const sourceLabels = Object.fromEntries(
-    sourceDefinitions.map((source) => [source.slug, source.label])
-  );
+  return <LeadDetailPageView {...result.data} />;
+}
 
+async function loadLeadDetailPage(params: PageProps["params"]) {
+  try {
+    const { leadId } = await params;
+    const assistantEnabled = isAssistantRuntimeConfigured();
+    const detail = await getLeadDetail(leadId);
+
+    if (!detail) {
+      notFound();
+    }
+
+    const [
+      customFieldDefinitions,
+      customFieldValues,
+      leadFollowUps,
+      activity,
+      sourceDefinitions
+    ] = await Promise.all([
+      getCustomFieldDefinitions(),
+      getLeadCustomFieldValues(leadId),
+      getLeadFollowUps(leadId),
+      getLeadActivity(leadId),
+      getWorkspaceSourceDefinitions()
+    ]);
+    const sourceOptions = sourceDefinitions
+      .filter((source) => source.isActive && !source.archivedAt)
+      .map((source) => ({ value: source.slug, label: source.label }));
+    const sourceLabels = Object.fromEntries(
+      sourceDefinitions.map((source) => [source.slug, source.label])
+    );
+
+    return {
+      ok: true as const,
+      data: {
+        activity,
+        assistantEnabled,
+        customFieldDefinitions,
+        customFieldValues,
+        detail: {
+          ...detail,
+          status: detail.status as LeadStatus,
+          missingFields: normalizeMissingFields(detail.missingFields)
+        },
+        leadFollowUps,
+        leadId,
+        sourceLabels,
+        sourceOptions
+      }
+    };
+  } catch (error) {
+    if (isEmptyDatabaseError(error)) {
+      return {
+        ok: false as const,
+        reason:
+          error instanceof Error
+            ? error.message
+            : "The demo workspace and seed records are missing."
+      };
+    }
+
+    throw error;
+  }
+}
+
+function LeadDetailPageView({
+  activity,
+  assistantEnabled,
+  customFieldDefinitions,
+  customFieldValues,
+  detail,
+  leadFollowUps,
+  leadId,
+  sourceLabels,
+  sourceOptions
+}: {
+  activity: Awaited<ReturnType<typeof getLeadActivity>>;
+  assistantEnabled: boolean;
+  customFieldDefinitions: CustomFieldDefinitionItem[];
+  customFieldValues: CustomFieldValueItem[];
+  detail: NonNullable<Awaited<ReturnType<typeof getLeadDetail>>>;
+  leadFollowUps: FollowUpListItem[];
+  leadId: string;
+  sourceLabels: Record<string, string>;
+  sourceOptions: Array<{ value: string; label: string }>;
+}) {
   return (
     <AppShell
       actions={<HistoryBackButton />}
@@ -125,11 +198,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
             activity={activity}
             customFieldDefinitions={customFieldDefinitions}
             customFieldValues={customFieldValues}
-            detail={{
-              ...detail,
-              status: detail.status as LeadStatus,
-              missingFields: normalizeMissingFields(detail.missingFields)
-            }}
+            detail={detail}
             followUps={leadFollowUps}
             sourceLabels={sourceLabels}
             sourceOptions={sourceOptions}

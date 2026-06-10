@@ -26,6 +26,7 @@ import { type CustomFieldValueItem } from "@/components/leads/custom-field-value
 import { type FollowUpListItem } from "@/components/leads/follow-ups-panel";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
+import { isEmptyDatabaseError } from "@/lib/db/bootstrap-state";
 import {
   contacts,
   customFieldDefinitions,
@@ -153,7 +154,9 @@ function EmptyDatabasePage({ reason }: { reason: string }) {
               </p>
               <ul className="list-disc space-y-1 pl-5">
                 <li>A `software-services-demo` workspace</li>
-                <li>Seeded users, leads, contacts, follow-ups, and source data</li>
+                <li>
+                  Seeded users, leads, contacts, follow-ups, and source data
+                </li>
                 <li>Applied migrations for the current schema</li>
               </ul>
             </div>
@@ -198,7 +201,9 @@ async function loadDashboardResult(
     const detailFollowUps = activeLeadId
       ? await getLeadFollowUps(activeLeadId)
       : [];
-    const detailActivity = activeLeadId ? await getLeadActivity(activeLeadId) : [];
+    const detailActivity = activeLeadId
+      ? await getLeadActivity(activeLeadId)
+      : [];
     const detailCustomFieldValues = activeLeadId
       ? await getLeadCustomFieldValues(activeLeadId)
       : [];
@@ -241,11 +246,7 @@ async function loadDashboardResult(
   }
 }
 
-async function Dashboard({
-  data
-}: {
-  data: DashboardData;
-}) {
+async function Dashboard({ data }: { data: DashboardData }) {
   const {
     assistantEnabled,
     customFieldDefinitionRows,
@@ -423,23 +424,6 @@ function getSingleSearchParam(value: string | string[] | undefined) {
   }
 
   return value ?? "";
-}
-
-function isEmptyDatabaseError(error: unknown) {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-
-  return (
-    message.includes("relation \"leads\" does not exist") ||
-    message.includes("relation \"workspaces\" does not exist") ||
-    message.includes("relation \"contacts\" does not exist") ||
-    message.includes("relation \"custom_field_definitions\" does not exist") ||
-    message.includes("seeded workspace software-services-demo was not found") ||
-    message.includes("does not exist")
-  );
 }
 
 function isUuid(value: string) {

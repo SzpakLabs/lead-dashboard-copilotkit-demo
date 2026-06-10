@@ -3,6 +3,7 @@ import { Settings2 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { EmptyDatabasePage } from "@/components/dashboard/database-states";
 import {
   CustomFieldDefinitionsPanel,
   type CustomFieldDefinitionItem
@@ -11,6 +12,7 @@ import { SourceDefinitionsPanel } from "@/components/leads/source-definitions-pa
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 import { getDb } from "@/lib/db";
 import { customFieldDefinitions } from "@/lib/db/schema";
+import { isEmptyDatabaseError } from "@/lib/db/bootstrap-state";
 import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
 import { cn } from "@/lib/utils";
 
@@ -23,14 +25,66 @@ type PageProps = {
 type SettingsSection = "custom-fields" | "sources";
 
 export default async function SettingsPage({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const assistantEnabled = isAssistantRuntimeConfigured();
-  const activeSection = parseSettingsSection(params.section);
-  const [definitions, sources] = await Promise.all([
-    getCustomFieldDefinitions(),
-    getWorkspaceSourceDefinitions()
-  ]);
+  const result = await loadSettingsPage(searchParams);
 
+  if (!result.ok) {
+    return (
+      <EmptyDatabasePage
+        activeSection="settings"
+        reason={result.reason}
+        title="Settings"
+      />
+    );
+  }
+
+  return <SettingsPageView {...result.data} />;
+}
+
+async function loadSettingsPage(searchParams: PageProps["searchParams"]) {
+  try {
+    const params = await searchParams;
+    const assistantEnabled = isAssistantRuntimeConfigured();
+    const activeSection = parseSettingsSection(params.section);
+    const [definitions, sources] = await Promise.all([
+      getCustomFieldDefinitions(),
+      getWorkspaceSourceDefinitions()
+    ]);
+
+    return {
+      ok: true as const,
+      data: {
+        activeSection,
+        assistantEnabled,
+        definitions,
+        sources
+      }
+    };
+  } catch (error) {
+    if (isEmptyDatabaseError(error)) {
+      return {
+        ok: false as const,
+        reason:
+          error instanceof Error
+            ? error.message
+            : "The demo workspace and seed records are missing."
+      };
+    }
+
+    throw error;
+  }
+}
+
+function SettingsPageView({
+  activeSection,
+  assistantEnabled,
+  definitions,
+  sources
+}: {
+  activeSection: SettingsSection;
+  assistantEnabled: boolean;
+  definitions: CustomFieldDefinitionItem[];
+  sources: Awaited<ReturnType<typeof getWorkspaceSourceDefinitions>>;
+}) {
   return (
     <AppShell
       activeSection="settings"

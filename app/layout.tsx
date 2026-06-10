@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from "@vercel/analytics/next";
 import { CopilotProvider } from "@/components/assistant/copilot-provider";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 
