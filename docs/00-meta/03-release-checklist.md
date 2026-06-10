@@ -12,6 +12,7 @@
 - [x] Confirm no secret values appear in the live UI or repo docs checked in this phase.
 - [x] Record whether lead preview or full detail was conclusively exercised in the live pass.
 - [ ] Confirm any screenshots or recording targets reflect current UI states.
+- [ ] Confirm `/settings` shows Workspace, Sources, Help, and About with honest non-admin framing.
 
 ## Local Development Path
 
@@ -44,6 +45,7 @@
 - [ ] Assistant-disabled branch is documented and presentable.
 - [ ] Assistant-configured branch is documented only as optional.
 - [ ] Reports and forecasts are described as read-only proof surfaces, not guaranteed always-on behavior.
+- [ ] Settings copy does not imply real LinkedIn, WhatsApp, phone, or other channel integrations.
 
 ## Manual GitHub Packaging
 

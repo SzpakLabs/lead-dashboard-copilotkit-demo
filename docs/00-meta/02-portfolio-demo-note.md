@@ -20,6 +20,7 @@ This demo shows how an AI-assisted lead operations workspace can turn messy inbo
 - Calendar: `/calendar` proves the workflow extends into scheduled work and follow-up timing.
 - Reports and forecasts: the optional assistant can generate read-only summaries and near-period pipeline views when configured.
 - Settings and sources: the demo supports workspace-level custom fields and source management instead of hard-coded lead metadata.
+- Settings hub: `/settings` now combines browser-local workspace defaults, editable sources, and read-only help/about context without pretending to be a production admin console.
 
 ## Product Walkthrough
 
@@ -29,6 +30,7 @@ This demo shows how an AI-assisted lead operations workspace can turn messy inbo
 4. Return to the console and show that the request becomes reviewable operational work with source, budget, urgency, next step, status, and follow-up context.
 5. Open lead preview or full detail when available in the current environment to show the same lead as a focused workspace.
 6. Open `/calendar` or mention reports and forecasts as supporting proof that the workflow connects to operations.
+7. Open `/settings` if you want to show the lightweight workspace hub, honest source framing, or release metadata.
 
 ## 60-Second Script
 

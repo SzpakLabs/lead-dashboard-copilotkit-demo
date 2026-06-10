@@ -8,6 +8,12 @@ Primary share URL:
 
 https://lead-dashboard-rosy.vercel.app/
 
+Settings hub highlights:
+
+- `/settings?section=workspace` keeps demo-safe workspace defaults in browser-local storage only.
+- `/settings?section=sources` keeps source labels editable but frames them as workflow metadata, not proof of live integrations.
+- `/settings?section=help` and `/settings?section=about` are read-only portfolio context, not editable admin content.
+
 Terminology:
 
 - Public demo / live demo: the hosted portfolio deployment above
@@ -86,8 +92,10 @@ For the demo, `New intake` opens a manual, source-labeled intake flow titled `Cr
 - Do not present the source dropdown as proof of real LinkedIn, WhatsApp, or phone integrations.
 
 ## Presenter Checklist
+
 - Open `https://lead-dashboard-rosy.vercel.app/`.
 - Confirm `/calendar` and `/settings` load from the live demo.
+- Open `/settings` and show that Workspace, Sources, Help, and About live in one shared shell.
 - Click `New intake`.
 - Confirm the `Create draft lead` flow opens with source and input type controls.
 - Paste a Test-safe inbound request and create a draft lead.

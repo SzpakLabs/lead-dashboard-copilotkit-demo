@@ -13,6 +13,7 @@ Context
 In scope
 
 1. Workspace profile
+
 - Workspace name
 - Business type
 - Timezone
@@ -20,21 +21,25 @@ In scope
 - Demo mode label
 
 2. Sources
+
 - Keep existing source definitions
 - Clarify these are source-labeled intake surfaces, not real external integrations
 
 3. Calendar settings
+
 - Working hours
 - Default follow-up window
 - Reminder and follow-up defaults
 
 4. Assistant settings
+
 - Enabled/disabled status
 - Safe model/provider label if available
 - No secrets
 - Explain assistant is optional
 
 5. Help / FAQ
+
 - What the demo shows
 - What is real
 - What is mocked or deferred
@@ -42,6 +47,7 @@ In scope
 - Business-friendly wording first
 
 6. Business value / positioning
+
 - Explain value for small service businesses, operators, founders, and managers
 - Lead with workflow outcomes, not stack details
 - Good themes:
@@ -64,6 +70,7 @@ Secondary technology wording:
 “Built with Next.js, TypeScript, PostgreSQL/Drizzle, Tailwind, and CopilotKit-style assistant UI patterns to demonstrate how modern AI-assisted dashboards can support real business operations.”
 
 7. About / Release
+
 - Live demo URL
 - GitHub repo URL placeholder or configurable text
 - Demo version
@@ -71,10 +78,12 @@ Secondary technology wording:
 - Changelog summary
 
 8. Developer / contact
+
 - Developer name
 - GitHub / LinkedIn / website / email placeholders or safe fields
 
 9. Data section
+
 - Mention possible future export/import
 - Do not implement real import/export unless trivial
 - Optional disabled future-state actions are acceptable
@@ -126,22 +135,21 @@ Preferred split:
 
 Phase 4 should focus on:
 
-* /settings as a lightweight settings hub;
-* Workspace, Sources, Help, About sections;
-* Workspace settings stored in localStorage;
-* Reset demo defaults by clearing the local settings namespace;
-* Help/business-value copy for non-technical business readers;
-* About/release/developer metadata;
-* clear wording about what is real, mocked, optional, or deferred;
-* no fake production admin, no auth, no billing, no real integrations.
+- /settings as a lightweight settings hub;
+- Workspace, Sources, Help, About sections;
+- Workspace settings stored in localStorage;
+- Reset demo defaults by clearing the local settings namespace;
+- Help/business-value copy for non-technical business readers;
+- About/release/developer metadata;
+- clear wording about what is real, mocked, optional, or deferred;
+- no fake production admin, no auth, no billing, no real integrations.
 
 Manual Phase 4 follow-up:
 
-* Add a manual Supabase hardening task:
-
-  * verify RLS is enabled for exposed public/demo tables;
-  * verify anonymous/public clients cannot insert, update, or delete shared demo data;
-  * keep the public demo DB effectively read-only from the browser unless a specific safe server-side write path is intentionally required.
+- Add a manual Supabase hardening task:
+  - verify RLS is enabled for exposed public/demo tables;
+  - verify anonymous/public clients cannot insert, update, or delete shared demo data;
+  - keep the public demo DB effectively read-only from the browser unless a specific safe server-side write path is intentionally required.
 
 Potential Phase 5:
 Assistant Demo Controls And Response Components
@@ -152,43 +160,43 @@ Potential Phase 5 scope:
 
 1. Assistant demo controls
 
-* preset command chips;
-* optional free-text input toggle;
-* preset-only demo mode if useful;
-* per-browser assistant usage limit via localStorage;
-* after the limit is reached, do not call the real assistant/AI runtime;
-* rotate predefined fallback responses;
-* one fallback response should suggest contacting Artem Litvinko via GitHub/LinkedIn for a tailored version;
-* clearly label this as demo guardrail, not production-grade rate limiting.
+- preset command chips;
+- optional free-text input toggle;
+- preset-only demo mode if useful;
+- per-browser assistant usage limit via localStorage;
+- after the limit is reached, do not call the real assistant/AI runtime;
+- rotate predefined fallback responses;
+- one fallback response should suggest contacting Artem Litvinko via GitHub/LinkedIn for a tailored version;
+- clearly label this as demo guardrail, not production-grade rate limiting.
 
 2. Assistant response components / Generative UI
    The assistant should avoid walls of text when referring to dashboard entities.
 
 Desired behavior:
 
-* lead-related answer -> compact lead row/card similar to the dashboard table;
-* calendar-related answer -> compact calendar event card/block;
-* reports/forecast/risk answer -> readable summary component, metric card, risk list, or small table;
-* business-value answer -> readable value card;
-* preset commands should intentionally demonstrate these visual response components.
+- lead-related answer -> compact lead row/card similar to the dashboard table;
+- calendar-related answer -> compact calendar event card/block;
+- reports/forecast/risk answer -> readable summary component, metric card, risk list, or small table;
+- business-value answer -> readable value card;
+- preset commands should intentionally demonstrate these visual response components.
 
 Possible minimal component set:
 
-* AssistantLeadCard
-* AssistantCalendarCard
-* AssistantSummaryCard
+- AssistantLeadCard
+- AssistantCalendarCard
+- AssistantSummaryCard
 
 Interaction rules:
 
-* interactive actions are allowed only if safe and trivial:
+- interactive actions are allowed only if safe and trivial:
+  - navigate to /
+  - navigate to /calendar
+  - open/select existing lead only if the current app already has a reliable route/state pattern
 
-  * navigate to /
-  * navigate to /calendar
-  * open/select existing lead only if the current app already has a reliable route/state pattern
-* no destructive actions;
-* no real external sends;
-* no fake “email sent” or “meeting booked” claims;
-* no hidden mutations.
+- no destructive actions;
+- no real external sends;
+- no fake “email sent” or “meeting booked” claims;
+- no hidden mutations.
 
 CopilotKit note:
 Use the existing CopilotKit/prebuilt chat setup if possible. Prefer slots, labels, suggestion UI, or custom tool/UI rendering patterns if the current project already supports them. Do not rewrite the whole assistant system.
