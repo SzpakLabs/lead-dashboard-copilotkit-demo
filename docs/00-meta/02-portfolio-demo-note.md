@@ -27,11 +27,12 @@ This demo shows how an AI-assisted lead operations workspace can turn messy inbo
 2. Click `New intake` and explain that it opens a manual, source-labeled intake flow.
 3. Paste a Test-safe inbound request into `Create draft lead`, select a source such as `LinkedIn`, keep `Pasted text`, and create the draft lead.
 4. Return to the console and show that the request becomes reviewable operational work with source, budget, urgency, next step, status, and follow-up context.
-5. Open `/calendar` or mention reports and forecasts as supporting proof that the workflow connects to operations.
+5. Open lead preview or full detail when available in the current environment to show the same lead as a focused workspace.
+6. Open `/calendar` or mention reports and forecasts as supporting proof that the workflow connects to operations.
 
 ## 60-Second Script
 
-“This live demo starts with a messy inbound request. I click New intake, paste a Test-safe request into the Create draft lead flow, label the source, and create a draft lead for review. Back on the console, that inbound request becomes reviewable operational work where I can inspect source, budget, urgency, next step, status, and follow-up context. From there I can use the calendar, and optionally reports or forecasts, as supporting proof that the workflow connects to real operations. The important point is not fake channel integrations, it is that messy inbound demand becomes structured, human-reviewed lead work.”
+“This live demo starts with a messy inbound request. I click New intake, paste a Test-safe request into the Create draft lead flow, label the source, and create a draft lead for review. Back on the console, that inbound request becomes reviewable operational work where I can inspect source, budget, urgency, next step, status, and follow-up context. If the environment exposes lead preview or full detail cleanly, I open that as the focused workspace. Then I use the calendar, and optionally reports or forecasts, as supporting proof that the workflow connects to real operations. The important point is not fake channel integrations, it is that messy inbound demand becomes structured, human-reviewed lead work.”
 
 ## Demo Notes
 

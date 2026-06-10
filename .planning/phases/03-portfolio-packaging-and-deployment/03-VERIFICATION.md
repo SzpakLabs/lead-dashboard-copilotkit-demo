@@ -1,6 +1,7 @@
 # Phase 3 Verification
 
 **Recorded:** 2026-06-10
+**Updated:** 2026-06-10T12:08:36Z
 **Scope:** Portfolio packaging and deployment preparation
 **Outcome:** Public demo is live and smoke-checked; local development path remains documented for developer setup
 
@@ -45,7 +46,7 @@ curl -I https://lead-dashboard-rosy.vercel.app/settings
 - Build output still reported a non-fatal Turbopack NFT tracing warning caused by `src/lib/assistant/config.ts` being pulled into an app route import trace.
 - Browser smoke checks on the live public demo confirmed that `New intake` opens the `Create draft lead` flow, source and input type controls are usable, a Test-safe pasted request creates a draft lead, and the UI reports `Draft lead created for review.`
 - The live console reflected the created lead immediately in the ledger and queue counts.
-- Lead preview or full detail was not conclusively exercised in the public smoke pass; that remains a small follow-up verification item rather than a release blocker for the packaging docs.
+- A follow-up Playwright pass attempted to open the created lead from the console ledger. The ledger row was clickable in automation, but the live pass did not expose a conclusively observable preview or route transition, so this remains a small UX verification follow-up rather than a packaging blocker.
 
 ## Public Smoke Checks
 
@@ -57,6 +58,8 @@ curl -I https://lead-dashboard-rosy.vercel.app/settings
 - `Input type` dropdown works: passed
 - Test-safe pasted text creates a draft lead: passed
 - Post-submit result stays coherent and non-broken: passed with `Draft lead created for review.`
+- Console metrics and queue counts reflect the created draft lead: passed
+- Lead preview or full detail from the live ledger: attempted, not conclusive in current automation pass
 - No secrets or private env values were observed in the checked live UI routes or the updated Phase 3 docs: passed
 
 ## Local Development Smoke Checks
@@ -93,6 +96,7 @@ curl -I https://lead-dashboard-rosy.vercel.app/settings
   - website URL pointing to `https://lead-dashboard-rosy.vercel.app/`
   - topics: `nextjs`, `typescript`, `postgresql`, `drizzle`, `tailwindcss`, `ai-dashboard`, `crm`, `lead-management`, `copilotkit`, `portfolio-demo`
 - The intake post-submit transition is acceptable for this pass but would be stronger with a clearer `Review now` or direct-open path.
+- The live ledger click path should be rechecked manually or with a stronger browser trace if preview or detail access needs to be part of a future release gate.
 
 ## Readiness Summary
 

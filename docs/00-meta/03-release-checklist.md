@@ -5,10 +5,12 @@
 - [x] Public demo URL is live: `https://lead-dashboard-rosy.vercel.app/`
 - [x] Smoke-check `/`, `/calendar`, and `/settings`.
 - [x] Confirm the presenter path starts on `/`.
-- [x] Confirm `New intake` opens the `Create draft lead` flow.
+- [x] Confirm `New Intake` opens the `Create draft lead` flow.
 - [x] Confirm source and input type controls work.
 - [x] Confirm a Test-safe pasted request can create a draft lead without breaking the app.
+- [x] Record the live post-submit state for draft creation.
 - [x] Confirm no secret values appear in the live UI or repo docs checked in this phase.
+- [x] Record whether lead preview or full detail was conclusively exercised in the live pass.
 - [ ] Confirm any screenshots or recording targets reflect current UI states.
 
 ## Local Development Path
@@ -33,15 +35,21 @@
 - [ ] `docs/00-meta/02-portfolio-demo-note.md` includes the outreach narrative and 60-second script.
 - [ ] Root `README.md` shows the live public demo near the top.
 - [ ] Screenshot inventory or capture targets are identified before sharing.
-- [ ] GitHub repo short description is set manually.
-- [ ] GitHub website URL is set to `https://lead-dashboard-rosy.vercel.app/`.
-- [ ] GitHub topics are set manually: `nextjs`, `typescript`, `postgresql`, `drizzle`, `tailwindcss`, `ai-dashboard`, `crm`, `lead-management`, `copilotkit`, `portfolio-demo`.
+- [x] GitHub repo short description is set manually.
+- [x] GitHub website URL is set to `https://lead-dashboard-rosy.vercel.app/`.
+- [x] GitHub topics are set manually: `nextjs`, `typescript`, `postgresql`, `drizzle`, `tailwindcss`, `ai-dashboard`, `crm`, `lead-management`, `copilotkit`, `portfolio-demo`.
 
 ## Assistant Branches
 
 - [ ] Assistant-disabled branch is documented and presentable.
 - [ ] Assistant-configured branch is documented only as optional.
 - [ ] Reports and forecasts are described as read-only proof surfaces, not guaranteed always-on behavior.
+
+## Manual GitHub Packaging
+
+- [x] Set the GitHub repo short description manually.
+- [x] Set the GitHub repo website URL to `https://lead-dashboard-rosy.vercel.app/`.
+- [x] Set GitHub topics manually: `nextjs`, `typescript`, `postgresql`, `drizzle`, `tailwindcss`, `ai-dashboard`, `crm`, `lead-management`, `copilotkit`, `portfolio-demo`.
 
 ## Terminology
 
