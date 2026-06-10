@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "format": "prettier . --write --ignore-unknown",
+    "format:fix": "prettier . --write --ignore-unknown && eslint . --fix",
     "format:check": "prettier . --check --ignore-unknown",
     "test": "vitest run",
     "test:watch": "vitest",

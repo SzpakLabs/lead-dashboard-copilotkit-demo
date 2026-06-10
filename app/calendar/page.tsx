@@ -167,7 +167,9 @@ function CalendarPageView({
         },
         anchorDate: anchorDate.toISOString(),
         selectedLeadId: selectedLeadId || null,
-        visibleLeadIds: Array.from(new Set(scopedItems.map((item) => item.leadId))),
+        visibleLeadIds: Array.from(
+          new Set(scopedItems.map((item) => item.leadId))
+        ),
         visibleItemCount: scopedItems.length
       }}
       assistantEnabled={assistantEnabled}
@@ -178,7 +180,10 @@ function CalendarPageView({
       title="Calendar"
     >
       <div className="ops-page-stack ops-calendar-page">
-        <section className="ops-calendar-board" aria-labelledby="calendar-title">
+        <section
+          className="ops-calendar-board"
+          aria-labelledby="calendar-title"
+        >
           <div className="ops-calendar-header">
             <div className="min-w-0">
               <p className="ops-eyebrow">
@@ -202,7 +207,10 @@ function CalendarPageView({
               >
                 <ArrowLeft className="size-4" />
               </Link>
-              <Link className="ops-calendar-today" href={getCalendarHref(scope, new Date())}>
+              <Link
+                className="ops-calendar-today"
+                href={getCalendarHref(scope, new Date())}
+              >
                 <RotateCcw className="size-4" />
                 <span>Today</span>
               </Link>
@@ -221,28 +229,52 @@ function CalendarPageView({
 
           <div className="ops-calendar-toolbar">
             <nav className="ops-scope-tabs" aria-label="Calendar scope">
-              {(["month", "week", "day"] satisfies CalendarScope[]).map((option) => (
-                <Link
-                  key={option}
-                  aria-current={scope === option ? "page" : undefined}
-                  className={cn(scope === option ? "is-active" : "")}
-                  href={getCalendarHref(option, anchorDate)}
-                >
-                  {option}
-                </Link>
-              ))}
+              {(["month", "week", "day"] satisfies CalendarScope[]).map(
+                (option) => (
+                  <Link
+                    key={option}
+                    aria-current={scope === option ? "page" : undefined}
+                    className={cn(scope === option ? "is-active" : "")}
+                    href={getCalendarHref(option, anchorDate)}
+                  >
+                    {option}
+                  </Link>
+                )
+              )}
             </nav>
             <div className="ops-calendar-stats" aria-label="Calendar totals">
-              <CalendarStat icon={<CalendarCheck2 className="size-4" />} label="Scheduled" value={boardStats.scheduled} />
-              <CalendarStat icon={<Clock3 className="size-4" />} label="Follow-ups" value={boardStats.followUps} />
-              <CalendarStat icon={<CheckCircle2 className="size-4" />} label="Completed" value={boardStats.completed} />
+              <CalendarStat
+                icon={<CalendarCheck2 className="size-4" />}
+                label="Scheduled"
+                value={boardStats.scheduled}
+              />
+              <CalendarStat
+                icon={<Clock3 className="size-4" />}
+                label="Follow-ups"
+                value={boardStats.followUps}
+              />
+              <CalendarStat
+                icon={<CheckCircle2 className="size-4" />}
+                label="Completed"
+                value={boardStats.completed}
+              />
             </div>
           </div>
 
           {scope === "month" ? (
-            <MonthBoard anchorDate={anchorDate} days={boardDays} items={scopedItems} scope={scope} />
+            <MonthBoard
+              anchorDate={anchorDate}
+              days={boardDays}
+              items={scopedItems}
+              scope={scope}
+            />
           ) : (
-            <AgendaBoard anchorDate={anchorDate} days={boardDays} items={scopedItems} scope={scope} />
+            <AgendaBoard
+              anchorDate={anchorDate}
+              days={boardDays}
+              items={scopedItems}
+              scope={scope}
+            />
           )}
         </section>
       </div>
