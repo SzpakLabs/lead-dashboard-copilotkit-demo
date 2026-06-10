@@ -9,8 +9,9 @@ import {
   sql,
   type SQL
 } from "drizzle-orm";
-import { DatabaseZap } from "lucide-react";
+import { AlertTriangle, DatabaseZap } from "lucide-react";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadPreviewDialog } from "@/components/dashboard/lead-preview-dialog";
 import {
   getCustomFieldFilterParamName,
@@ -44,51 +45,157 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+type DashboardData = {
+  assistantEnabled: boolean;
+  customFieldDefinitionRows: CustomFieldDefinitionItem[];
+  activeSourceOptions: { value: string; label: string }[];
+  sourceLabels: Record<string, string>;
+  filters: DashboardFilters;
+  leadRows: Awaited<ReturnType<typeof getLeadRows>>;
+  currentTime: number;
+  metrics: Awaited<ReturnType<typeof getDashboardMetrics>>;
+  activeLeadId: string | undefined;
+  detail: Awaited<ReturnType<typeof getLeadDetail>>;
+  detailFollowUps: FollowUpListItem[];
+  detailActivity: Awaited<ReturnType<typeof getLeadActivity>>;
+  detailCustomFieldValues: CustomFieldValueItem[];
+  activeLeadRow: Awaited<ReturnType<typeof getLeadRows>>[number] | undefined;
+  activeFilterCount: number;
+};
+
 export default async function Home({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
+  const result = await loadDashboardResult(resolvedSearchParams);
 
-  return <Dashboard searchParams={resolvedSearchParams} />;
+  if (!result.ok) {
+    return <DatabaseUnavailablePage error={result.error} />;
+  }
+
+  return <Dashboard data={result.data} />;
+}
+
+function DatabaseUnavailablePage({ error }: { error: unknown }) {
+  const message =
+    error instanceof Error
+      ? error.message
+      : "The demo database could not be reached.";
+
+  return (
+    <AppShell
+      activeSection="console"
+      eyebrow="Service Ops Console"
+      eyebrowIcon={<DatabaseZap className="size-4" />}
+      title="Lead operations"
+    >
+      <section className="ops-page-stack">
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-amber-200">
+              <AlertTriangle className="size-4" />
+              Database unavailable
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              The dashboard cannot load because the production database is not
+              reachable right now.
+            </p>
+            <p className="rounded-md border border-border bg-background/70 p-3 font-mono text-xs text-foreground">
+              {message}
+            </p>
+            <p>
+              Fix the Vercel `DATABASE_URL` and redeploy, or point the app at a
+              live Postgres instance with the seeded demo data.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+    </AppShell>
+  );
+}
+
+async function loadDashboardResult(searchParams: Record<string, string | string[] | undefined>) {
+  try {
+    const assistantEnabled = isAssistantRuntimeConfigured();
+    const selectedLeadId = getSingleSearchParam(searchParams.leadId);
+    const [customFieldDefinitionRows, sourceDefinitions] = await Promise.all([
+      getCustomFieldDefinitions(),
+      getWorkspaceSourceDefinitions()
+    ]);
+    const activeSourceOptions = sourceDefinitions
+      .filter((source) => source.isActive && !source.archivedAt)
+      .map((source) => ({ value: source.slug, label: source.label }));
+    const sourceLabels = Object.fromEntries(
+      sourceDefinitions.map((source) => [source.slug, source.label])
+    );
+    const filters = parseDashboardFilters(
+      searchParams,
+      customFieldDefinitionRows,
+      activeSourceOptions.map((source) => source.value)
+    );
+    const leadRows = await getLeadRows(filters);
+    const currentTime = await getCurrentTime();
+    const metrics = await getDashboardMetrics(currentTime);
+
+    const activeLeadId = isUuid(selectedLeadId) ? selectedLeadId : undefined;
+    const detail = activeLeadId ? await getLeadDetail(activeLeadId) : null;
+    const detailFollowUps = activeLeadId
+      ? await getLeadFollowUps(activeLeadId)
+      : [];
+    const detailActivity = activeLeadId ? await getLeadActivity(activeLeadId) : [];
+    const detailCustomFieldValues = activeLeadId
+      ? await getLeadCustomFieldValues(activeLeadId)
+      : [];
+    const activeLeadRow = leadRows.find((lead) => lead.id === activeLeadId);
+    const activeFilterCount = getActiveFilterCount(filters);
+
+    return {
+      ok: true as const,
+      data: {
+        assistantEnabled,
+        customFieldDefinitionRows,
+        activeSourceOptions,
+        sourceLabels,
+        filters,
+        leadRows,
+        currentTime,
+        metrics,
+        activeLeadId,
+        detail,
+        detailFollowUps,
+        detailActivity,
+        detailCustomFieldValues,
+        activeLeadRow,
+        activeFilterCount
+      }
+    };
+  } catch (error) {
+    return { ok: false as const, error };
+  }
 }
 
 async function Dashboard({
-  searchParams
+  data
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
+  data: DashboardData;
 }) {
-  const assistantEnabled = isAssistantRuntimeConfigured();
-  const selectedLeadId = getSingleSearchParam(searchParams.leadId);
-  const [customFieldDefinitionRows, sourceDefinitions] = await Promise.all([
-    getCustomFieldDefinitions(),
-    getWorkspaceSourceDefinitions()
-  ]);
-  const activeSourceOptions = sourceDefinitions
-    .filter((source) => source.isActive && !source.archivedAt)
-    .map((source) => ({ value: source.slug, label: source.label }));
-  const sourceLabels = Object.fromEntries(
-    sourceDefinitions.map((source) => [source.slug, source.label])
-  );
-  const filters = parseDashboardFilters(
-    searchParams,
+  const {
+    assistantEnabled,
     customFieldDefinitionRows,
-    activeSourceOptions.map((source) => source.value)
-  );
-  const leadRows = await getLeadRows(filters);
-  const currentTime = await getCurrentTime();
-  const metrics = await getDashboardMetrics(currentTime);
-
-  const activeLeadId = isUuid(selectedLeadId) ? selectedLeadId : undefined;
-  const detail = activeLeadId ? await getLeadDetail(activeLeadId) : null;
-  const detailFollowUps = activeLeadId
-    ? await getLeadFollowUps(activeLeadId)
-    : [];
-  const detailActivity = activeLeadId
-    ? await getLeadActivity(activeLeadId)
-    : [];
-  const detailCustomFieldValues = activeLeadId
-    ? await getLeadCustomFieldValues(activeLeadId)
-    : [];
-  const activeLeadRow = leadRows.find((lead) => lead.id === activeLeadId);
-  const activeFilterCount = getActiveFilterCount(filters);
+    activeSourceOptions,
+    sourceLabels,
+    filters,
+    leadRows,
+    currentTime,
+    metrics,
+    activeLeadId,
+    detail,
+    detailFollowUps,
+    detailActivity,
+    detailCustomFieldValues,
+    activeLeadRow,
+    activeFilterCount
+  } = data;
 
   return (
     <AppShell
