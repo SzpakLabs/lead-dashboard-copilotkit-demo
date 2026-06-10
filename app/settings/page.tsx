@@ -1,6 +1,5 @@
 import { asc, isNull } from "drizzle-orm";
-import { Settings2 } from "lucide-react";
-import Link from "next/link";
+import { Info, Settings2, ShieldCheck, Tags, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { EmptyDatabasePage } from "@/components/dashboard/database-states";
@@ -9,12 +8,21 @@ import {
   type CustomFieldDefinitionItem
 } from "@/components/leads/custom-field-definitions-panel";
 import { SourceDefinitionsPanel } from "@/components/leads/source-definitions-panel";
-import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
+import { SettingsAboutPanel } from "@/components/settings/settings-about-panel";
+import { SettingsHelpPanel } from "@/components/settings/settings-help-panel";
+import {
+  SettingsSectionNav,
+  type SettingsSection
+} from "@/components/settings/settings-section-nav";
+import { WorkspaceSettingsPanel } from "@/components/settings/workspace-settings-panel";
+import {
+  getAssistantRuntimeReadiness,
+  isAssistantRuntimeConfigured
+} from "@/lib/assistant/config";
+import { isEmptyDatabaseError } from "@/lib/db/bootstrap-state";
 import { getDb } from "@/lib/db";
 import { customFieldDefinitions } from "@/lib/db/schema";
-import { isEmptyDatabaseError } from "@/lib/db/bootstrap-state";
 import { getWorkspaceSourceDefinitions } from "@/lib/domain/sources/manage-sources";
-import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +30,13 @@ type PageProps = {
   searchParams: Promise<{ section?: string }>;
 };
 
-type SettingsSection = "custom-fields" | "sources";
+type AssistantReadinessView = {
+  enabled: boolean;
+  model: string;
+  provider: string;
+  providerKeyName: string;
+  reason: string | null;
+};
 
 export default async function SettingsPage({ searchParams }: PageProps) {
   const result = await loadSettingsPage(searchParams);
@@ -44,6 +58,7 @@ async function loadSettingsPage(searchParams: PageProps["searchParams"]) {
   try {
     const params = await searchParams;
     const assistantEnabled = isAssistantRuntimeConfigured();
+    const assistantReadiness = getAssistantRuntimeReadiness();
     const activeSection = parseSettingsSection(params.section);
     const [definitions, sources] = await Promise.all([
       getCustomFieldDefinitions(),
@@ -55,6 +70,13 @@ async function loadSettingsPage(searchParams: PageProps["searchParams"]) {
       data: {
         activeSection,
         assistantEnabled,
+        assistantReadiness: {
+          enabled: assistantReadiness.enabled,
+          model: assistantReadiness.model,
+          provider: assistantReadiness.provider,
+          providerKeyName: assistantReadiness.providerKeyName,
+          reason: assistantReadiness.enabled ? null : assistantReadiness.reason
+        },
         definitions,
         sources
       }
@@ -77,11 +99,13 @@ async function loadSettingsPage(searchParams: PageProps["searchParams"]) {
 function SettingsPageView({
   activeSection,
   assistantEnabled,
+  assistantReadiness,
   definitions,
   sources
 }: {
   activeSection: SettingsSection;
   assistantEnabled: boolean;
+  assistantReadiness: AssistantReadinessView;
   definitions: CustomFieldDefinitionItem[];
   sources: Awaited<ReturnType<typeof getWorkspaceSourceDefinitions>>;
 }) {
@@ -107,74 +131,117 @@ function SettingsPageView({
     >
       <section className="ops-page-stack">
         <div className="ops-settings-layout">
-          <nav className="ops-settings-nav" aria-label="Settings sections">
-            <SettingsLink
-              active={activeSection === "custom-fields"}
-              href="/settings?section=custom-fields"
-              label="Custom fields"
-            />
-            <SettingsLink
-              active={activeSection === "sources"}
-              href="/settings?section=sources"
-              label="Sources"
-            />
-          </nav>
-
-          {activeSection === "custom-fields" ? (
-            <SettingsPanel
-              title="Custom fields"
-              description="Configure reusable fields for lead-specific values."
-            >
-              <CustomFieldDefinitionsPanel definitions={definitions} />
-            </SettingsPanel>
-          ) : (
-            <SettingsPanel
-              title="Sources"
-              description="Choose active lead sources and manage custom source labels."
-            >
-              <SourceDefinitionsPanel sources={sources} />
-            </SettingsPanel>
-          )}
+          <SettingsSectionNav activeSection={activeSection} />
+          <div className="settings-section-stack">
+            {renderSettingsSection({
+              activeSection,
+              assistantEnabled,
+              assistantReadiness,
+              definitions,
+              sources
+            })}
+          </div>
         </div>
       </section>
     </AppShell>
   );
 }
 
-function SettingsLink({
-  active,
-  href,
-  label
+function renderSettingsSection({
+  activeSection,
+  assistantEnabled,
+  assistantReadiness,
+  definitions,
+  sources
 }: {
-  active: boolean;
-  href: string;
-  label: string;
+  activeSection: SettingsSection;
+  assistantEnabled: boolean;
+  assistantReadiness: AssistantReadinessView;
+  definitions: CustomFieldDefinitionItem[];
+  sources: Awaited<ReturnType<typeof getWorkspaceSourceDefinitions>>;
 }) {
+  if (activeSection === "workspace") {
+    return (
+      <>
+        <SettingsPanel
+          title="Workspace"
+          description="Keep these demo-safe preferences in this browser only. They do not change shared database records or deployment settings."
+          icon={<Wrench className="size-4" />}
+        >
+          <WorkspaceSettingsPanel assistantReadiness={assistantReadiness} />
+        </SettingsPanel>
+        <SettingsPanel
+          title="Custom fields"
+          description="Configure reusable lead metadata for this demo workspace without leaving the shared settings hub."
+          icon={<Tags className="size-4" />}
+        >
+          <CustomFieldDefinitionsPanel definitions={definitions} />
+        </SettingsPanel>
+      </>
+    );
+  }
+
+  if (activeSection === "sources") {
+    return (
+      <SettingsPanel
+        title="Sources"
+        description="These source labels support manual and demo intake context. They do not prove live LinkedIn, WhatsApp, phone, or other channel integrations."
+        icon={<Tags className="size-4" />}
+      >
+        <div className="settings-callout">
+          <p>
+            Keep the source list honest: use it to label where a lead came from
+            in the workflow, not to imply that this portfolio demo is already
+            connected to every channel shown here.
+          </p>
+        </div>
+        <SourceDefinitionsPanel sources={sources} />
+      </SettingsPanel>
+    );
+  }
+
+  if (activeSection === "help") {
+    return (
+      <SettingsPanel
+        title="Help"
+        description="Explain the workflow in business terms first, then point reviewers to what is real, optional, and deferred."
+        icon={<Info className="size-4" />}
+      >
+        <SettingsHelpPanel assistantEnabled={assistantEnabled} />
+      </SettingsPanel>
+    );
+  }
+
   return (
-    <Link
-      aria-current={active ? "page" : undefined}
-      className={cn(active ? "is-active" : "")}
-      href={href}
+    <SettingsPanel
+      title="About"
+      description="Public release notes, portfolio links, and safe developer metadata for the live demo."
+      icon={<ShieldCheck className="size-4" />}
     >
-      {label}
-    </Link>
+      <SettingsAboutPanel />
+    </SettingsPanel>
   );
 }
 
 function SettingsPanel({
   children,
   description,
+  icon,
   title
 }: {
   children: ReactNode;
   description: string;
+  icon: ReactNode;
   title: string;
 }) {
   return (
     <div className="ops-panel">
       <div className="ops-panel-heading">
         <div>
-          <h2>{title}</h2>
+          <h2 className="settings-panel-title">
+            {icon}
+            <span>{title}</span>
+          </h2>
           <p>{description}</p>
         </div>
       </div>
@@ -184,7 +251,14 @@ function SettingsPanel({
 }
 
 function parseSettingsSection(value: string | undefined): SettingsSection {
-  return value === "sources" ? "sources" : "custom-fields";
+  switch (value) {
+    case "sources":
+    case "help":
+    case "about":
+      return value;
+    default:
+      return "workspace";
+  }
 }
 
 async function getCustomFieldDefinitions(): Promise<

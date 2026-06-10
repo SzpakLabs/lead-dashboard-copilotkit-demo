@@ -503,10 +503,13 @@ html[data-theme="dark"] .ops-console {
 }
 
 .ops-settings-nav a {
+  align-items: center;
   border-radius: var(--ops-control-radius);
   color: hsl(var(--ops-ink-soft));
+  display: flex;
   font-size: 0.9rem;
   font-weight: 700;
+  gap: 0.55rem;
   padding: 0.65rem 0.75rem;
 }
 
@@ -535,6 +538,121 @@ html[data-theme="dark"] .ops-console {
 .settings-list {
   display: grid;
   gap: 0.55rem;
+}
+
+.settings-section-stack,
+.settings-form-grid,
+.settings-status-grid,
+.settings-faq-grid,
+.settings-metadata-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.settings-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.settings-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.settings-field span,
+.settings-detail-list span {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.settings-select {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--ops-control-radius);
+  min-height: 2.25rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.settings-inline-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.settings-note,
+.settings-feedback,
+.settings-callout p,
+.settings-faq-card p,
+.settings-bullet-list li,
+.settings-detail-list a {
+  color: hsl(var(--ops-ink-soft));
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.settings-feedback {
+  color: hsl(var(--ops-success));
+  font-weight: 700;
+}
+
+.settings-callout {
+  background: hsl(var(--muted) / 0.34);
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: var(--ops-control-radius);
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.9rem;
+}
+
+.settings-copy-block strong,
+.settings-faq-card strong {
+  font-size: 0.92rem;
+  font-weight: 760;
+}
+
+.settings-faq-grid,
+.settings-metadata-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.settings-faq-card {
+  background: hsl(var(--ops-surface));
+  border: 1px solid hsl(var(--ops-line));
+  border-radius: var(--ops-control-radius);
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.95rem;
+}
+
+.settings-detail-list,
+.settings-bullet-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.settings-detail-list li {
+  align-items: start;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.settings-detail-list a {
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 0.16rem;
+}
+
+.settings-bullet-list {
+  list-style: disc;
+  padding-left: 1.15rem;
+}
+
+.settings-panel-title {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.45rem;
 }
 
 .settings-list-disabled {
@@ -2396,6 +2514,12 @@ body[data-intake-drawer-open="true"]
 
   .settings-create-row,
   .settings-create-row-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-form-grid,
+  .settings-faq-grid,
+  .settings-metadata-grid {
     grid-template-columns: 1fr;
   }
 
