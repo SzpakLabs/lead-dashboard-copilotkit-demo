@@ -7,17 +7,8 @@ Completed: 2026-06-08
 - `npm run typecheck` passed after the provider change.
 - `npm run test` passed: 12 files, 25 tests.
 - `npm run build` passed.
-- `npm run check` did not complete because `format:check` fails on pre-existing unrelated planning docs:
-  - `.planning/archive/PROJECT.md`
-  - `.planning/archive/REQUIREMENTS.md`
-  - `.planning/archive/ROADMAP.md`
-  - `.planning/research/ARCHITECTURE.md`
-  - `.planning/research/FEATURES.md`
-  - `.planning/research/PITFALLS.md`
-  - `.planning/research/STACK.md`
-  - `.planning/research/SUMMARY.md`
-
-`npm run check` passed its in-scope typecheck, lint, and test steps before stopping at the unrelated format warnings.
+- Current baseline on 2026-06-10: `npm run check` passed when run by itself.
+- Historical note: an earlier `npm run check` failure was not a formatting blocker. The later isolated rerun showed formatting was already clean, and the previous stop came from `check` reaching `next build` while another `next build` process was already running.
 
 Build warning retained: Next/Turbopack reports an unexpected NFT trace through `next.config.ts -> src/lib/assistant/config.ts -> app/api/copilotkit/route.ts`. The production build still succeeds.
 
@@ -40,6 +31,5 @@ Build warning retained: Next/Turbopack reports an unexpected NFT trace through `
 
 ## Remaining Caveats
 
-- `npm run check` is blocked by unrelated historical formatting warnings in `.planning/archive` and `.planning/research`.
 - Build succeeds with the existing Turbopack NFT trace warning.
 - Mobile preview section navigation is horizontally scrollable by design; no clipping or overlap blocked use in the tested viewport.
