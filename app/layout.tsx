@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/next';
 import { CopilotProvider } from "@/components/assistant/copilot-provider";
 import { isAssistantRuntimeConfigured } from "@/lib/assistant/config";
 
@@ -44,7 +45,10 @@ export default function RootLayout({
 }`}</Script>
         <link rel="stylesheet" href="/copilotkit-react-core-v2.css" />
       </head>
-      <body>{content}</body>
+      <body>
+        {content}
+        <Analytics />
+      </body>
     </html>
   );
 }
