@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: blocked
-last_updated: "2026-06-10T00:35:00.000Z"
+last_updated: "2026-06-10T01:15:00.000Z"
 progress:
   total_phases: 3
   completed_phases: 2
@@ -25,7 +25,7 @@ See: `.planning/PROJECT.md` (updated 2026-06-08)
 
 Project initialized from `.planning/idea.md` after codebase mapping. The repository is brownfield: the lead operations app already exists, and the immediate priority is publishing the existing workflow as a credible portfolio demo.
 
-Phase 3 execution is complete. The repo is packaged, documented, verified locally, and ready for local sharing. Public deployment remains prepared but blocked until explicit approval is granted for external deployment.
+Phase 3 execution is complete. The repo is packaged, documented, and verified locally. Public deployment is no longer approval-blocked: Vercel access is available, but the release is still blocked because the current `DATABASE_URL` points only to local Postgres and no hosted Supabase or other remote Postgres connection is configured for production.
 
 ## Active Roadmap
 
@@ -42,4 +42,4 @@ Phase 3 execution is complete. The repo is packaged, documented, verified locall
 
 ## Next Command
 
-Request deployment approval for the public share path, or run `$gsd-verify-work 3` for an independent verification pass.
+Provision a hosted Postgres connection for `DATABASE_URL`, then deploy to Vercel and smoke-check `/`, `/calendar`, and `/favicon.ico`.
