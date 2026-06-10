@@ -63,12 +63,21 @@ type DashboardData = {
   activeFilterCount: number;
 };
 
+type DashboardLoadResult =
+  | { ok: true; data: DashboardData }
+  | { ok: false; kind: "empty"; reason: string }
+  | { ok: false; kind: "error"; error: unknown };
+
 export default async function Home({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const result = await loadDashboardResult(resolvedSearchParams);
 
   if (!result.ok) {
-    return <DatabaseUnavailablePage error={result.error} />;
+    return result.kind === "empty" ? (
+      <EmptyDatabasePage reason={result.reason} />
+    ) : (
+      <DatabaseUnavailablePage error={result.error} />
+    );
   }
 
   return <Dashboard data={result.data} />;
@@ -114,7 +123,54 @@ function DatabaseUnavailablePage({ error }: { error: unknown }) {
   );
 }
 
-async function loadDashboardResult(searchParams: Record<string, string | string[] | undefined>) {
+function EmptyDatabasePage({ reason }: { reason: string }) {
+  return (
+    <AppShell
+      activeSection="console"
+      eyebrow="Service Ops Console"
+      eyebrowIcon={<DatabaseZap className="size-4" />}
+      title="Lead operations"
+    >
+      <section className="ops-page-stack">
+        <Card className="border-border/80 bg-background/80">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DatabaseZap className="size-4 text-muted-foreground" />
+              Empty database
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm text-muted-foreground">
+            <p>
+              The production database is connected, but it does not have the
+              demo workspace or seed data yet.
+            </p>
+            <p className="rounded-md border border-border bg-muted/30 p-3 font-mono text-xs text-foreground">
+              {reason}
+            </p>
+            <div className="space-y-2">
+              <p className="font-medium text-foreground">
+                What this demo needs:
+              </p>
+              <ul className="list-disc space-y-1 pl-5">
+                <li>A `software-services-demo` workspace</li>
+                <li>Seeded users, leads, contacts, follow-ups, and source data</li>
+                <li>Applied migrations for the current schema</li>
+              </ul>
+            </div>
+            <p>
+              Once the database is seeded, this page will show the console
+              normally.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+    </AppShell>
+  );
+}
+
+async function loadDashboardResult(
+  searchParams: Record<string, string | string[] | undefined>
+): Promise<DashboardLoadResult> {
   try {
     const assistantEnabled = isAssistantRuntimeConfigured();
     const selectedLeadId = getSingleSearchParam(searchParams.leadId);
@@ -170,7 +226,18 @@ async function loadDashboardResult(searchParams: Record<string, string | string[
       }
     };
   } catch (error) {
-    return { ok: false as const, error };
+    if (isEmptyDatabaseError(error)) {
+      return {
+        ok: false as const,
+        kind: "empty",
+        reason:
+          error instanceof Error
+            ? error.message
+            : "The demo workspace and seed records are missing."
+      };
+    }
+
+    return { ok: false as const, kind: "error", error };
   }
 }
 
@@ -356,6 +423,23 @@ function getSingleSearchParam(value: string | string[] | undefined) {
   }
 
   return value ?? "";
+}
+
+function isEmptyDatabaseError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+
+  return (
+    message.includes("relation \"leads\" does not exist") ||
+    message.includes("relation \"workspaces\" does not exist") ||
+    message.includes("relation \"contacts\" does not exist") ||
+    message.includes("relation \"custom_field_definitions\" does not exist") ||
+    message.includes("seeded workspace software-services-demo was not found") ||
+    message.includes("does not exist")
+  );
 }
 
 function isUuid(value: string) {
