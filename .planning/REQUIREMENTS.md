@@ -35,11 +35,11 @@
 
 ### Workspace Settings And Demo Metadata
 
-- [ ] **SET-01**: `/settings` presents `Workspace`, `Sources`, `Help`, and `About` as one coherent demo-safe hub.
-- [ ] **SET-02**: Workspace settings persist through browser-local storage only, reload cleanly, and can reset to demo defaults without touching shared database data.
-- [ ] **SET-03**: Help content explains business value, demo flow, and what is real, mocked, optional, or deferred without AI hype or fake claims.
-- [ ] **SET-04**: Sources settings stay editable but clearly frame source labels as workflow metadata rather than proof of real external integrations.
-- [ ] **SET-05**: About content exposes live demo and release metadata, changelog summary, and developer/contact details without introducing secrets or editable CMS-style content.
+- [x] **SET-01**: `/settings` presents `Workspace`, `Sources`, `Help`, and `About` as one coherent demo-safe hub.
+- [x] **SET-02**: Workspace settings persist through browser-local storage only, reload cleanly, and can reset to demo defaults without touching shared database data.
+- [x] **SET-03**: Help content explains business value, demo flow, and what is real, mocked, optional, or deferred without AI hype or fake claims.
+- [x] **SET-04**: Sources settings stay editable but clearly frame source labels as workflow metadata rather than proof of real external integrations.
+- [x] **SET-05**: About content exposes live demo and release metadata, changelog summary, and developer/contact details without introducing secrets or editable CMS-style content.
 
 ## v2 Requirements
 
@@ -88,11 +88,11 @@
 | PACK-02     | Phase 3 | Complete |
 | PACK-03     | Phase 1 | Complete |
 | PACK-04     | Phase 3 | Complete |
-| SET-01      | Phase 4 | Planned  |
-| SET-02      | Phase 4 | Planned  |
-| SET-03      | Phase 4 | Planned  |
-| SET-04      | Phase 4 | Planned  |
-| SET-05      | Phase 4 | Planned  |
+| SET-01      | Phase 4 | Complete |
+| SET-02      | Phase 4 | Complete |
+| SET-03      | Phase 4 | Complete |
+| SET-04      | Phase 4 | Complete |
+| SET-05      | Phase 4 | Complete |
 
 **Coverage:**
 
@@ -103,4 +103,4 @@
 ---
 
 _Requirements defined: 2026-06-08_
-_Last updated: 2026-06-10 after public demo verification reconciliation_
+_Last updated: 2026-06-10 after Phase 4 verification_

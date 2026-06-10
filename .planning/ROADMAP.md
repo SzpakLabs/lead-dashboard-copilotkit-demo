@@ -6,11 +6,12 @@
 
 ## Phase Summary
 
-| Phase | Name                               | Requirements                                    | Goal                                            |
-| ----- | ---------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
-| 1     | 3/3                                | Complete                                        | 2026-06-08                                      |
-| 2     | 3/3                                | Complete                                        | 2026-06-08                                      |
-| 3     | Portfolio Packaging And Deployment | ACCESS-02, ACCESS-03, PACK-01, PACK-02, PACK-04 | Demo is documented, checked, and ready to share |
+| Phase | Name                                           | Requirements                                    | Goal                                            |
+| ----- | ---------------------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
+| 1     | 3/3                                            | Complete                                        | 2026-06-08                                      |
+| 2     | 3/3                                            | Complete                                        | 2026-06-08                                      |
+| 3     | Portfolio Packaging And Deployment             | ACCESS-02, ACCESS-03, PACK-01, PACK-02, PACK-04 | Demo is documented, checked, and ready to share |
+| 4     | Workspace Settings, Help, And Release Metadata | SET-01, SET-02, SET-03, SET-04, SET-05          | 2026-06-10                                      |
 
 ## Phases
 
@@ -105,9 +106,10 @@
 - If assistant settings need meaningful custom UI or response components, split that work into Phase 5 rather than expanding Phase 4.
 
 Plans:
-- [ ] 04-01 - Build the settings hub, local workspace preferences, and source-context framing
-- [ ] 04-02 - Add read-only help and about sections with honest demo and release metadata
-- [ ] 04-03 - Verify persistence, copy honesty, and release tracking updates
+
+- [x] 04-01 - Build the settings hub, local workspace preferences, and source-context framing
+- [x] 04-02 - Add read-only help and about sections with honest demo and release metadata
+- [x] 04-03 - Verify persistence, copy honesty, and release tracking updates
 
 ### Phase 5: Assistant Demo Controls And Response Components
 
@@ -117,6 +119,7 @@ Plans:
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (candidate follow-on if assistant demo controls or response UI exceed Phase 4 scope)
 
 ---

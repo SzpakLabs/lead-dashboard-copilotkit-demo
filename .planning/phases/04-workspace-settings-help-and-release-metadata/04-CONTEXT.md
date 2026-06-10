@@ -70,6 +70,7 @@ This phase does not add auth, billing, production permissions, real external int
 </decisions>
 
 <canonical_refs>
+
 ## Canonical References
 
 **Downstream agents MUST read these before planning or implementing.**
@@ -112,6 +113,7 @@ This phase does not add auth, billing, production permissions, real external int
 </canonical_refs>
 
 <code_context>
+
 ## Existing Code Insights
 
 ### Reusable Assets
