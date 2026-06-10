@@ -33,6 +33,14 @@
 - [x] **PACK-03**: The first screenshot or first viewport is professional enough for GitHub, LinkedIn, Upwork, and direct outreach.
 - [x] **PACK-04**: Verification evidence records the strongest practical checks run before sharing the demo.
 
+### Workspace Settings And Demo Metadata
+
+- [ ] **SET-01**: `/settings` presents `Workspace`, `Sources`, `Help`, and `About` as one coherent demo-safe hub.
+- [ ] **SET-02**: Workspace settings persist through browser-local storage only, reload cleanly, and can reset to demo defaults without touching shared database data.
+- [ ] **SET-03**: Help content explains business value, demo flow, and what is real, mocked, optional, or deferred without AI hype or fake claims.
+- [ ] **SET-04**: Sources settings stay editable but clearly frame source labels as workflow metadata rather than proof of real external integrations.
+- [ ] **SET-05**: About content exposes live demo and release metadata, changelog summary, and developer/contact details without introducing secrets or editable CMS-style content.
+
 ## v2 Requirements
 
 ### Integrations
@@ -80,11 +88,16 @@
 | PACK-02     | Phase 3 | Complete |
 | PACK-03     | Phase 1 | Complete |
 | PACK-04     | Phase 3 | Complete |
+| SET-01      | Phase 4 | Planned  |
+| SET-02      | Phase 4 | Planned  |
+| SET-03      | Phase 4 | Planned  |
+| SET-04      | Phase 4 | Planned  |
+| SET-05      | Phase 4 | Planned  |
 
 **Coverage:**
 
-- v1 requirements: 16 total
-- Mapped to phases: 16
+- v1 requirements: 21 total
+- Mapped to phases: 21
 - Unmapped: 0
 
 ---

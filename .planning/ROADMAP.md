@@ -79,19 +79,45 @@
 
 ## Coverage
 
-- v1 requirements: 16 total
-- Mapped to phases: 16
+- v1 requirements: 21 total
+- Mapped to phases: 21
 - Unmapped: 0
 
 ### Phase 4: Workspace Settings, Help, And Release Metadata
 
+**Goal:** Make `/settings` a truthful, demo-safe workspace hub that supports light local customization, explains the product clearly, and surfaces release metadata without pretending to be production admin.
+**Requirements**: SET-01, SET-02, SET-03, SET-04, SET-05
+**Depends on:** Phase 3
+**Plans:** 3 plans
+
+**Success Criteria:**
+
+1. `/settings` exposes `Workspace`, `Sources`, `Help`, and `About` inside the shared app shell without adding a separate admin experience.
+2. Workspace preferences such as name, business type, timezone, currency, demo label, and modest calendar defaults persist through browser-local storage and can reset to seeded defaults.
+3. `Sources` remains editable while clearly stating that source labels support manual/demo workflow context rather than real integrations.
+4. `Help` explains business value, the main demo flow, human-in-the-loop control, and what is real versus mocked or deferred in business-readable language.
+5. `About` shows the live demo URL, repo metadata, version or release date context, changelog summary, and developer/contact details without exposing secrets.
+
+**Notes:**
+
+- Keep `Workspace` and `Sources` editable, but keep `Help` and `About` read-only.
+- Do not add database tables or migrations for Phase 4 workspace preferences; use browser-local persistence only.
+- If assistant settings need meaningful custom UI or response components, split that work into Phase 5 rather than expanding Phase 4.
+
+Plans:
+- [ ] 04-01 - Build the settings hub, local workspace preferences, and source-context framing
+- [ ] 04-02 - Add read-only help and about sections with honest demo and release metadata
+- [ ] 04-03 - Verify persistence, copy honesty, and release tracking updates
+
+### Phase 5: Assistant Demo Controls And Response Components
+
 **Goal:** [To be planned]
 **Requirements**: TBD
-**Depends on:** Phase 3
+**Depends on:** Phase 4
 **Plans:** 0 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 4 to break down)
+- [ ] TBD (candidate follow-on if assistant demo controls or response UI exceed Phase 4 scope)
 
 ---
 

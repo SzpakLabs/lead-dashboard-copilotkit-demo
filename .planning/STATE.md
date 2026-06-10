@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: active
-last_updated: "2026-06-10T16:08:00.000Z"
+last_updated: "2026-06-10T17:00:34.403Z"
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
-  total_plans: 9
+  total_plans: 12
   completed_plans: 9
   percent: 75
 ---
@@ -19,7 +19,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-06-08)
 
 **Core value:** Show a realistic lead qualification workflow where messy inquiries become actionable sales operations data under human control.
-**Current focus:** Phase 4 added for workspace settings, help, and release metadata planning
+**Current focus:** Phase 4 is now planned for workspace settings, help, and release metadata execution
 
 ## Current Status
 
@@ -27,7 +27,7 @@ Project initialized from `.planning/idea.md` after codebase mapping. The reposit
 
 Phase 3 execution and its packaging follow-up are complete. The public demo is live at `https://lead-dashboard-rosy.vercel.app/`, public smoke checks are recorded, and the repo treats that hosted demo as the primary share artifact. The local development path remains documented for developers, while production SaaS hardening stays out of scope for this portfolio milestone.
 
-Phase 4 was added to capture the next slice of workspace settings, help, and release metadata work.
+Phase 4 is now broken into execution plans covering the settings hub, browser-local workspace preferences, honest help/about copy, and verification of persistence plus metadata safety.
 
 ## Active Roadmap
 
@@ -51,4 +51,4 @@ Phase 4 was added to capture the next slice of workspace settings, help, and rel
 
 ## Next Command
 
-`$gsd-plan-phase 4`
+`$gsd-execute-phase 4`
