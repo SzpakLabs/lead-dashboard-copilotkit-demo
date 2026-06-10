@@ -2,13 +2,17 @@
 
 AI-assisted lead operations demo for turning messy inbound requests into structured, follow-up-ready work.
 
+## Live Demo
+
+https://lead-dashboard-rosy.vercel.app/
+
 ## Problem
 
 Small service teams often receive leads as scattered messages, vague requests, and incomplete notes. That makes it hard to review urgency, confirm scope, schedule follow-ups, and explain pipeline health without moving data into a cleaner operational flow.
 
 ## Solution
 
-This demo shows a single operator workspace where inbound lead data becomes structured review, searchable lead records, follow-up timing, calendar visibility, and assistant-ready reporting. The main story starts on `/`, where the seeded `software-services-demo` workspace presents lead queues, filters, preview dialogs, and next-step context.
+This demo shows a single operator workspace where inbound lead data becomes structured review, searchable lead records, follow-up timing, calendar visibility, and assistant-ready reporting. The main story starts on `/`, where the lead console presents source-labeled intake, review queues, preview and detail surfaces, and next-step context.
 
 ## What The Demo Proves
 
@@ -34,7 +38,7 @@ This demo shows a single operator workspace where inbound lead data becomes stru
 - `/settings` — workspace settings for custom fields and sources
 - `/leads/[leadId]` — full lead workspace
 
-## Local Setup
+## Local Development Setup
 
 1. Install dependencies.
 2. Create a local `.env` file with the safe variable names from `.env.example`.
@@ -51,7 +55,7 @@ npm run dev
 
 ## Demo Reset Flow
 
-Use the seeded `software-services-demo` workspace for the local demo path.
+Use the seeded `software-services-demo` workspace for the local development path.
 
 ```sh
 npm run db:migrate
@@ -78,27 +82,32 @@ When credentials are missing, the demo should be presented as assistant-off rath
 
 ## Deployment Notes
 
-Phase 3 prepares the public-share path but does not assume external deployment approval has already been granted.
+The primary share artifact is the live public demo:
 
-- Required env surface for a safe share path: `DATABASE_URL`
+https://lead-dashboard-rosy.vercel.app/
+
+- Public demo: controlled hosted portfolio deployment, not a production SaaS app
+- Local development path: developer setup for running and reseeding the app locally
 - Optional assistant env surface: `LEAD_ASSISTANT_ENABLED`, `COPILOTKIT_MODEL`, `OPENAI_API_KEY`, `COPILOTKIT_PROVIDER_API_KEY`, `COPILOTKIT_TELEMETRY_DISABLED`
-- Preferred public-hosting direction: deploy the existing Next.js app to Vercel or another Node-compatible host only after explicit approval to use external services.
-- Exact next deployment action once approved: configure the required environment variables in the hosting target, run the production deployment command for that target, then smoke-check `/`, `/calendar`, and `/favicon.ico`.
+- Secrets are intentionally not exposed in this repo or in the public demo docs
 
-Until that approval exists, the documented local demo path is the release fallback.
+Public smoke checks for `/`, `/calendar`, and `/settings` are recorded in `.planning/phases/03-portfolio-packaging-and-deployment/03-VERIFICATION.md`.
 
 ## Demo Walkthrough
 
 Use this order for a fast product story:
 
-1. Open `/` and show how messy inbound work becomes a structured lead queue.
-2. Open a lead preview to show summary, source, next step, and follow-up context.
-3. Open the full lead page or `/calendar` to show operational depth.
-4. Mention reports, forecasts, and assistant behavior as supporting proof points rather than the main story.
+1. Open the live demo on `/`.
+2. Click `New intake` and explain that it opens a manual, source-labeled intake flow.
+3. Paste a Test-safe inbound request, select a source and input type, and create a draft lead.
+4. Return to the console and show how that inbound request becomes reviewable operational work.
+5. Open lead preview or full detail to show source, budget, urgency, next step, status, and follow-up context.
+6. Open `/calendar` or mention reports and forecasts as supporting proof points.
 
 ## Limitations
 
 - This is a portfolio demo, not a production-authenticated multi-tenant system.
-- Public deployment is approval-gated and may remain blocked even when the local demo is ready.
+- The source dropdown in `New intake` represents source-labeled intake, not completed live integrations for LinkedIn, WhatsApp, or phone systems.
+- Public demo hosting exists for portfolio review, but production SaaS hardening is out of scope.
 - Assistant behavior depends on optional provider credentials and should be treated as an enhancement, not the core requirement.
 - External ingestion channels such as Telegram, website capture, and telephony are deferred.

@@ -9,7 +9,7 @@
 
 - [x] **ACCESS-01**: User can open the main lead dashboard route without crashes in the documented demo environment.
 - [x] **ACCESS-02**: User can follow documented local setup steps for database, seed data, and optional assistant configuration.
-- [ ] **ACCESS-03**: Public demo path avoids exposing private credentials and documents any unavailable private capabilities.
+- [x] **ACCESS-03**: Public demo path avoids exposing private credentials and documents any unavailable private capabilities.
 
 ### Lead Workflow
 
@@ -66,7 +66,7 @@
 | ----------- | ------- | -------- |
 | ACCESS-01   | Phase 1 | Complete |
 | ACCESS-02   | Phase 3 | Complete |
-| ACCESS-03   | Phase 3 | Pending  |
+| ACCESS-03   | Phase 3 | Complete |
 | LEAD-01     | Phase 1 | Complete |
 | LEAD-02     | Phase 1 | Complete |
 | LEAD-03     | Phase 1 | Complete |
@@ -90,4 +90,4 @@
 ---
 
 _Requirements defined: 2026-06-08_
-_Last updated: 2026-06-10 after verification reconciliation_
+_Last updated: 2026-06-10 after public demo verification reconciliation_

@@ -58,7 +58,7 @@
 
 ### Phase 3: Portfolio Packaging And Deployment
 
-**Goal:** Package and publish the demo for outreach.
+**Goal:** As a prospective client or recruiter, I want to review and share the demo confidently, so that the portfolio proves the product story and implementation quality.
 
 **Mode:** mvp
 

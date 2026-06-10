@@ -1,10 +1,23 @@
 # Demo Runbook
 
-Use this runbook for the seeded local demo path first. Public deployment stays a separate approval-gated branch.
+Use this runbook for the live public demo first. Keep the local development path for developer setup and reseeding only.
 
-## Local Demo Reset
+## Public Demo
 
-These commands target the `software-services-demo` workspace only.
+Primary share URL:
+
+https://lead-dashboard-rosy.vercel.app/
+
+Terminology:
+
+- Public demo / live demo: the hosted portfolio deployment above
+- Local development path: developer-only setup on `localhost`
+- Self-hosted demo / standalone hosted demo: controlled hosted deployment, not production SaaS
+- Production SaaS: out of scope for this portfolio demo
+
+## Local Development Reset
+
+These commands target the `software-services-demo` workspace only for local development.
 
 ```sh
 npm run db:migrate
@@ -16,7 +29,7 @@ npm run dev
 
 ## Required Environment
 
-Required for the base demo:
+Required for the base local development path:
 
 ```sh
 DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/lead_dashboard"
@@ -39,7 +52,19 @@ Assistant-off behavior is the default safe path. Assistant entry points stay hid
 - Disabled: `LEAD_ASSISTANT_ENABLED=false` or no provider key. The app should still run cleanly on `/`, `/calendar`, and `/settings` without assistant entry points.
 - Configured: `LEAD_ASSISTANT_ENABLED=true` plus a valid provider key. Assistant surfaces should appear and support read-only reports or forecasts along with preview-first mutations.
 
-## Smoke Check
+## Public Smoke Check
+
+Use the live public demo for share-readiness checks:
+
+```sh
+curl -I https://lead-dashboard-rosy.vercel.app/
+curl -I https://lead-dashboard-rosy.vercel.app/calendar
+curl -I https://lead-dashboard-rosy.vercel.app/settings
+```
+
+Expected public smoke result: each route returns an HTTP success response and no secrets or private env values are exposed in the UI or docs.
+
+## Local Development Smoke Check
 
 ```sh
 npm run check
@@ -49,23 +74,24 @@ curl -I http://localhost:3000/calendar
 curl -I http://localhost:3000/favicon.ico
 ```
 
-Expected local smoke result: each route returns an HTTP success response and the console opens on `/`.
+Expected local development smoke result: each route returns an HTTP success response and the console opens on `/`.
 
-## Deployment Preparation
+## Intake Story
 
-Use this only after explicit approval to use external services.
+For the demo, `New intake` opens a manual, source-labeled intake flow titled `Create draft lead`.
 
-- Configure the same safe variable names in the hosting target.
-- Keep assistant disabled by default unless provider credentials are intentionally supplied.
-- After the production deployment command runs, smoke-check `/`, `/calendar`, and `/favicon.ico`.
-- If approval is missing, stop at documentation readiness and use the local demo path instead.
+- The user pastes a call note, chat, or transcript.
+- The user labels the source and input type.
+- The app creates a draft lead for human review.
+- Do not present the source dropdown as proof of real LinkedIn, WhatsApp, or phone integrations.
 
 ## Presenter Checklist
-
-- Run `npm run db:migrate`.
-- Run `npm run db:reset-demo`.
-- Run `npm run dev`.
-- Confirm `/` opens the seeded console flow.
-- Confirm `/calendar` renders seeded schedule data.
+- Open `https://lead-dashboard-rosy.vercel.app/`.
+- Confirm `/calendar` and `/settings` load from the live demo.
+- Click `New intake`.
+- Confirm the `Create draft lead` flow opens with source and input type controls.
+- Paste a Test-safe inbound request and create a draft lead.
+- Confirm the app shows a clear enough non-broken post-submit result.
 - Decide whether the demo is assistant-off or assistant-configured before presenting.
 - If assistant-off, state that reports and forecasts are optional surfaces and the core workflow does not depend on them.
+- Use the local development reset commands only when you need to reproduce or reseed the app locally.

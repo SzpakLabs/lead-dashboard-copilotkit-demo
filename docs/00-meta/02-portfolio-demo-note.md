@@ -1,5 +1,9 @@
 # Portfolio Demo Note
 
+Live demo:
+
+https://lead-dashboard-rosy.vercel.app/
+
 ## Audience
 
 - GitHub reviewers
@@ -19,18 +23,21 @@ This demo shows how an AI-assisted lead operations workspace can turn messy inbo
 
 ## Product Walkthrough
 
-1. Start on `/` and explain that inbound requests usually arrive incomplete.
-2. Open a lead preview and show how summary, source, confidence, and next step become reviewable in one place.
-3. Open the full lead page or jump to `/calendar` to show follow-up and scheduled-work depth.
-4. Mention reports, forecasts, dark mode, search, and dense mode as proof that the demo is a working product surface rather than a static concept.
+1. Open the live demo on `/`.
+2. Click `New intake` and explain that it opens a manual, source-labeled intake flow.
+3. Paste a Test-safe inbound request into `Create draft lead`, select a source such as `LinkedIn`, keep `Pasted text`, and create the draft lead.
+4. Return to the console and show that the request becomes reviewable operational work with source, budget, urgency, next step, status, and follow-up context.
+5. Open `/calendar` or mention reports and forecasts as supporting proof that the workflow connects to operations.
 
 ## 60-Second Script
 
-“This demo starts with a messy inbound service request and turns it into an operational lead record. On the console, I can review the lead, inspect source and urgency, see the next step, and open a quick preview without losing the queue. From there I can move into the full lead workspace or the calendar to show follow-ups and scheduled work. If assistant credentials are configured, I can also generate a report or a near-period forecast, but the core value is that scattered sales input becomes structured, human-reviewed operational data.”
+“This live demo starts with a messy inbound request. I click New intake, paste a Test-safe request into the Create draft lead flow, label the source, and create a draft lead for review. Back on the console, that inbound request becomes reviewable operational work where I can inspect source, budget, urgency, next step, status, and follow-up context. From there I can use the calendar, and optionally reports or forecasts, as supporting proof that the workflow connects to real operations. The important point is not fake channel integrations, it is that messy inbound demand becomes structured, human-reviewed lead work.”
 
 ## Demo Notes
 
 - Keep the story anchored to intake-to-review, not feature count.
+- Describe `New intake` as manual or source-labeled intake, not as completed external channel integration.
 - Treat calendar, reports, and assistant behavior as supporting proof points.
 - If the assistant is disabled, say so directly and keep the demo focused on the core workflow.
 - Use demo-safe names such as `Sofia Test` or `Carlos Test` in any added examples.
+- Follow-up improvement: make the post-submit transition more obvious with a clearer `Draft created`, `Review now`, or direct-open moment.

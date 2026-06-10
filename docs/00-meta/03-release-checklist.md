@@ -1,6 +1,17 @@
 # Release Checklist
 
-## Local Fallback Release
+## Public Demo Release
+
+- [x] Public demo URL is live: `https://lead-dashboard-rosy.vercel.app/`
+- [x] Smoke-check `/`, `/calendar`, and `/settings`.
+- [x] Confirm the presenter path starts on `/`.
+- [x] Confirm `New intake` opens the `Create draft lead` flow.
+- [x] Confirm source and input type controls work.
+- [x] Confirm a Test-safe pasted request can create a draft lead without breaking the app.
+- [x] Confirm no secret values appear in the live UI or repo docs checked in this phase.
+- [ ] Confirm any screenshots or recording targets reflect current UI states.
+
+## Local Development Path
 
 - [ ] Run `npm run db:migrate`.
 - [ ] Run `npm run db:reset-demo`.
@@ -8,18 +19,7 @@
 - [ ] Run `npm run build`.
 - [ ] Start the app with `npm run dev`.
 - [ ] Smoke-check `/`, `/calendar`, and `/favicon.ico`.
-- [ ] Confirm the presenter path starts on `/` and uses the seeded `software-services-demo` workspace.
-- [ ] Confirm any screenshots or recording targets reflect current UI states.
-
-## Public Deployment Release
-
-- [ ] Explicit approval exists before any external deployment command is run.
-- [ ] Hosting target is chosen for the current Next.js app.
-- [ ] Required env var `DATABASE_URL` is configured.
-- [ ] Optional assistant env vars are configured only if intentionally enabled.
-- [ ] Assistant-off behavior is acceptable if credentials are absent.
-- [ ] Production deployment command is prepared but not run without approval.
-- [ ] Post-deploy smoke targets are `/`, `/calendar`, and `/favicon.ico`.
+- [ ] Confirm the seeded `software-services-demo` workspace is ready locally.
 
 ## Environment Safety
 
@@ -31,7 +31,11 @@
 
 - [ ] Root `README.md` explains the problem, solution, stack, setup, deployment notes, and limitations.
 - [ ] `docs/00-meta/02-portfolio-demo-note.md` includes the outreach narrative and 60-second script.
+- [ ] Root `README.md` shows the live public demo near the top.
 - [ ] Screenshot inventory or capture targets are identified before sharing.
+- [ ] GitHub repo short description is set manually.
+- [ ] GitHub website URL is set to `https://lead-dashboard-rosy.vercel.app/`.
+- [ ] GitHub topics are set manually: `nextjs`, `typescript`, `postgresql`, `drizzle`, `tailwindcss`, `ai-dashboard`, `crm`, `lead-management`, `copilotkit`, `portfolio-demo`.
 
 ## Assistant Branches
 
@@ -39,6 +43,9 @@
 - [ ] Assistant-configured branch is documented only as optional.
 - [ ] Reports and forecasts are described as read-only proof surfaces, not guaranteed always-on behavior.
 
-## Next Deployment Action
+## Terminology
 
-Once external deployment approval is granted, configure the approved hosting target with the safe environment variables, run the production deployment command for that target, then smoke-check `/`, `/calendar`, and `/favicon.ico` before sharing the public URL.
+- Public demo / live demo: the hosted portfolio deployment
+- Local development path: developer-only setup
+- Self-hosted demo / standalone hosted demo: controlled hosted demo deployment
+- Production SaaS: out of scope for this portfolio demo
