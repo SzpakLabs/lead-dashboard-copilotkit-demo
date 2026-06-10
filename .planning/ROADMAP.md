@@ -83,6 +83,16 @@
 - Mapped to phases: 16
 - Unmapped: 0
 
+### Phase 4: Workspace Settings, Help, And Release Metadata
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 3
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 4 to break down)
+
 ---
 
 _Roadmap created: 2026-06-08_
