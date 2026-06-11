@@ -86,6 +86,7 @@ npm run dev
 ## Manual Follow-Up
 
 - Owner follow-up: verify that RLS is enabled for any exposed public/demo tables and confirm anonymous/public clients cannot insert, update, or delete shared demo data unless an explicitly intended safe server-side write path exists.
+- Planning follow-up: preserve the non-blocking Help/About polish and safe cross-surface workspace-preferences ideas as future scope rather than reopening Phase 4 or diluting the assistant-focused intent of Phase 5.
 
 ## Requirement Alignment
 
